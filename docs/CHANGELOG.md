@@ -2,6 +2,15 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-13 — E00-T04 — Codecs de servidor TS/Rust
+
+- Tipo: implementação e documentação.
+- Decoder/encoder TS e wrapper Rust validam welcome, input_ack, error, snapshots, resultados e eventos de checkpoint/item; 45 fixtures compartilhadas e roundtrip.
+- Verificação de dados de resultado extraída de sua associação ao snapshot final. Campos anuláveis obrigatórios e números finitos conferidos antes de serializar em TS.
+- Spike emite envelope completo e sequência independente em todas as respostas. Limites: 4 KiB cliente, 16 KiB servidor. Smoke Node usa decoder TS nas respostas reais Rust.
+- Evidência: tipos e 30 testes TS; 8 testes Rust; rustfmt/clippy sem warnings; smoke WebSocket Node e Chromium aprovados.
+- Etapa 00 segue em andamento; adapters, salas, simulação e demais provas de plataforma continuam pendentes.
+
 ## 2026-11-13 — E00-T03/T04 — Sessão, estados e resultado de corrida
 
 - Tipo: implementação de contratos e documentação.

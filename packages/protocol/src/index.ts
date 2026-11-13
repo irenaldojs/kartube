@@ -79,5 +79,8 @@ export class ClientMessageGate {
 export type RaceServerPayload = Exclude<import('@kartube/game-core').RaceEvent, { readonly type: 'connection' }>;
 export type ServerMessage = Envelope<
   | { readonly type: 'welcome'; readonly connectionId: string }
+  | { readonly type: 'input_ack'; readonly inputSeq: number }
   | RaceServerPayload
 >;
+
+export { decodeServerMessage, encodeServerMessage, MAX_SERVER_MESSAGE_BYTES } from './server-codec.ts';

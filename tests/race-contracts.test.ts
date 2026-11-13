@@ -68,7 +68,7 @@ test('rejects fabricated points, duplicate slots, incorrect clocks and unfinishe
 });
 test('rejects results with inconsistent finish times or DNF status', () => {
   const { result, state } = resultFixture();
-  assert.throws(() => validateRaceResult({ ...result, positions: result.positions.map(p => ({ ...p, finishTick: 100 })) }, state), /mismatch/);
+  assert.throws(() => validateRaceResult({ ...result, positions: result.positions.map(p => p.slotId === 0 ? { ...p, finishTick: 109 } : p) }, state), /mismatch/);
   assert.throws(() => validateRaceResult({ ...result, positions: result.positions.map(p => ({ ...p, status: 'dnf' })) }, state), /DNF/);
 });
 test('equal finish ticks require stable slot order', () => {

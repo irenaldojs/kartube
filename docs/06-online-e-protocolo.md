@@ -53,7 +53,7 @@ Bots **simulados logicamente no servidor** por waypoints/estado simplificado, co
 
 ## Fronteira implementada — E00-T04 (parcial)
 
-`decodeClientMessage` aceita texto JSON de até 4096 bytes UTF-8 e retorna uma união de sucesso/erro sem lançar por JSON inválido. Somente `hello` e `input` estão implementados. IDs/build usam 1–64 caracteres ASCII alfanuméricos, ponto, hífen ou sublinhado; `seq` é inteiro seguro não negativo. Campos desconhecidos são ignorados para evolução aditiva; tipos de mensagem desconhecidos são rejeitados. Versão divergente retorna `incompatible_version`. A versão 1 ainda é experimental e não foi publicada como contrato estável.
+`decodeClientMessage` aceita texto JSON de até 4096 bytes UTF-8 e retorna uma união de sucesso/erro sem lançar por JSON inválido. O decoder de cliente implementa `hello` e `input`; mensagens de servidor têm codec próprio descrito abaixo. IDs/build usam 1–64 caracteres ASCII alfanuméricos, ponto, hífen ou sublinhado; `seq` é inteiro seguro não negativo. Campos desconhecidos são ignorados para evolução aditiva; tipos de mensagem desconhecidos são rejeitados. Versão divergente retorna `incompatible_version`. A versão 1 ainda é experimental e não foi publicada como contrato estável.
 
 `ClientMessageGate` pertence a uma conexão: exige `hello` antes de input, aceita sequência estritamente crescente (lacunas permitidas), descarta repetidos/antigos e rejeita novo `hello`. Rejeições não alteram a sequência aceita. `eventId` identifica o evento para diagnóstico; deduplicação nesta conexão usa `seq`. Reconexões exigirão novo handshake e futura validação de token; esta classe não implementa resume nem autoridade de corrida. O transporte deve limitar frames antes de acumulá-los em memória. Rate limit, heartbeat, timeout e demais mensagens permanecem pendentes antes de exposição pública.
 
@@ -63,7 +63,7 @@ Fixtures portáveis em `fixtures/client-messages.json`; testes TS exercitam JSON
 
 `apps/server` usa Tokio/Axum e serve diagnóstico em `/` e socket em `/ws`, somente em `127.0.0.1:3001`. Limites de frame e mensagem são 4096 bytes; excesso no transporte encerra a conexão. O decoder também limita tamanho quando chamado diretamente. Frames binários recebem `text_required`; ping/pong seguem o transporte.
 
-Nesta prova, respostas de diagnóstico são `{protocolVersion:1, seq, payload:{type:"welcome"|"input_ack"}}` para aceitação e `{payload:{type:"error",code}}` para rejeição. Estes acknowledgements não são o contrato futuro de snapshots/resultados, não atribuem slots e não confirmam progresso de corrida. O gate é isolado por conexão; `input` apenas é validado, sem simulação.
+A prova agora usa o envelope completo `{protocolVersion:1,eventId,seq,payload}` em todas as respostas. `welcome` contém connectionId, `input_ack` contém inputSeq; `error` contém code. Estes acknowledgements não são o contrato futuro de snapshots/resultados, não atribuem slots e não confirmam progresso de corrida. O gate é isolado por conexão; `input` apenas é validado, sem simulação.
 
 `npm run check:spike` inicializa o servidor, verifica versão incompatível, handshake, replay, input válido/inválido via Node WebSocket e abre Chromium headless para enviar hello pela página e conferir welcome. Rust consome fixtures compartilhadas de mensagens e inputs. Ainda faltam Android físico, WebGL2/WASM, Tauri, outras mensagens e testes com latência/partidas.
 
@@ -71,4 +71,14 @@ Nesta prova, respostas de diagnóstico são `{protocolVersion:1, seq, payload:{t
 
 `ServerMessage` define envelope com welcome (connectionId) e os eventos de corrida de game-core. Checkpoints, itens e resultados são exclusivamente mensagens da autoridade; o cliente continua enviando input (incluindo useItem), sem poder atribuir slot, alvo oficial ou pontos. `RaceSession` recebe eventos locais/remotos através da mesma interface. Ver campos e invariantes em `16-formato-dados.md` e ciclo de vida em `02-arquitetura-do-sistema.md`.
 
-Esse contrato tipado ainda não é usado pelo endpoint de diagnóstico: welcome/input_ack do spike continuam deliberadamente limitados à prova de transporte. Decoder de servidor, mapeamento Rust, lobby, campeonato, reconexão, rate limit e validação física permanecem entregas futuras.
+O endpoint de diagnóstico agora usa o codec de servidor para welcome/input_ack/error; snapshots e eventos de corrida têm codec, mas ainda não são produzidos por uma simulação. Lobby, campeonato, reconexão, rate limit e validação física permanecem entregas futuras.
+
+## Codecs de servidor implementados — E00-T04
+
+`decodeServerMessage` recebe string desconhecida e retorna sucesso tipado ou too_large/invalid_json/incompatible_version/invalid_message. `encodeServerMessage` valida antes de serializar, rejeitando números não finitos em campos conhecidos. Rust usa `server_codec::ServerMessage`, um wrapper privado criado por new(Value) ou decode(&str); somente mensagens validadas podem ser emitidas por encode. Novas mensagens de saída são serializadas via serde_json; a decodificação preserva o texto recebido para roundtrip sem expandir a representação de números desconhecidos.
+
+Limite de cliente permanece 4096 bytes; servidor usa 16384 bytes UTF-8 para acomodar oito estados completos de kart. Todas as mensagens têm protocolVersion 1, eventId ASCII e seq inteiro seguro não negativo. seq de saída é independente do cliente, cresce por conexão e inclui respostas de erro; eventId do spike é identificado no contexto da conexão. O decoder verifica formato, mas não rejeita replay sozinho: essa obrigação pertence ao futuro adapter remoto.
+
+Snapshots validam configuração, oito slots/pilotos únicos, campos obrigatórios e invariantes de fase/progresso. Resultados validam oito posições, pontos, tempos, DNF e desempate por slot; ao aplicar, ainda é obrigatório comparar com o snapshot final usando validateRaceResult. Eventos de checkpoint aceitos exigem reason null; rejeitados exigem código de motivo. targetSlotId é null ou slot 0–7. Campos anuláveis são obrigatórios: ausência não equivale a null. Mensagens connection são locais e rejeitadas na rede; tipos desconhecidos são rejeitados e campos extras são tolerados.
+
+`fixtures/server-messages.json` contém 45 casos comuns a TS/Rust, cobrindo variantes válidas, roundtrip, mensagens malformadas e inconsistências. O smoke real lê welcome/input_ack/error emitidos por Rust pelo decoder TS e verifica sequência crescente. Chromium continua confirmando handshake pela página. Ainda não existe gameplay ou adapter remoto capaz de consumir todos os eventos.

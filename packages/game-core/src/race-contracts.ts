@@ -106,24 +106,22 @@ export function validateRaceTransition(previous: RaceSnapshot, next: RaceSnapsho
     if (p.finishTick !== null) ensure(n.finishTick === p.finishTick, 'Finish tick changed');
   }
 }
-export function validateRaceResult(result: RaceResult, snapshot: RaceSnapshot): void {
-  validateRaceSnapshot(snapshot);
-  ensure(snapshot.phase === 'finished' && result.raceId === snapshot.config.raceId && identifier(result.resultId), 'Result requires finished race');
-  ensure(result.startTick === snapshot.startTick && result.endTick === snapshot.serverTick, 'Result clock mismatch');
+/** Validate a result without session context. An adapter must additionally bind it to a final snapshot. */
+export function validateRaceResultData(result: RaceResult): void {
+  ensure(identifier(result.raceId) && identifier(result.resultId), 'Invalid result identity');
+  ensure(tick(result.startTick) && tick(result.endTick) && result.endTick >= result.startTick, 'Invalid result clock');
   ensure(result.positions.length === 8, 'Expected eight result positions');
   const slots = new Set<number>();
   let previousFinish = -1;
   let previousSlot = -1;
   let sawDnf = false;
   for (const [index, entry] of result.positions.entries()) {
-    const participant = snapshot.participants.find(p => p.slotId === entry.slotId);
-    ensure(participant && !slots.has(entry.slotId), 'Invalid result slot');
+    ensure(Number.isInteger(entry.slotId) && entry.slotId >= 0 && entry.slotId < 8 && !slots.has(entry.slotId), 'Invalid result slot');
     slots.add(entry.slotId);
     ensure(entry.position === index + 1 && entry.points === RACE_POINTS[index], 'Invalid position/points');
     ensure(entry.status === 'finished' || entry.status === 'dnf', 'Invalid finish status');
-    ensure(entry.finishTick === participant.finishTick, 'Result finish tick mismatch');
     if (entry.status === 'finished') {
-      ensure(!sawDnf && entry.finishTick !== null && entry.finishTick >= previousFinish, 'Invalid finish ordering');
+      ensure(!sawDnf && entry.finishTick !== null && tick(entry.finishTick) && entry.finishTick >= result.startTick && entry.finishTick <= result.endTick && entry.finishTick >= previousFinish, 'Invalid finish ordering');
       ensure(entry.finishTick !== previousFinish || entry.slotId > previousSlot, 'Finish tie must use stable slot order');
       previousFinish = entry.finishTick;
       previousSlot = entry.slotId;
@@ -131,5 +129,15 @@ export function validateRaceResult(result: RaceResult, snapshot: RaceSnapshot): 
       sawDnf = true;
       ensure(entry.finishTick === null, 'DNF cannot have finish tick');
     }
+  }
+}
+export function validateRaceResult(result: RaceResult, snapshot: RaceSnapshot): void {
+  validateRaceSnapshot(snapshot);
+  ensure(snapshot.phase === 'finished' && result.raceId === snapshot.config.raceId && identifier(result.resultId), 'Result requires finished race');
+  ensure(result.startTick === snapshot.startTick && result.endTick === snapshot.serverTick, 'Result clock mismatch');
+  validateRaceResultData(result);
+  for (const entry of result.positions) {
+    const participant = snapshot.participants.find(p => p.slotId === entry.slotId)!;
+    ensure(entry.finishTick === participant.finishTick, 'Result finish tick mismatch');
   }
 }

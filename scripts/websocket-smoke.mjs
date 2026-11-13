@@ -1,13 +1,18 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
+import { decodeServerMessage } from '@kartube/protocol';
 const socket = new WebSocket('ws://127.0.0.1:3001/ws');
 const timer = setTimeout(() => { console.error('WebSocket smoke timed out'); process.exit(1); }, 5000);
 try {
   await once(socket, 'open');
+  let serverSeq = 0;
   async function exchange(message) {
     const reply = once(socket, 'message');
     socket.send(JSON.stringify(message));
-    return JSON.parse((await reply)[0].data);
+    const result = decodeServerMessage((await reply)[0].data);
+    assert.ok(result.ok, JSON.stringify(result));
+    assert.equal(result.message.seq, serverSeq++);
+    return result.message;
   }
   const hello = { protocolVersion: 1, eventId: 'smoke-hello', seq: 0, payload: { type: 'hello', build: 'smoke' } };
   assert.equal((await exchange({ ...hello, protocolVersion: 2 })).payload.code, 'incompatible_version');

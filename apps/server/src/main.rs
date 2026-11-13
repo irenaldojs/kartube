@@ -7,28 +7,44 @@ use axum::{
     response::{Html, IntoResponse},
     routing::get,
 };
-use kartube_server::{ConnectionGate, MAX_MESSAGE_BYTES, decode};
+use kartube_server::{ConnectionGate, MAX_MESSAGE_BYTES, decode, server_codec::ServerMessage};
+use std::sync::atomic::{AtomicU64, Ordering};
+static NEXT_CONNECTION: AtomicU64 = AtomicU64::new(1);
 use serde_json::json;
 
 async fn socket(mut socket: WebSocket) {
     let mut gate = ConnectionGate::default();
+    let connection_id = format!(
+        "connection-{}",
+        NEXT_CONNECTION.fetch_add(1, Ordering::Relaxed)
+    );
+    let mut server_seq = 0_u64;
     while let Some(Ok(message)) = socket.recv().await {
         let reply = match message {
             Message::Text(text) => match decode(&text) {
                 Ok(value) => match gate.accept(&value) {
                     Ok(()) => {
-                        json!({"protocolVersion":1,"seq":value["seq"],"payload":{"type":if value["payload"]["type"] == "hello" {"welcome"} else {"input_ack"}}})
+                        if value["payload"]["type"] == "hello" {
+                            json!({"type":"welcome","connectionId":connection_id})
+                        } else {
+                            json!({"type":"input_ack","inputSeq":value["payload"]["input"]["seq"]})
+                        }
                     }
-                    Err(code) => json!({"payload":{"type":"error","code":code}}),
+                    Err(code) => json!({"type":"error","code":code}),
                 },
-                Err(code) => json!({"payload":{"type":"error","code":code}}),
+                Err(code) => json!({"type":"error","code":code}),
             },
             Message::Close(_) => break,
             Message::Ping(_) | Message::Pong(_) => continue,
-            Message::Binary(_) => json!({"payload":{"type":"error","code":"text_required"}}),
+            Message::Binary(_) => json!({"type":"error","code":"text_required"}),
         };
+        let envelope = json!({"protocolVersion":1,"eventId":format!("server-{server_seq}"),"seq":server_seq,"payload":reply});
+        let Ok(message) = ServerMessage::new(envelope) else {
+            break;
+        };
+        server_seq += 1;
         if socket
-            .send(Message::Text(reply.to_string().into()))
+            .send(Message::Text(message.encode().into()))
             .await
             .is_err()
         {

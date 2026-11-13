@@ -40,7 +40,7 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 - Responsável / agente: Codex
 - Data de início: 2026-11-13
 - Referência de commit/PR: primeiro commit de implementação (`chore: initialize Kartube foundations`); consultar git log.
-- Testes executados e ambiente: Node.js 24.22.2 / npm 11.19.1 / Rust 1.100.0 em Linux; tipos e 27 testes TS, 7 testes Rust, rustfmt, clippy e `npm run check:spike` aprovados. Chromium headless confirmou hello/welcome por WebSocket (detalhes no changelog).
+- Testes executados e ambiente: Node.js 24.22.2 / npm 11.19.1 / Rust 1.100.0 em Linux; tipos e 30 testes TS, 8 testes Rust, rustfmt, clippy e `npm run check:spike` aprovados. Chromium headless confirmou hello/welcome por WebSocket (detalhes no changelog).
 - Evidências de aprovação: **—**
 - Pendências / riscos: T01, T03–T07 ainda pendentes de validação completa; Android físico não definido; Rust/Cargo agora instalados. Interfaces e fixtures iniciais não bastam para encerrar a etapa.
 - Data de conclusão: **—**
@@ -80,3 +80,10 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 - Validadores puros de snapshot, continuidade e resultado; 27 testes TS no total, incluindo lifecycle, clocks, substituição por bot e inconsistências. Sem implementação de partida, física ou contagem de voltas da etapa 02.
 - Contrato tipado ServerMessage adicionado; decoder/encoder de corrida e integração ao Rust ainda pendentes. Spike WebSocket não mudou de protocolo.
 - T03/T04 continuam parciais até contratos testados com implementações local/remota e codecs; T01/T05/T06/T07 ainda pendentes.
+
+### Avanço E00-T04 — Codecs de servidor — 2026-11-13
+
+- Decoder/encoder TS e wrapper Rust validado para welcome/input_ack/error, snapshot, resultado e eventos checkpoint/item.
+- Limite de saída 16 KiB; entrada continua 4 KiB. Envelope completo aplicado ao spike, com sequência de servidor independente.
+- 45 fixtures comuns; 30 testes TS, 8 Rust, rustfmt/clippy e smoke Node/Chromium aprovados. O smoke Node valida as respostas reais Rust pelo decoder TS.
+- Resultado tem validação isolada de dados e validação contextual com snapshot final. Nenhuma corrida/sala implementada; adapters e demais pendências da etapa permanecem abertos.
