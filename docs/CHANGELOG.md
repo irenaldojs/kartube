@@ -2,6 +2,19 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-13 — Checkpoint de retomada dos builds nativos
+
+- Usuário pediu commit e ponto de retomada. CHECKPOINT.md registra estado, evidências e comandos; builds em andamento encerrados intencionalmente, sem processos de compilação deixados ativos.
+- Tipos/63 testes e rustfmt aprovados; biblioteca Rust Android ARM64 compilada. Pacotes Android/Linux não gerados, smoke nativo e CI Windows não executados.
+- E01-T06 permanece aberta, sem converter preparação de build em compatibilidade validada. Recomeçar pelos builds/testes indicados no checkpoint.
+
+## 2026-11-13 — E01-T06 — Empacotamento desktop e Android
+
+- Wrapper Tauri 2 em apps/native reutiliza o build apps/web/dist. Scripts para desktop e Android; relatório identifica runtime browser/tauri sem dependência nativa no cliente.
+- Projeto Gradle Android versionado, APK debug ARM64 e workflow de Linux `.deb`, Windows NSIS e Android. Guia de build/instalação e ícone SVG original incluídos.
+- Smoke nativo Linux por WebKitWebDriver verifica cliente embutido, WebGL2/WASM, pilotagem, pausa e descarte/reinício. Resultados de compilação/testes registrados na etapa 01.
+- E01-T06 permanece em andamento até prova física do APK; não há aparelho adb disponível neste ambiente. Configuração de CI não declara execução remota/validação Windows concluída.
+
 ## 2026-11-13 — E01-T05 — Assets e liberação de recursos
 
 - Propriedade única e descarte idempotente de geometrias/materiais; caixa unitária/material por cor compartilhados entre malhas. Pista com 2 geometrias, laboratório com 3.

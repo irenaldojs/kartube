@@ -1,0 +1,16 @@
+[package]
+name = "kartube-native"
+version = "0.1.0"
+description = "Kartube native wrapper for the shared web client"
+edition = "2024"
+rust-version = "1.90"
+
+[lib]
+name = "kartube_native_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "=2.7.4", features = [] }
+
+[dependencies]
+tauri = { version = "=2.12.5", features = [] }

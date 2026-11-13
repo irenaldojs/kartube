@@ -1,0 +1,53 @@
+{
+  "$schema": "../../../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Kartube",
+  "version": "0.1.0",
+  "identifier": "io.kartube.game",
+  "build": {
+    "frontendDist": "../../web/dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": {
+      "script": "npm run dev:web -- --host 0.0.0.0 --port 5173 --strictPort",
+      "cwd": "../.."
+    },
+    "beforeBuildCommand": {
+      "script": "npm run build:web",
+      "cwd": "../.."
+    }
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Kartube",
+        "width": 1280,
+        "height": 900,
+        "resizable": true,
+        "fullscreen": false,
+        "minWidth": 360,
+        "minHeight": 640,
+        "label": "main"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' ipc: http://ipc.localhost; object-src 'none'; base-uri 'self'",
+      "devCsp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ipc: http: ws:; object-src 'none'; base-uri 'self'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "android": {
+      "debugApplicationIdSuffix": ".debug"
+    },
+    "category": "Game",
+    "shortDescription": "Prot\u00f3tipo de corrida de karts 3D",
+    "publisher": "Kartube"
+  }
+}

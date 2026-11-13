@@ -31,3 +31,11 @@
 Navegador desktop, Tauri desktop e Tauri Android devem abrir a mesma pista, reproduzir animações, aceitar inputs, entrar em sala, carregar sons, concluir corrida e mostrar pódio. Manter matriz dos modelos e versões de SO/WebView testados.
 
 Referências: https://v2.tauri.app/start/prerequisites/ · https://v2.tauri.app/distribute/google-play/ · https://github.com/tauri-apps/tauri-docs/blob/v2/src/content/docs/reference/webview-versions.md
+
+## Wrapper implementado — E01-T06
+
+`apps/native` usa Tauri 2, com crate Rust de entrada e projeto Gradle Android versionado. `frontendDist` referencia `apps/web/dist`; os hooks de desenvolvimento/build executam scripts da raiz. O código web não depende de APIs Tauri: apenas o relatório distingue runtime browser/tauri pela presença do runtime nativo.
+
+Scripts na raiz: `dev:desktop`, `build:desktop`, `dev:android`, `build:android` e `check:native`. O build desktop gera pacotes do sistema host; workflow dedicado compila `.deb` em Linux e instalador NSIS em Windows. O Android padrão é APK debug ARM64 (identificador `io.kartube.game.debug`), com o cliente embutido. Não há assinatura de produção/loja configurada.
+
+Teste Linux por tauri-driver/WebKitWebDriver verifica o binário com assets embutidos e permite inspecionar o relatório e captura do WebViewGTK real. A CI está configurada, sem pressupor execução remota. O roteiro de instalação e validação física está em [apps/native/README.md](../apps/native/README.md); o resultado da prova fica no registro da etapa 01.

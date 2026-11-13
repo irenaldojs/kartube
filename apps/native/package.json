@@ -1,0 +1,14 @@
+{
+  "name": "@kartube/native",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "android:init": "tauri android init --skip-targets-install",
+    "android:dev": "tauri android dev",
+    "android:build": "tauri android build --apk --target aarch64 --debug"
+  }
+}

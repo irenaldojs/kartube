@@ -8,7 +8,8 @@
   },
   "workspaces": [
     "packages/*",
-    "apps/web"
+    "apps/web",
+    "apps/native"
   ],
   "scripts": {
     "test": "node --test tests/*.test.ts",
@@ -17,9 +18,16 @@
     "check:spike": "node scripts/check-spike.mjs",
     "dev:web": "npm run dev --workspace @kartube/web",
     "build:web": "npm run build --workspace @kartube/web",
-    "check:web": "npm run build:web && node scripts/webgl-smoke.mjs"
+    "check:web": "npm run build:web && node scripts/webgl-smoke.mjs",
+    "dev:desktop": "npm run --workspace @kartube/native dev --",
+    "build:desktop": "npm run --workspace @kartube/native build --",
+    "android:init": "npm run --workspace @kartube/native android:init --",
+    "dev:android": "npm run --workspace @kartube/native android:dev --",
+    "build:android": "npm run --workspace @kartube/native android:build --",
+    "check:native": "node scripts/native-smoke.mjs"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "2.12.4",
     "playwright": "^1.65.0",
     "typescript": "5.9.3"
   }

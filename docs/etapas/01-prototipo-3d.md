@@ -93,3 +93,18 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 - Verificação: `npm run check` (63 testes, incluindo registro de recurso compartilhado, descarte repetido, adoção tardia e ciclos de mundo Rapier); `npm run check:web` (ciclos de liberar/reiniciar/trocar cena/perfil com contadores estáveis e zerados após liberação, falha de inicialização gráfica injetada, troca de perfil durante carregamento pendente de física e regressões de input/render/física).
 - Também atendido o ajuste solicitado: botão de toque Freio / Ré único; o mesmo comando desacelera o avanço até parar e depois engata ré, com teste de física dedicado; tem prioridade sobre acelerar quando ambos são pressionados.
 - E01-T05 concluída no escopo procedural do protótipo. Próxima E01-T06: empacotar o mesmo build em Tauri Android e testar no aparelho físico. E01-T07 (RAM/áudio/WebView) permanece aberta.
+
+### Avanço E01-T06 — Wrapper desktop e Android — 2026-11-13
+
+- Usuário confirmou que deseja apps nativos desktop além de Android e navegador. Criado `apps/native` com Tauri 2 e frontendDist compartilhado; entradas Rust/Kotlin não duplicam gameplay.
+- Projeto Gradle Android versionado, APK debug ARM64, scripts de desenvolvimento/build, ícone original em SVG e capacidades básicas do wrapper. Workflow para Linux `.deb`, Windows NSIS e APK Android.
+- Guia nativo documenta dependências, instalação e roteiro físico. Smoke de WebKitGTK executa o mesmo cliente embutido, verificando runtime/WebGL2/WASM, movimento, pausa e descarte/reinício.
+- Ambiente local recebeu bibliotecas WebKitGTK, JDK 21, SDK Android, NDK e target Rust ARM64. Nenhum aparelho conectado via adb; prova Tauri no S20 FE permanece pendente e T06 não é marcada concluída só pelo build.
+
+### Checkpoint solicitado pelo usuário — 2026-11-13
+
+- `npm run check`: tipos e 63 testes aprovados. Rustfmt e sintaxe de `scripts/native-smoke.mjs` aprovados.
+- Build Android: biblioteca Rust ARM64 concluída em 9m42s; `.so` local em target/aarch64-linux-android/debug. Gradle iniciou download de 9.6.1; compilação foi interrompida por solicitação de checkpoint antes de gerar APK.
+- Build Linux: dependências Rust/WebKitGTK em compilação, interrompidas sem pacote gerado. Encerramento intencional (código 130), sem erro de compilação observado nos logs até esse ponto; isso não comprova build final aprovado.
+- Smoke nativo, build Windows/CI e teste Tauri no S20 FE não executados. E01-T06/T07 continuam abertas.
+- Comandos, caminhos de SDK e próximos passos em [CHECKPOINT.md](../../CHECKPOINT.md). Não reiniciar etapas concluídas nem regenerar o projeto Android sem necessidade.

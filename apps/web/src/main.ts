@@ -20,7 +20,7 @@ let cleanup: (() => ReleaseReport) | null = null;
 let lastRelease: ReleaseReport | null = null;
 let report: Record<string, unknown> = { status: 'loading' };
 function publish(data: Record<string, unknown>) {
-  report = { ...data, userAgent: navigator.userAgent };
+  report = { ...data, runtime: '__TAURI_INTERNALS__' in window ? 'tauri' : 'browser', userAgent: navigator.userAgent };
   output.textContent = JSON.stringify(report, null, 2);
   document.body.dataset.status = String(report.status);
 }

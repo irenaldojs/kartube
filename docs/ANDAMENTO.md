@@ -5,7 +5,7 @@
 | Etapa | Status | Evidência | Próximo critério |
 |---|---|---|---|
 | 00 — Fundamentos | Concluída | Sessões local/remota, codecs TS/Rust, pistas, WebSocket e prova WebGL2/WASM desktop e S20 FE | Critérios de fundamentos atendidos; validações futuras nos respectivos marcos |
-| 01 — Protótipo 3D | Em andamento | Kart dirigível e ciclo de assets/descarte verificado | E01-T06: build Tauri Android em aparelho físico |
+| 01 — Protótipo 3D | Em andamento | Kart dirigível e ciclo de assets/descarte verificado | E01-T06 em execução: builds desktop/Android e teste do WebView físico |
 | 02 — Corrida local | Planejada | — | 3 voltas e resultado válidos |
 | 03 — Bots locais | Planejada | — | 8 pilotos terminam corrida |
 | 04 — Mecânicas | Planejada | — | Rampas, boosts, itens e atalho |
@@ -46,3 +46,9 @@ Rust/Cargo instalados e prova local WebSocket implementada. Prova básica WebGL2
 - 2026-11-13: E01-T04 concluída com pilotagem básica, colisões, teclado/toque e teste do circuito completo; próxima E01-T05. Novo build ainda requer playtest Android.
 
 - 2026-11-13: correção multitouch confirmada pelo usuário e commitada em `85ed663`. E01-T05 concluída com recursos compartilhados, cleanup e diagnóstico após descarte; botão Freio / Ré unificado conforme solicitação. Próxima E01-T06.
+
+- 2026-11-13: E01-T06 iniciada com wrapper Tauri compartilhado e destinos desktop Linux/Windows, Android e navegador. Build não equivale a aprovação do WebView Android; aparelho não conectado ao ambiente.
+
+## Checkpoint de retomada — 2026-11-13
+
+Execução encerrada a pedido do usuário para continuar depois. Consulte [CHECKPOINT.md](../CHECKPOINT.md) antes de retomar. E01-T06 continua em andamento: wrapper/CI/documentação preparados; Rust Android ARM64 compilou, porém builds desktop e Gradle foram interrompidos antes dos pacotes. Não há APK/instalador gerado nem aprovação do smoke nativo ou Windows/Android físico. Testes TS/tipos: 63 aprovados.

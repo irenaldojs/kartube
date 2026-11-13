@@ -2,9 +2,11 @@
 
 Jogo de corrida de karts 3D cartoon em desenvolvimento. Plano completo: [Geral.md](Geral.md).
 
+**Para retomar o desenvolvimento:** [checkpoint atual e próximos comandos](CHECKPOINT.md).
+
 ## Estado
 
-Etapa 00 concluída; etapa 01 em andamento, com boot 3D e seleção de qualidade gráfica. Há provas locais de WebSocket com Rust e de renderização WebGL2 com física WASM. Há um protótipo dirigível; corrida com regras, salas online e cliente nativo ainda não foram implementados.
+Etapa 00 concluída; etapa 01 em andamento, com boot 3D e seleção de qualidade gráfica. Há provas locais de WebSocket com Rust e de renderização WebGL2 com física WASM. Há um protótipo dirigível e um wrapper Tauri para desktop/Android usando o mesmo build web. Corrida com regras e salas online ainda não foram implementadas.
 
 ## Desenvolvimento
 
@@ -67,3 +69,19 @@ npm run check:web
 ```
 
 O teste gera o build e verifica renderização, colisão, pausa, descarte/reinício, perda de contexto, layout móvel e mensagens para ausência de WebGL2/WASM. Salva captura e relatório em `/tmp/kartube-webgl.png` e `/tmp/kartube-webgl-report.json`. Chromium headless usa SwiftShader: esses resultados não medem desempenho de GPU física nem comprovam compatibilidade Android/Tauri. Para Android real, execute o servidor em uma rede acessível ao aparelho, abra a cena e exporte o relatório; a prova básica já foi aprovada pelo usuário no S20 FE; a matriz completa e o aceite de Tauri continuam pendentes.
+
+## Aplicativos nativos (desktop e Android)
+
+O navegador continua disponível com `npm run dev:web`. O wrapper em `apps/native` empacota esse mesmo cliente, sem duplicar gameplay.
+
+```sh
+npm run dev:desktop
+# Linux
+npm run build:desktop -- --bundles deb
+# Windows (executar em Windows)
+npm run build:desktop -- --bundles nsis
+# Android ARM64 de desenvolvimento, com SDK/NDK/JDK configurados
+npm run build:android -- --ci
+```
+
+Pré-requisitos, caminhos dos pacotes, instalação no aparelho e teste do WebView real: [guia nativo](apps/native/README.md). A CI de builds nativos inclui Linux, Windows e APK Android; resultados locais e pendências de validação estão no [andamento](docs/ANDAMENTO.md). Compilar o APK não substitui o teste no S20 FE.
