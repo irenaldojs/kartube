@@ -19,7 +19,7 @@ try {
   }
   assert.equal((await fetch('http://127.0.0.1:4173')).status, 200);
   browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
-  const page = await browser.newPage({ viewport: { width: 1280, height: 1000 } });
+  const page = await browser.newPage({ viewport: { width: 1280, height: 1000 }, hasTouch: true });
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   const read = async () => JSON.parse(await page.locator('#report').textContent());
   const readyScene = async () => page.waitForFunction(() => document.body.dataset.status === 'running', { timeout: 30_000 });
@@ -86,15 +86,36 @@ try {
   const touch = await page.context().newCDPSession(page);
   await touch.send('Emulation.setTouchEmulationEnabled', { enabled: true });
   const right = await page.getByRole('button', { name: 'Virar à direita', exact: true }).boundingBox();
-  await touch.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [
-    { x: accelerator.x + accelerator.width / 2, y: accelerator.y + accelerator.height / 2, id: 1 },
-    { x: right.x + right.width / 2, y: right.y + right.height / 2, id: 2 },
-  ] });
+  const pedalPoint = { x: accelerator.x + accelerator.width / 2, y: accelerator.y + accelerator.height / 2, id: 1 };
+  const rightPoint = { x: right.x + right.width / 2, y: right.y + right.height / 2, id: 2 };
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [pedalPoint] });
+  await page.waitForFunction(() => JSON.parse(document.getElementById('report').textContent).driving.input.throttle === 1);
+  await page.getByRole('button', { name: 'Acelerar', exact: true }).focus();
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [pedalPoint, rightPoint] });
+  await page.getByRole('button', { name: 'Virar à direita', exact: true }).focus();
   await page.waitForFunction(() => {
     const input = JSON.parse(document.getElementById('report').textContent).driving.input;
     return input.throttle === 1 && input.steering === 1;
   });
-  await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  // CDP touchEnd lists the points to release, rather than those still held.
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [rightPoint] });
+  await page.waitForFunction(() => {
+    const input = JSON.parse(document.getElementById('report').textContent).driving.input;
+    return input.throttle === 1 && input.steering === 0;
+  });
+  const left = await page.getByRole('button', { name: 'Virar à esquerda', exact: true }).boundingBox();
+  const leftPoint = { x: left.x + left.width / 2, y: left.y + left.height / 2, id: 3 };
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [pedalPoint, leftPoint] });
+  await page.waitForFunction(() => {
+    const input = JSON.parse(document.getElementById('report').textContent).driving.input;
+    return input.throttle === 1 && input.steering === -1;
+  });
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [pedalPoint] });
+  await page.waitForFunction(() => {
+    const input = JSON.parse(document.getElementById('report').textContent).driving.input;
+    return input.throttle === 0 && input.steering === -1;
+  });
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] });
   await page.waitForFunction(() => {
     const input = JSON.parse(document.getElementById('report').textContent).driving.input;
     return input.throttle === 0 && input.steering === 0;

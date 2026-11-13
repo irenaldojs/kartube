@@ -2,6 +2,13 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-13 — Correção de multitouch na pilotagem móvel
+
+- Usuário relatou que acelerar impedia acionar a direção no celular. O smoke anterior iniciava dois dedos juntos e não cobria a sequência relatada nem troca de foco entre botões.
+- Entrada touch passa a rastrear cada identificador nativo independentemente de captura de ponteiro; mouse/caneta mantêm Pointer Events. Troca de foco limpa só teclado, preservando dedos ainda pressionados; blur/ocultação/pausa/descarte continuam limpando tudo.
+- Gestos e menu de toque longo bloqueados na área de controle; botões destacam ações efetivamente mantidas.
+- Smoke ampliado com touch habilitado desde a criação da página, acelerador primeiro/direção depois, troca de foco, soltura independente, direção oposta e cancelamento. Verificação: `npm run check` e `npm run check:web`; usuário confirmou a correção no celular nesta sessão.
+
 ## 2026-11-13 — E01-T04 — Pilotagem básica
 
 - Controlador arcade Rapier a 60 Hz: acelerar, frear, dar ré, esterçar, aderência lateral e CCD, com ajustes em módulo próprio. Gravidade/colisões preservadas e tração condicionada a apoio.

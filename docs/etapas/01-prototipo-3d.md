@@ -77,3 +77,9 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 - Verificação: `npm run check` (59 testes; aceleração, freio, ré, reset, guardrail, direção e circuito completo com rampas por inputs, sem teleporte); `npm run check:web` (teclado, freio, direção, perda de foco, pausa, ponteiro, multitouch em viewport móvel e regressões). Captura móvel em `/tmp/kartube-driving-mobile.png`.
 - E01-T04 concluída. Test driver existe só no teste, sem implementar bots de gameplay. Drift, boost/item, gamepad, configuração de controles e corrida com checkpoints/voltas não estão implementados. Sem nova medição ou aprovação física Android deste build.
 - Próxima tarefa: E01-T05, revisar ciclo de assets, descarte e isolamento entre malhas e colisores, com evidências de recursos.
+
+### Correção após teste móvel do usuário — 2026-11-13
+
+- Multitouch da E01-T04 falhou no celular segundo o usuário; sucesso do smoke anterior não representou o gesto sequencial real.
+- Rastreamento por Touch.identifier e foco do teclado separado das ações de toque; controles bloqueiam gestos/menu nativos e exibem ações mantidas.
+- Regressão cobre primeiro acelerar, depois virar, trocar foco entre controles, soltar só direção, trocar para o outro lado, soltar só acelerador e cancelar o toque restante. Verificação automatizada em Chromium com suporte touch; usuário confirmou a correção no celular nesta sessão; registro manual, sem nova medição de desempenho.

@@ -43,8 +43,8 @@ footer { border-top:1px solid #354047; display:flex; justify-content:space-betwe
 #scene, #camera { margin-bottom:16px; }
 
 #speed { position:absolute; right:20px; top:18px; padding:6px 10px; background:#141b20cc; color:#edf0e9; font:14px ui-monospace,monospace; pointer-events:none; }
-.driving { position:absolute; left:12px; right:12px; bottom:12px; max-width:350px; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; }
+.driving { position:absolute; left:12px; right:12px; bottom:12px; max-width:350px; touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; }
 .driving button { min-height:48px; padding:6px; background:#c5e7a4e8; touch-action:none; user-select:none; -webkit-user-select:none; }
-.driving button:active { background:#ecb970; }
+.driving button:active, .driving button[data-held="true"] { background:#ecb970; }
 #reset-kart { width:100%; }
 .viewport:focus-visible { outline:2px solid #ecb970; outline-offset:-2px; }
