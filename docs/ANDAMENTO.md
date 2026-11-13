@@ -4,7 +4,7 @@
 
 | Etapa | Status | Evidência | Próximo critério |
 |---|---|---|---|
-| 00 — Fundamentos | Em andamento | Pacotes TS, decoder/gate de protocolo, 9 testes e CI | Validar contratos completos e spikes de plataforma |
+| 00 — Fundamentos | Em andamento | Contratos TS/Rust, fixtures e spike WebSocket | Validar contratos completos e spikes de plataforma |
 | 01 — Protótipo 3D | Planejada | — | Pista cinza e kart dirigível |
 | 02 — Corrida local | Planejada | — | 3 voltas e resultado válidos |
 | 03 — Bots locais | Planejada | — | 8 pilotos terminam corrida |
@@ -23,7 +23,7 @@
 
 ## Bloqueios atuais
 
-Rust/Cargo não estão instalados neste ambiente. Android físico ainda não definido; provas de plataforma pendentes. Riscos conhecidos estão em [Backlog e riscos](15-backlog-e-riscos.md).
+Rust/Cargo instalados e prova local WebSocket implementada. Android físico ainda não definido; provas de plataforma pendentes. Riscos conhecidos estão em [Backlog e riscos](15-backlog-e-riscos.md).
 
 ## Histórico de marcos
 

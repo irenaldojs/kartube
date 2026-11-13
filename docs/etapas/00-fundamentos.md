@@ -40,13 +40,21 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 - Responsável / agente: Codex
 - Data de início: 2026-11-13
 - Referência de commit/PR: primeiro commit de implementação (`chore: initialize Kartube foundations`); consultar git log.
-- Testes executados e ambiente: Node.js 24.22.2 / npm 11.19.1; `npm run check`: tipos aprovados e 9 testes passando, incluindo decoder e gate de protocolo (detalhes no changelog).
+- Testes executados e ambiente: Node.js 24.22.2 / npm 11.19.1 / Rust 1.100.0 em Linux; tipos e 9 testes TS, 4 testes Rust, rustfmt, clippy e `npm run check:spike` aprovados. Chromium headless confirmou hello/welcome por WebSocket (detalhes no changelog).
 - Evidências de aprovação: **—**
-- Pendências / riscos: T01, T03–T07 ainda pendentes de validação completa; Rust/Cargo ausentes, Android físico não definido. Interfaces e fixtures iniciais não bastam para encerrar a etapa.
+- Pendências / riscos: T01, T03–T07 ainda pendentes de validação completa; Android físico não definido; Rust/Cargo agora instalados. Interfaces e fixtures iniciais não bastam para encerrar a etapa.
 - Data de conclusão: **—**
 
 ### Avanço E00-T04 — 2026-11-13
 
 - Decoder v1 para hello/input, limite UTF-8, verificação de versão e gate de handshake/sequência implementados.
 - Fixtures canônicas de envelope adicionadas; documentação de rede alinhada com o formato real.
-- T04 permanece aberta: contrato de pista validado em runtime, demais mensagens e paridade Rust ainda pendentes. T06 permanece aberta: nenhum teste real browser/Rust ou Android executado.
+- T04 permanece aberta: contrato de pista validado em runtime, demais mensagens e paridade Rust ainda pendentes. T06 permanece aberta até todas as provas de plataforma; o avanço seguinte registra o teste browser/Rust.
+
+### Avanço E00-T06 — 2026-11-13
+
+- Criado `apps/server` antecipadamente como spike exigido pela etapa 00; isso não inicia nem conclui a etapa 05 (salas). Sem apps web/nativo ainda.
+- Toolchain Rust fixada, dependências com Cargo.lock, Tokio/Axum WebSocket e página de diagnóstico local.
+- Decoder/gate Rust e fixtures compartilhadas com TS; 4 testes Rust.
+- Teste integrado Node WebSocket e navegador Chromium automatizado; comandos e CI no README.
+- ADRs seguem propostos: transporte local não valida sincronização de corridas, renderização ou empacotamento. T06 segue parcial até WebGL2/WASM no Android físico.

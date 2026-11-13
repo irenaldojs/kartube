@@ -2,6 +2,15 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-13 — E00-T06 — Prova local WebSocket browser/Rust
+
+- Tipo: implementação e documentação.
+- Spike antecipado em `apps/server`: Tokio/Axum, endpoint WebSocket, página de diagnóstico e decoder/gate Rust com fixtures compartilhadas de input e envelope. Sem salas ou regras de corrida.
+- Instalado Rust no ambiente; toolchain fixada e Cargo.lock versionado. Playwright/Chromium e scripts para iniciar, testar e encerrar o servidor local; job de CI configurado, ainda não executado remotamente.
+- Evidência: 9 testes TS e tipos aprovados; 4 testes Rust; rustfmt e clippy sem warnings; smoke WebSocket Node aprovado (versão, handshake, replay e inputs); Chromium headless confirmou página → WebSocket → Rust → welcome.
+- Ambiente: Linux, Node 24.22.2, Rust 1.100.0, Playwright 1.65.0/Chromium 158. As bibliotecas Linux do navegador foram instaladas para executar a prova.
+- Etapa 00 segue em andamento. E00-T06 parcial: WebGL2/WASM, Tauri e Android físico ainda pendentes; ADRs continuam propostos.
+
 ## 2026-11-13 — E00-T04 — Validação inicial do protocolo
 
 - Tipo: implementação e documentação.

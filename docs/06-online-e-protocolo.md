@@ -57,4 +57,12 @@ Bots **simulados logicamente no servidor** por waypoints/estado simplificado, co
 
 `ClientMessageGate` pertence a uma conexão: exige `hello` antes de input, aceita sequência estritamente crescente (lacunas permitidas), descarta repetidos/antigos e rejeita novo `hello`. Rejeições não alteram a sequência aceita. `eventId` identifica o evento para diagnóstico; deduplicação nesta conexão usa `seq`. Reconexões exigirão novo handshake e futura validação de token; esta classe não implementa resume nem autoridade de corrida. O transporte deve limitar frames antes de acumulá-los em memória. Rate limit, heartbeat, timeout e demais mensagens permanecem pendentes antes de exposição pública.
 
-Fixtures portáveis em `fixtures/client-messages.json`; testes TS exercitam JSON inválido, versão, campos, UTF-8, handshake e replay. Ainda falta executar os mesmos casos em Rust e a prova browser↔Rust; não há socket aberto nesta entrega.
+Fixtures portáveis em `fixtures/client-messages.json`; testes TS exercitam JSON inválido, versão, campos, UTF-8, handshake e replay. Os mesmos casos agora são executados em Rust. O spike local em `apps/server` exercita o handshake por WebSocket; ainda não há salas, autenticação ou corrida online.
+
+## Spike local Rust/WebSocket — E00-T06 (parcial)
+
+`apps/server` usa Tokio/Axum e serve diagnóstico em `/` e socket em `/ws`, somente em `127.0.0.1:3001`. Limites de frame e mensagem são 4096 bytes; excesso no transporte encerra a conexão. O decoder também limita tamanho quando chamado diretamente. Frames binários recebem `text_required`; ping/pong seguem o transporte.
+
+Nesta prova, respostas de diagnóstico são `{protocolVersion:1, seq, payload:{type:"welcome"|"input_ack"}}` para aceitação e `{payload:{type:"error",code}}` para rejeição. Estes acknowledgements não são o contrato futuro de snapshots/resultados, não atribuem slots e não confirmam progresso de corrida. O gate é isolado por conexão; `input` apenas é validado, sem simulação.
+
+`npm run check:spike` inicializa o servidor, verifica versão incompatível, handshake, replay, input válido/inválido via Node WebSocket e abre Chromium headless para enviar hello pela página e conferir welcome. Rust consome fixtures compartilhadas de mensagens e inputs. Ainda faltam Android físico, WebGL2/WASM, Tauri, outras mensagens e testes com latência/partidas.

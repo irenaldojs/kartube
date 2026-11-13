@@ -55,7 +55,7 @@ Campanha narrativa, mundo aberto, economia/loja, ranking global competitivo, con
 - **Servidor Rust**: Tokio + Axum, WebSocket, salas em memória no MVP; serviço autoritativo para ocupação de vagas, início/fim de prova, resultados, itens e checkpoints. Não depende de banco de dados inicialmente.
 - **Web**: Vite + TypeScript + Three.js (renderização WebGL2) + Rapier 3D/WASM (colisões/física) e HUD desacoplada. Hospedagem estática HTTPS; WebSocket conecta ao serviço Rust.
 - **Nativo**: Tauri 2, usando build web comum, integrações mínimas por plataforma e testes antecipados de WebView/controles/áudio em Android.
-- **Monorepo iniciado na etapa 00**: `apps/web`, `apps/server`, `apps/native`, `packages/game-core`, `packages/protocol`, `packages/game-data`; os três pacotes de contratos já existem; os aplicativos serão criados conforme as etapas.
+- **Monorepo iniciado na etapa 00**: `apps/web`, `apps/server`, `apps/native`, `packages/game-core`, `packages/protocol`, `packages/game-data`; os três pacotes de contratos e um spike Rust em `apps/server` já existem; os demais aplicativos serão criados conforme as etapas.
 - **Multiplayer**: inputs e snapshots com interpolação; jogador local com resposta imediata, correção quando necessário. O servidor valida regras e resultados. Evitar prometer física determinística idêntica entre dispositivos.
 
 A definição de responsabilidades e os riscos estão em [Arquitetura](docs/02-arquitetura-do-sistema.md) e [Multiplayer](docs/06-online-e-protocolo.md).
@@ -109,4 +109,4 @@ A definição de responsabilidades e os riscos estão em [Arquitetura](docs/02-a
 
 ## 8. Próximo marco
 
-**Etapa 00 em andamento.** Monorepo npm e contratos iniciais criados; validações de Rust/WebSocket, Android e aceitação dos ADRs permanecem pendentes. Consulte o registro da etapa para evidências.
+**Etapa 00 em andamento.** Monorepo npm e contratos iniciais criados; a prova local Rust/WebSocket foi implementada; Android e aceitação dos ADRs permanecem pendentes. Consulte o registro da etapa para evidências.

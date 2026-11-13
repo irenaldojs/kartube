@@ -48,4 +48,4 @@ Essas fontes confirmam **viabilidade das tecnologias**, não FPS garantido nem c
 
 ## Ambiente inicial implementado — Etapa 00
 
-Node.js 24, npm 11 e npm workspaces para os três pacotes TS. TypeScript fixado no manifesto e lockfile; compilação estrita sem emissão nesta etapa. `npm run check` é o gate local/CI. Sem dependência de render ou física até o protótipo. Aplicativos web, Rust e nativo ainda não criados.
+Node.js 24, npm 11 e npm workspaces para os três pacotes TS. TypeScript fixado no manifesto e lockfile; compilação estrita sem emissão nesta etapa. `npm run check` é o gate local/CI. Sem dependência de render ou física até o protótipo. Spike Rust/Tokio/Axum criado em `apps/server`, com toolchain em `rust-toolchain.toml` e dependências em Cargo.lock. Web de jogo e nativo ainda não criados. Rust segue rustfmt e clippy sem warnings; testes de decoder usam os mesmos JSONs do TS.

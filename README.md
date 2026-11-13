@@ -4,7 +4,7 @@ Jogo de corrida de karts 3D cartoon em desenvolvimento. Plano completo: [Geral.m
 
 ## Estado
 
-Etapa 00 em andamento: monorepo e contratos TypeScript iniciais. Ainda não há jogo executável, servidor Rust ou cliente nativo.
+Etapa 00 em andamento: monorepo e contratos TypeScript iniciais. Há uma prova local de WebSocket com Rust. Ainda não há jogo executável, salas online ou cliente nativo.
 
 ## Desenvolvimento
 
@@ -24,4 +24,27 @@ npm run check
 - `docs`: plano, decisões e evidências de desenvolvimento.
 - `assets`: estrutura reservada, sem conteúdo final.
 
-Leia [índice](docs/INDICE.md), [andamento](docs/ANDAMENTO.md) e [etapa ativa](docs/etapas/00-fundamentos.md) antes de alterar o projeto. Próximos passos: validar contratos de pista e protocolo completos, executar spike Rust/WebSocket e definir dispositivos para os testes Android. Os ADRs permanecem propostos até suas provas de aceitação.
+Leia [índice](docs/INDICE.md), [andamento](docs/ANDAMENTO.md) e [etapa ativa](docs/etapas/00-fundamentos.md) antes de alterar o projeto. Próximos passos: validar contratos de pista e protocolo completos e definir dispositivos para os testes Android. O spike local Rust/WebSocket passou em Chromium. Os ADRs permanecem propostos até suas provas de aceitação.
+
+## Prova WebSocket (Etapa 00)
+
+Instale Rust via rustup; a toolchain está fixada em `rust-toolchain.toml`.
+
+```sh
+cargo run --locked --manifest-path apps/server/Cargo.toml
+```
+
+Abra http://127.0.0.1:3001 e clique em **Conectar e enviar hello**. O retorno esperado contém `welcome`. O serviço escuta apenas em localhost. A página é um diagnóstico do transporte, sem renderização ou regras de corrida.
+
+Para executar as verificações completas do spike, com a porta 3001 livre:
+
+```sh
+npm ci
+npx playwright install --with-deps chromium
+cargo fmt --manifest-path apps/server/Cargo.toml --check
+cargo clippy --locked --manifest-path apps/server/Cargo.toml -- -D warnings
+cargo test --locked --manifest-path apps/server/Cargo.toml
+npm run check:spike
+```
+
+O último comando inicia/encerra o servidor e testa WebSocket em Node e Chromium headless. Linux pode precisar de privilégios de administrador para instalar as bibliotecas do Chromium. A CI inclui esses comandos; testes Android/Tauri permanecem pendentes.

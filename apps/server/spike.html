@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kartube — prova WebSocket</title>
+<h1>Prova WebSocket — Etapa 00</h1>
+<p>Teste local de handshake com Rust. Não inicia uma corrida.</p>
+<button id="connect">Conectar e enviar hello</button>
+<pre id="output" role="status" aria-live="polite"></pre>
+<script>
+const button = document.querySelector('#connect');
+const output = document.querySelector('#output');
+button.onclick = () => {
+  button.disabled = true;
+  const socket = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws`);
+  socket.onopen = () => socket.send(JSON.stringify({ protocolVersion: 1, eventId: 'browser-hello', seq: 0, payload: { type: 'hello', build: 'spike' } }));
+  socket.onmessage = event => { output.textContent = event.data; socket.close(); };
+  socket.onerror = () => { output.textContent = 'Falha na conexão WebSocket.'; };
+  socket.onclose = () => { button.disabled = false; };
+};
+</script>
+</html>
