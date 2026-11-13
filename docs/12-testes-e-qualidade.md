@@ -35,3 +35,9 @@ Crash frequente, perda de resultados, itens duplicados, checkpoints burláveis d
 ## Evidência de aceite
 
 Salvar no documento da etapa: plataforma, build/commit, cenário, resultados observados, vídeos/screenshots de teste quando úteis, problemas abertos e decisão `aprovado/reprovado`. Evitar confundir teste planejado com teste executado.
+
+## Evidência de contratos locais/remotos — Etapa 00
+
+`tests/local-session.test.ts` usa autoridade roteirizada para ciclo, inputs, atomicidade, finalização, aborto e falhas de limpeza/listeners. Um mesmo fluxo de snapshots/eventos é aplicado por LocalRaceSession e RemoteRaceSession, conferindo igualdade dos eventos observados e imutabilidade do estado. Esses testes não comprovam checkpoints percorridos, bots ou corrida física.
+
+`npm run check` totaliza 54 testes TS e checagem estrita dos pacotes. `npm run check:spike` também passa após a extração do validador de input para game-core: codec WebSocket Node, adapter remoto/Rust e handshake Chromium. Dispositivos Android e desempenho continuam sem evidência real.

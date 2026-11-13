@@ -40,3 +40,6 @@ export function validateRoster(participants: readonly Participant[]): void {
 }
 
 export * from './race-contracts.ts';
+export { isInputFrame } from './input-frame.ts';
+export { LocalRaceSession } from './local-session.ts';
+export type { LocalRaceAuthority, LocalAuthorityFrame, LocalAuthorityEvent, LocalSessionOptions } from './local-session.ts';

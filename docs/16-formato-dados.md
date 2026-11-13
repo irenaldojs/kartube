@@ -80,3 +80,9 @@ RaceEvent discrimina snapshot, checkpoint_ack (aceito/motivo), item_granted (ins
 ### Validação de resultado sem contexto
 
 `validateRaceResultData` extrai as invariantes de identidade, relógio, oito posições/pontos, finishTick, DNF e ordenação, permitindo validação pelo codec antes de uma sessão existir. `validateRaceResult` reutiliza essa checagem e também exige snapshot finished da mesma corrida e finishTick correspondentes. O decoder não comprova contexto de sessão: RemoteRaceSession verifica configuração esperada, continuidade de sequência/ticks e idempotência do resultado antes de entregar os eventos. Eventos de checkpoint/item têm IDs ASCII e serverTick não negativo. Código de motivo de checkpoint rejeitado é identificador; aceitação usa reason null.
+
+### Frames da autoridade local
+
+LocalAuthorityFrame contém snapshot e events (somente checkpoint_ack, item_granted, item_used ou race_result). A sessão local exige um snapshot por step, tick anterior+1 e eventos no tick desse snapshot. Término é atômico: snapshot finished acompanhado de um único resultado correspondente. Aborto não gera resultado. Essa convenção interna não altera o protocolo de rede: o teste de equivalência envia o snapshot antes dos eventos pelo envelope de servidor. Eventos de item/checkpoint são apenas verificados/entregues; não representam inventário ou regras físicas implementados.
+
+A validação isInputFrame agora pertence a game-core, permitindo uso offline sem dependência de rede; protocol reexporta a mesma função para preservar os imports existentes e usa-a em seu decoder de cliente.

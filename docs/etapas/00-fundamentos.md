@@ -14,15 +14,15 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 
 - [ ] E00-T01 — Confirmar com o time os objetivos, escopo P0/P1 e pontuação/tie-break em documentos de domínio.
 - [x] E00-T02 — Fixar esquema de monorepo futuro (apps e packages) e normas TypeScript/Rust; escolher ferramenta de workspaces na execução.
-- [ ] E00-T03 — Validar arquitetura local/online, APIs `RaceSession`, `InputAdapter`, `PlatformAdapter` e responsabilidades server/client.
-- [ ] E00-T04 — Especificar contrato de pista/checkpoint, envelope de protocolo e casos canônicos compartilhados TS/Rust.
+- [x] E00-T03 — Validar arquitetura local/online, APIs `RaceSession`, `InputAdapter`, `PlatformAdapter` e responsabilidades server/client.
+- [x] E00-T04 — Especificar contrato de pista/checkpoint, envelope de protocolo e casos canônicos compartilhados TS/Rust.
 - [ ] E00-T05 — Planejar conjunto mínimo de testes e matriz real de aparelhos alvo, incluindo Android físico.
 - [ ] E00-T06 — Executar microprovas técnicas de WebSocket entre browser e Rust e carregamento de WebGL2/WASM no Android tão logo houver código.
 - [ ] E00-T07 — Aceitar ou revisar ADR-0001 a 0003 com evidência.
 
 ## Critérios de aceite
 
-- [ ] Contratos e responsabilidades escritos sem ambiguidades de autoridade.
+- [x] Contratos e responsabilidades escritos sem ambiguidades de autoridade.
 - [ ] Um checklist de validação por plataforma aprovado; ADRs com estado atualizado.
 - [ ] Nenhuma implementação posterior começa sem interfaces de pista e sessão acordadas.
 
@@ -40,9 +40,9 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 - Responsável / agente: Codex
 - Data de início: 2026-11-13
 - Referência de commit/PR: primeiro commit de implementação (`chore: initialize Kartube foundations`); consultar git log.
-- Testes executados e ambiente: Node.js 24.22.2 / npm 11.19.1 / Rust 1.100.0 em Linux; tipos e 43 testes TS, 8 testes Rust, rustfmt, clippy e `npm run check:spike` aprovados. Chromium headless confirmou hello/welcome por WebSocket (detalhes no changelog).
+- Testes executados e ambiente: Node.js 24.22.2 / npm 11.19.1 / Rust 1.100.0 em Linux; tipos e 54 testes TS, 8 testes Rust, rustfmt, clippy e `npm run check:spike` aprovados. Chromium headless confirmou hello/welcome por WebSocket (detalhes no changelog).
 - Evidências de aprovação: **—**
-- Pendências / riscos: T01, T03–T07 ainda pendentes de validação completa; Android físico não definido; Rust/Cargo agora instalados. Interfaces e fixtures iniciais não bastam para encerrar a etapa.
+- Pendências / riscos: T01, T05–T07 ainda pendentes de validação completa; Android físico não definido; Rust/Cargo agora instalados. Interfaces e fixtures iniciais não bastam para encerrar a etapa.
 - Data de conclusão: **—**
 
 ### Avanço E00-T04 — 2026-11-13
@@ -95,3 +95,11 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 - Evidência: `npm run check` com 43 testes TS/tipos aprovados; `npm run check:spike` confirmou handshake da nova sessão com Rust e smoke Node/Chromium.
 - Pacote antecipado é prova das interfaces da etapa 00, sem implementação de salas/sincronização de partidas das etapas 05/06. Config/slot vêm de fixture até existir lobby autoritativo.
 - T03 continua parcial: falta implementação local de referência e provas completas dos adapters; resync/timeout/reconexão não implementados. Etapa permanece em andamento.
+
+### Avanço E00-T03 — Sessão local e equivalência — 2026-11-13
+
+- LocalRaceSession implementada em game-core com LocalRaceAuthority injetável, um humano/sete bots, ticks explícitos, input copiado/consumido uma vez e frames validados atomicamente. Autoridade de teste roteirizada, sem antecipar simulação/IA das etapas 02–04.
+- Lifecycle, término/aborto, falhas, estado imutável, descarte e equivalência local/remoto (snapshots/checkpoint/item/resultado) testados. isInputFrame movido para o núcleo e reexportado por protocol, preservando a direção de dependências.
+- Evidência: `npm run check`, 54 testes TS e tipos estritos; `npm run check:spike` aprovado com Node/adapter remoto/Rust/Chromium.
+- T03 e T04 concluídas no escopo de contratos iniciais: fronteiras de sessão/input/plataforma documentadas, duas implementações de referência, pista/checksum/envelope e casos canônicos TS/Rust verificados. Codecs de lobby/campeonato e adapters de dispositivos serão ampliados nas etapas de domínio, sem manter artificialmente estas tarefas de contrato abertas. Isso não equivale a gameplay implementado ou compatibilidade de plataformas validada.
+- Etapa 00 continua em andamento: T01 (aceite de produto/regras), T05 (matriz real), T06 (WebGL2/WASM/Android) e T07 (ADRs 0001–0003) permanecem pendentes.

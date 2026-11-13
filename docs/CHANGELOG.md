@@ -2,6 +2,15 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-13 — E00-T03 — Sessão local de referência e equivalência
+
+- Tipo: implementação e documentação.
+- LocalRaceSession com autoridade injetável implementa RaceSession offline: um humano/sete bots, step explícito, frame validado atomicamente, input copiado, resultado único e liberação idempotente.
+- Falha de autoridade preserva último snapshot e encerra a sessão; listeners/limpeza são isolados. Teste compartilhado confirma eventos equivalentes via sessão local e remota.
+- Validador de InputFrame movido ao núcleo/reexportado por protocol, evitando dependência do offline em rede. Sem autoridade de gameplay, física ou IA antecipadas.
+- Evidência: 54 testes TS e tipos aprovados; smoke WebSocket Node, adapter remoto/Rust e Chromium aprovado.
+- E00-T03/T04 concluídas no escopo dos contratos iniciais; etapa 00 em andamento por aceite de produto, matriz de aparelhos, WebGL2/WASM/Android e ADRs iniciais.
+
 ## 2026-11-13 — E00-T03 — Sessão remota com transporte injetável
 
 - Tipo: implementação e decisão (ADR-0005).
