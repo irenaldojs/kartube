@@ -2,6 +2,13 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-13 — E01-T03 — Câmera em terceira pessoa e sombra
+
+- Câmera acompanha o kart provisório com suavização por tempo e orientação; troca para visão geral preserva física e pausa.
+- Sombra de contato sem textura/shadow map acompanha a superfície por raycast; perfis com 16/24 segmentos e recursos descartáveis.
+- Verificação: tipos e 56 testes, incluindo orientação e equivalência de suavização a 30/60 Hz; smoke Chromium de câmera, sombra, descarte e regressões WebGL2/WASM. Captura da terceira pessoa adicionada aos artefatos.
+- E01-T03 concluída; próxima E01-T04 (movimento básico). Pilotagem e validação física da câmera em movimento ainda pendentes; novo build ainda sem evidência Android.
+
 ## 2026-11-13 — E01-T02 — Circuito cinza de protótipo
 
 - Cena inicial com pista fechada, largada quadriculada, guardrails, duas rampas, três boosts visuais, três caixas e caminho alternativo conectado.

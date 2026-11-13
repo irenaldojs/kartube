@@ -14,7 +14,7 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 
 - [x] E01-T01 — Criar estrutura de código planejada e primeiro boot com seleção de qualidade gráfica.
 - [x] E01-T02 — Exibir pista cinza fechada com linha de largada, chão, guardrails, rampas, boosts, caixa de item e alternativa em geometria simples.
-- [ ] E01-T03 — Carregar kart placeholder por cena GLB ou geometria provisória, câmera em terceira pessoa e sombras de baixo custo.
+- [x] E01-T03 — Carregar kart placeholder por cena GLB ou geometria provisória, câmera em terceira pessoa e sombras de baixo custo.
 - [ ] E01-T04 — Executar movimento básico e colisões com timestep fixo; criar debug de FPS/física.
 - [ ] E01-T05 — Carregar e liberar assets sem vazamento; separar malhas e colisores.
 - [ ] E01-T06 — Realizar spike do mesmo build no browser e Tauri Android em aparelho físico.
@@ -58,3 +58,12 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 - Visão geral da pista é a cena inicial; seletor mantém disponível o laboratório de queda. Trocas de cena liberam/recriam recursos. Kart provisório nasce sobre uma reta.
 - Smoke confirma cena, diagnóstico dos elementos, repouso físico no spawn, liberação/reinício e retorno ao laboratório com as verificações anteriores. Captura em `/tmp/kartube-track.png`, incluída nos artefatos da CI.
 - E01-T02 concluída no escopo visual/geométrico. Checkpoints, voltas, efeitos de boost/itens e dirigibilidade não são parte desta entrega. Próxima tarefa: E01-T03, câmera em terceira pessoa e sombras de baixo custo para o kart provisório.
+
+### E01-T03 — Kart, câmera e sombra de contato — 2026-11-13
+
+- Kart de geometria provisória preservado. `src/camera.ts` acompanha posição e orientação com offset traseiro, alvo adiante e suavização exponencial em função do tempo. Primeiro enquadramento e troca de modo são imediatos; seletor alterna terceira pessoa/visão geral sem reiniciar física.
+- Sombra de contato elíptica, sem textura ou shadow map, usa raycast vertical contra vias/rampas; acompanha a superfície e fica menos opaca com a altura. Recursos entram no descarte da cena. Perfil leve reduz os segmentos de 24 para 16.
+- Diagnóstico exporta modo/posição/alvo da câmera e sombra visível. Layout da cena acompanha a altura do painel no desktop, com altura própria no móvel.
+- Verificação: `npm run check` (56 testes, incluindo orientação em quatro direções e suavização a 30/60 Hz); `npm run check:web` (convergência após queda, sombra sobre a pista, troca de câmera sem alterar physicsSteps, descarte/reinício e regressões). Captura em `/tmp/kartube-chase.png` incluída na CI e inspecionada visualmente.
+- E01-T03 concluída. Ainda sem pilotagem; colisão/oclusão de câmera em movimento será avaliada com o kart dirigível. Sombra é aproximação visual de contato, sem sombras dinâmicas do cenário. Medições anteriores do S20 FE não validam este novo build.
+- Próxima tarefa: E01-T04, movimento básico e colisões a timestep fixo, reaproveitando diagnóstico de FPS/física existente.

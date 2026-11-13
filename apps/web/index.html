@@ -9,12 +9,13 @@
   <body>
     <main>
       <header><a class="brand" href="/">KARTUBE<span>LAB / 01</span></a><span class="tag">PROVA TÉCNICA</span></header>
-      <section class="intro"><p class="eyebrow">PRIMEIRO CONTATO</p><h1>O circuito começa<br>a tomar forma.</h1><p>Explore a visão geral da pista cinza: circuito fechado, rampas e caminho alternativo. Use o laboratório para repetir a prova de queda e colisão.</p></section>
+      <section class="intro"><p class="eyebrow">PRIMEIRO CONTATO</p><h1>O circuito começa<br>a tomar forma.</h1><p>Acompanhe o kart ou explore a visão geral da pista cinza: circuito fechado, rampas e caminho alternativo. Use o laboratório para repetir a prova de queda e colisão.</p></section>
       <section class="lab" aria-label="Laboratório de renderização">
         <div class="viewport" id="viewport" aria-label="Cena 3D com kart de teste"><span class="scene-label">01 / PROTÓTIPO 3D</span></div>
         <div class="panel">
           <div class="panel-heading"><span class="dot"></span><p id="status" role="status" aria-live="polite">Carregando o motor…</p></div>
-          <label for="scene">Cena</label><select id="scene"><option value="track" selected>Pista cinza · visão geral</option><option value="drop">Laboratório · teste de queda</option></select>
+          <label for="scene">Cena</label><select id="scene"><option value="track" selected>Pista cinza</option><option value="drop">Laboratório · teste de queda</option></select>
+          <label for="camera">Câmera</label><select id="camera" disabled><option value="chase" selected>Terceira pessoa</option><option value="overview">Visão geral</option></select>
           <label for="quality">Perfil gráfico</label><select id="quality"><option value="low">Leve · resolução reduzida</option><option value="balanced" selected>Equilibrado</option></select>
           <div class="actions"><button id="pause" disabled>Pausar</button><button id="step" disabled>Avançar 120 passos</button></div>
           <button id="restart" disabled>Reiniciar teste</button>

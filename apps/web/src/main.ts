@@ -5,6 +5,7 @@ function element<T extends HTMLElement>(id: string): T {
 }
 const host = element('viewport'), status = element('status'), output = element('report');
 const scene = element<HTMLSelectElement>('scene');
+const camera = element<HTMLSelectElement>('camera');
 const quality = element<HTMLSelectElement>('quality');
 const pause = element<HTMLButtonElement>('pause'), step = element<HTMLButtonElement>('step');
 const restart = element<HTMLButtonElement>('restart'), release = element<HTMLButtonElement>('release');
@@ -16,7 +17,7 @@ function publish(data: Record<string, unknown>) {
   output.textContent = JSON.stringify(report, null, 2);
   document.body.dataset.status = String(report.status);
 }
-function controls(active: boolean) { pause.disabled = !active; step.disabled = true; release.disabled = !active; restart.disabled = false; }
+function controls(active: boolean) { camera.disabled = !active; pause.disabled = !active; step.disabled = true; release.disabled = !active; restart.disabled = false; }
 function stop() { generation++; cleanup?.(); cleanup = null; controls(false); }
 async function boot() {
   stop(); const token = generation;
@@ -26,7 +27,7 @@ async function boot() {
   let view: ReturnType<typeof import('./view.ts').createView> | null = null;
   let physics: Awaited<ReturnType<typeof import('./physics.ts').createPhysics>> | null = null;
   let destroyed = false, raf = 0;
-  const destroy = () => { if (destroyed) return; destroyed = true; cancelAnimationFrame(raf); pause.onclick = null; step.onclick = null; document.removeEventListener('visibilitychange', visibility); physics?.dispose(); view?.dispose(); physics = null; view = null; };
+  const destroy = () => { if (destroyed) return; destroyed = true; cancelAnimationFrame(raf); pause.onclick = null; step.onclick = null; camera.onchange = null; document.removeEventListener('visibilitychange', visibility); physics?.dispose(); view?.dispose(); physics = null; view = null; };
   let previous = performance.now(), accumulator = 0, paused = false;
   const visibility = () => { previous = performance.now(); accumulator = 0; };
   cleanup = destroy;
@@ -36,7 +37,7 @@ async function boot() {
     view = createView(host, profile, () => {
       stop(); status.textContent = 'O contexto gráfico foi perdido. Reinicie o teste.';
       publish({ ...report, status: 'error', error: 'webgl_context_lost' });
-    }, sceneKind);
+    }, sceneKind, camera.value === 'overview' ? 'overview' : 'chase');
     if (typeof WebAssembly === 'undefined') throw new Error('WebAssembly não está disponível. A física precisa de WASM para iniciar.');
     const { createPhysics, PHYSICS_DT } = await import('./physics.ts');
     if (token !== generation) return;
@@ -46,7 +47,7 @@ async function boot() {
     let frames = 0, sampledFrames = 0, sampleTime = performance.now(), fps = 0;
     const update = () => publish({ status: paused ? 'paused' : 'running', quality: profile, ...display.info, wasm: true, rapierVersion: world.version,
       physicsSteps: world.steps, renderFrames: frames, bodyY: Number(world.position.y.toFixed(4)), fps: Number(fps.toFixed(1)), memory: display.memory });
-    const draw = () => { display.render(world.position); frames++; };
+    const draw = (elapsed = 0) => { display.render(world.position, elapsed); frames++; };
     const animate = (now: number) => {
       if (destroyed) return;
       const elapsed = Math.min(Math.max((now - previous) / 1000, 0), 0.1); previous = now;
@@ -56,13 +57,14 @@ async function boot() {
         while (accumulator >= PHYSICS_DT && iterations < 8) { world.step(); accumulator -= PHYSICS_DT; iterations++; }
         if (iterations === 8) accumulator = 0;
       }
-      if (!document.hidden) draw();
+      if (!document.hidden) draw(elapsed);
       if (now - sampleTime >= 250) { fps = (frames - sampledFrames) * 1000 / (now - sampleTime); sampledFrames = frames; sampleTime = now; update(); }
       raf = requestAnimationFrame(animate);
     };
     document.addEventListener('visibilitychange', visibility);
     pause.onclick = () => { paused = !paused; accumulator = 0; previous = performance.now(); pause.textContent = paused ? 'Retomar' : 'Pausar'; step.disabled = !paused; status.textContent = paused ? 'Simulação pausada' : 'Renderização e física ativas'; update(); };
     step.onclick = () => { if (!paused || destroyed) return; for (let i = 0; i < 120; i++) world.step(); draw(); update(); };
+    camera.onchange = () => { display.setCameraMode(camera.value === 'overview' ? 'overview' : 'chase'); draw(); update(); };
     controls(true); pause.textContent = 'Pausar'; status.textContent = 'Renderização e física ativas';
     previous = performance.now(); draw(); update(); raf = requestAnimationFrame(animate);
   } catch (error) {

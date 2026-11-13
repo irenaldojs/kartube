@@ -14,7 +14,7 @@ h1 { font-size:clamp(34px,4.6vw,60px); line-height:1.06; letter-spacing:-2px; ma
 p { line-height:1.7; color:#aab7bd; }
 .intro>p:last-child { margin:0 0 3px; max-width:410px; font-size:15px; }
 .lab { display:grid; grid-template-columns:minmax(0,1fr) 290px; border:1px solid #3d494f; border-radius:5px; overflow:hidden; }
-.viewport { height:440px; min-width:0; position:relative; background:#222d32; }
+.viewport { height:100%; min-height:440px; min-width:0; position:relative; background:#222d32; }
 .viewport canvas { width:100%; height:100%; display:block; }
 .scene-label { position:absolute; left:22px; top:22px; color:#b8c7ca; z-index:1; pointer-events:none; }
 .panel { background:#1c262b; padding:25px 22px; border-left:1px solid #3d494f; }
@@ -38,6 +38,6 @@ h2 { font-size:23px; font-weight:550; margin:0; letter-spacing:-.5px; }
 .diagnostics p:not(.eyebrow) { font-size:13px; max-width:340px; }
 pre { margin:0; padding:20px; border:1px solid #354047; background:#10181c; border-radius:4px; font:11px/1.6 ui-monospace,monospace; overflow:auto; max-height:320px; color:#bcd5c0; }
 footer { border-top:1px solid #354047; display:flex; justify-content:space-between; padding:22px 0; color:#8e9da5; font:10px ui-monospace,monospace; letter-spacing:1px; }
-@media(max-width:800px) { main { padding:0 20px; } .intro { grid-template-columns:1fr; gap:20px; } .lab { grid-template-columns:1fr; } .viewport { height:360px; } .panel { border-left:0; border-top:1px solid #3d494f; } .panel-heading { margin-bottom:15px; } .diagnostics { grid-template-columns:1fr; gap:20px; } .tag { font-size:9px; letter-spacing:1px; } footer { gap:20px; line-height:1.6; } }
+@media(max-width:800px) { main { padding:0 20px; } .intro { grid-template-columns:1fr; gap:20px; } .lab { grid-template-columns:1fr; } .viewport { height:360px; min-height:0; } .panel { border-left:0; border-top:1px solid #3d494f; } .panel-heading { margin-bottom:15px; } .diagnostics { grid-template-columns:1fr; gap:20px; } .tag { font-size:9px; letter-spacing:1px; } footer { gap:20px; line-height:1.6; } }
 
-#scene { margin-bottom:16px; }
+#scene, #camera { margin-bottom:16px; }

@@ -1,7 +1,8 @@
 import * as THREE from 'three';
+import { createCameraRig, type CameraMode, type KartPose } from './camera.ts';
 import { TRACK_PARTS, TRACK_SUMMARY, type SceneKind } from './track.ts';
 export type Quality = 'low' | 'balanced';
-export function createView(host: HTMLElement, quality: Quality, onContextLost: () => void, sceneKind: SceneKind = 'drop') {
+export function createView(host: HTMLElement, quality: Quality, onContextLost: () => void, sceneKind: SceneKind = 'drop', cameraMode: CameraMode = 'chase') {
   const canvas = document.createElement('canvas');
   canvas.setAttribute('aria-label', sceneKind === 'track' ? 'Pista cinza fechada com kart, rampas e caminho alternativo' : 'Kart de teste sobre uma plataforma');
   const gl = canvas.getContext('webgl2', { antialias: quality === 'balanced', alpha: false });
@@ -12,12 +13,12 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
   renderer.setClearColor(0x222d32);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 240);
-  camera.position.set(13, 10, 14); camera.lookAt(0, 0.8, 0);
-  if (sceneKind === 'track') { camera.position.set(48, 58, 62); camera.lookAt(0, 0, 0); }
+  const cameraRig = createCameraRig(camera, sceneKind, cameraMode);
   scene.add(new THREE.HemisphereLight(0xffffff, 0x36464c, 2.4));
   const light = new THREE.DirectionalLight(0xffffff, 3); light.position.set(4, 9, 2); scene.add(light);
   const geometries: THREE.BufferGeometry[] = [];
   const materials: THREE.Material[] = [];
+  const shadowSurfaces: THREE.Object3D[] = [];
   function box(x: number, y: number, z: number, color: number) {
     const geometry = new THREE.BoxGeometry(x, y, z); geometries.push(geometry);
     const material = new THREE.MeshStandardMaterial({ color, roughness: 0.85 }); materials.push(material);
@@ -33,11 +34,12 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
       const mesh = new THREE.Mesh(geometry, material);
       mesh.scale.set(...part.size); mesh.position.set(...part.position); mesh.rotation.z = part.rotationZ ?? 0;
       scene.add(mesh);
+      if (part.kind === 'road' || part.kind === 'ramp') shadowSurfaces.push(mesh);
     }
   } else {
-  const floor = box(20, 0.5, 14, 0x536368); floor.position.y = -0.25; scene.add(floor);
-  const grid = new THREE.GridHelper(20, 20, 0x94b5a5, 0x667c7b); grid.position.y = 0.01; scene.add(grid);
-  geometries.push(grid.geometry); materials.push(...(Array.isArray(grid.material) ? grid.material : [grid.material]));
+    const floor = box(20, 0.5, 14, 0x536368); floor.position.y = -0.25; scene.add(floor); shadowSurfaces.push(floor);
+    const grid = new THREE.GridHelper(20, 20, 0x94b5a5, 0x667c7b); grid.position.y = 0.01; scene.add(grid);
+    geometries.push(grid.geometry); materials.push(...(Array.isArray(grid.material) ? grid.material : [grid.material]));
   }
   const kart = new THREE.Group();
   const chassis = box(1.8, 0.45, 2.8, 0xe8a64e); kart.add(chassis);
@@ -45,7 +47,16 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
   for (const x of [-0.9, 0.9]) for (const z of [-0.9, 0.9]) {
     const wheel = box(0.45, 0.55, 0.65, 0x182126); wheel.position.set(x, -0.08, z); kart.add(wheel);
   }
-  scene.add(kart); host.append(canvas);
+  scene.add(kart);
+  // A small untextured contact shadow avoids a shadow-map render pass on mobile.
+  const shadowGeometry = new THREE.CircleGeometry(1, quality === 'low' ? 16 : 24);
+  const shadowMaterial = new THREE.MeshBasicMaterial({ color: 0x0a1519, transparent: true, opacity: 0.28, depthWrite: false });
+  geometries.push(shadowGeometry); materials.push(shadowMaterial);
+  const shadow = new THREE.Mesh(shadowGeometry, shadowMaterial);
+  shadow.scale.set(1.25, 1.7, 1); scene.add(shadow);
+  const ray = new THREE.Raycaster(), normal = new THREE.Vector3(), up = new THREE.Vector3(0, 0, 1);
+  ray.ray.direction.set(0, -1, 0);
+  host.append(canvas);
   let disposed = false;
   const resize = new ResizeObserver(() => {
     const width = Math.max(host.clientWidth, 1), height = Math.max(host.clientHeight, 1);
@@ -58,10 +69,23 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
   canvas.addEventListener('webglcontextlost', lost);
   const debug = gl.getExtension('WEBGL_debug_renderer_info');
   return {
-    info: { scene: sceneKind, ...(sceneKind === 'track' ? { track: TRACK_SUMMARY } : {}), threeVersion: THREE.REVISION, webgl2: true, gpu: String(gl.getParameter(debug ? debug.UNMASKED_RENDERER_WEBGL : gl.RENDERER)), pixelRatio: ratio },
-    render(position: { x: number; y: number; z: number }) {
+    get info() { return { camera: cameraRig.info, shadow: 'contact', shadowVisible: shadow.visible, scene: sceneKind, ...(sceneKind === 'track' ? { track: TRACK_SUMMARY } : {}), threeVersion: THREE.REVISION, webgl2: true, gpu: String(gl.getParameter(debug ? debug.UNMASKED_RENDERER_WEBGL : gl.RENDERER)), pixelRatio: ratio }; },
+    setCameraMode(mode: CameraMode) { cameraRig.setMode(mode); },
+    render(position: KartPose, elapsed = 0) {
       if (disposed) return;
-      kart.position.copy(position); renderer.render(scene, camera);
+      kart.position.copy(position); kart.rotation.y = position.yaw ?? 0;
+      // Surface transforms must be current before raycasting, including the first frame.
+      scene.updateMatrixWorld(true);
+      ray.ray.origin.set(position.x, position.y + 0.1, position.z);
+      const hit = ray.intersectObjects(shadowSurfaces, false)[0];
+      shadow.visible = !!hit;
+      if (hit?.face) {
+        normal.copy(hit.face.normal).transformDirection(hit.object.matrixWorld);
+        shadow.position.copy(hit.point).addScaledVector(normal, 0.015);
+        shadow.quaternion.setFromUnitVectors(up, normal);
+        shadowMaterial.opacity = 0.28 / (1 + Math.max(position.y - hit.point.y - 0.35, 0) * 0.5);
+      }
+      cameraRig.update(position, elapsed); renderer.render(scene, camera);
     },
     get memory() { return { ...renderer.info.memory }; },
     dispose() {
