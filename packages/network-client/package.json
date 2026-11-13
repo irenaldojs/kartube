@@ -1,0 +1,11 @@
+{
+  "name": "@kartube/network-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@kartube/game-core": "0.1.0",
+    "@kartube/protocol": "0.1.0"
+  }
+}

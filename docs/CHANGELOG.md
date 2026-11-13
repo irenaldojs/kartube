@@ -2,6 +2,15 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-13 — E00-T03 — Sessão remota com transporte injetável
+
+- Tipo: implementação e decisão (ADR-0005).
+- Novo pacote network-client mantém I/O fora do núcleo/protocolo e implementa RaceSession remota com handshake, continuidade de envelopes/snapshots e contexto de eventos.
+- Input só é enviado por slot humano em corrida ativa; resultado é emitido uma vez após snapshot final válido. Estado exposto é congelado, listeners isolados e descarte idempotente remove callbacks/fecha transporte.
+- Extraída validação de RaceConfig para reuso no construtor; adicionado smoke do adapter contra o Rust real ao check:spike já executado pela CI.
+- Evidência: tipos e 43 testes TS aprovados; smoke de WebSocket Node, RemoteRaceSession/Rust e Chromium aprovado. Sem alterações no servidor Rust nesta entrega.
+- Etapa 00 segue em andamento; sessão local de referência, resync/reconexão, lobby e provas Android permanecem pendentes.
+
 ## 2026-11-13 — E00-T04 — Codecs de servidor TS/Rust
 
 - Tipo: implementação e documentação.

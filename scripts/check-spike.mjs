@@ -19,6 +19,7 @@ try {
     await delay(100);
   }
   await import('./websocket-smoke.mjs');
+  await import('./remote-session-smoke.mjs');
   await import('./browser-smoke.mjs');
 } finally {
   if (server.exitCode === null && !failure) {

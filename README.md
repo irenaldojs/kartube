@@ -19,6 +19,7 @@ npm run check
 
 - `packages/game-core`: contratos de sessão/eventos, input e plataforma; validação de snapshots, transições e resultados.
 - `packages/game-data`: contrato, parser e verificação SHA-256 canônica de pista, checkpoints e spawns.
+- `packages/network-client`: sessão remota, validação contextual de eventos e transporte WebSocket.
 - `packages/protocol`: envelope v1, codecs de cliente/servidor e gate de handshake/sequência.
 - `fixtures`: casos canônicos destinados também aos testes Rust futuros.
 - `docs`: plano, decisões e evidências de desenvolvimento.
@@ -47,4 +48,4 @@ cargo test --locked --manifest-path apps/server/Cargo.toml
 npm run check:spike
 ```
 
-O último comando inicia/encerra o servidor e testa WebSocket em Node e Chromium headless. O teste Node valida as respostas Rust com o decoder TypeScript. Linux pode precisar de privilégios de administrador para instalar as bibliotecas do Chromium. A CI inclui esses comandos; testes Android/Tauri permanecem pendentes.
+O último comando inicia/encerra o servidor e testa WebSocket em Node e Chromium headless. O teste Node valida as respostas Rust com o decoder TypeScript e confirma handshake pelo adapter remoto. Linux pode precisar de privilégios de administrador para instalar as bibliotecas do Chromium. A CI inclui esses comandos; testes Android/Tauri permanecem pendentes.

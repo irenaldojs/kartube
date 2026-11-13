@@ -40,7 +40,7 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 - Responsável / agente: Codex
 - Data de início: 2026-11-13
 - Referência de commit/PR: primeiro commit de implementação (`chore: initialize Kartube foundations`); consultar git log.
-- Testes executados e ambiente: Node.js 24.22.2 / npm 11.19.1 / Rust 1.100.0 em Linux; tipos e 30 testes TS, 8 testes Rust, rustfmt, clippy e `npm run check:spike` aprovados. Chromium headless confirmou hello/welcome por WebSocket (detalhes no changelog).
+- Testes executados e ambiente: Node.js 24.22.2 / npm 11.19.1 / Rust 1.100.0 em Linux; tipos e 43 testes TS, 8 testes Rust, rustfmt, clippy e `npm run check:spike` aprovados. Chromium headless confirmou hello/welcome por WebSocket (detalhes no changelog).
 - Evidências de aprovação: **—**
 - Pendências / riscos: T01, T03–T07 ainda pendentes de validação completa; Android físico não definido; Rust/Cargo agora instalados. Interfaces e fixtures iniciais não bastam para encerrar a etapa.
 - Data de conclusão: **—**
@@ -87,3 +87,11 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 - Limite de saída 16 KiB; entrada continua 4 KiB. Envelope completo aplicado ao spike, com sequência de servidor independente.
 - 45 fixtures comuns; 30 testes TS, 8 Rust, rustfmt/clippy e smoke Node/Chromium aprovados. O smoke Node valida as respostas reais Rust pelo decoder TS.
 - Resultado tem validação isolada de dados e validação contextual com snapshot final. Nenhuma corrida/sala implementada; adapters e demais pendências da etapa permanecem abertos.
+
+### Avanço E00-T03 — Adapter remoto — 2026-11-13
+
+- RemoteRaceSession em network-client implementa RaceSession com transporte injetável e implementação WebSocket padrão; isolamento registrado no ADR-0005.
+- Handshake, sequência contígua, IDs de evento, contexto de corrida, continuidade de snapshots, resultado único, input e descarte testados. Snapshots/eventos congelados e erros de listener isolados.
+- Evidência: `npm run check` com 43 testes TS/tipos aprovados; `npm run check:spike` confirmou handshake da nova sessão com Rust e smoke Node/Chromium.
+- Pacote antecipado é prova das interfaces da etapa 00, sem implementação de salas/sincronização de partidas das etapas 05/06. Config/slot vêm de fixture até existir lobby autoritativo.
+- T03 continua parcial: falta implementação local de referência e provas completas dos adapters; resync/timeout/reconexão não implementados. Etapa permanece em andamento.

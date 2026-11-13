@@ -21,3 +21,7 @@ Prova de importação de pacote compartilhado e empacotamento do mesmo build em 
 ## Evidência parcial — 2026-11-13
 
 Escolhido npm workspaces. `npm run check` passou com importação de `@kartube/game-core` pelo pacote `protocol` e pelos testes em Node 24. Ainda falta empacotar o mesmo cliente no navegador/Tauri; ADR permanece proposto.
+
+## Extensão da prova de interfaces — 2026-11-13
+
+Adicionado pacote network-client para manter transporte e ciclo de conexão fora de game-core/protocol; decisão específica no ADR-0005. O desenho dos três aplicativos distribuíveis permanece o mesmo. ADR-0001 continua proposto até validar empacotamento compartilhado.

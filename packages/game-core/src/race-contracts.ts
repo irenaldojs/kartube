@@ -65,11 +65,14 @@ function ensure(condition: unknown, reason: string): asserts condition {
 }
 function tick(n: number): boolean { return Number.isSafeInteger(n) && n >= 0; }
 function identifier(s: string): boolean { return typeof s === 'string' && /^[A-Za-z0-9._-]{1,64}$/.test(s); }
+export function validateRaceConfig(config: RaceConfig): void {
+  ensure(identifier(config.raceId) && identifier(config.track.id), 'Invalid race/track identifier');
+  ensure(Number.isSafeInteger(config.track.version) && config.track.version > 0 && typeof config.track.checksum === 'string' && /^[0-9a-f]{64}$/.test(config.track.checksum), 'Invalid track reference');
+  ensure(Number.isSafeInteger(config.laps) && config.laps > 0 && Number.isSafeInteger(config.tickRate) && config.tickRate > 0, 'Invalid race configuration');
+}
 export function validateRaceSnapshot(snapshot: RaceSnapshot): void {
   const { config, serverTick, startTick, phase } = snapshot;
-  ensure(identifier(config.raceId) && identifier(config.track.id), 'Invalid race/track identifier');
-  ensure(Number.isSafeInteger(config.track.version) && config.track.version > 0 && /^[0-9a-f]{64}$/.test(config.track.checksum), 'Invalid track reference');
-  ensure(Number.isSafeInteger(config.laps) && config.laps > 0 && Number.isSafeInteger(config.tickRate) && config.tickRate > 0, 'Invalid race configuration');
+  validateRaceConfig(config);
   ensure(tick(serverTick), 'Invalid server tick');
   ensure(['waiting', 'countdown', 'racing', 'finished', 'aborted'].includes(phase), 'Invalid race phase');
   if (phase === 'waiting') ensure(startTick === null, 'Waiting race cannot have start tick');
