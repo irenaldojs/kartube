@@ -40,7 +40,7 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 - Responsável / agente: Codex
 - Data de início: 2026-11-13
 - Referência de commit/PR: primeiro commit de implementação (`chore: initialize Kartube foundations`); consultar git log.
-- Testes executados e ambiente: Node.js 24.22.2 / npm 11.19.1 / Rust 1.100.0 em Linux; tipos e 15 testes TS, 4 testes Rust, rustfmt, clippy e `npm run check:spike` aprovados. Chromium headless confirmou hello/welcome por WebSocket (detalhes no changelog).
+- Testes executados e ambiente: Node.js 24.22.2 / npm 11.19.1 / Rust 1.100.0 em Linux; tipos e 18 testes TS, 7 testes Rust, rustfmt, clippy e `npm run check:spike` aprovados. Chromium headless confirmou hello/welcome por WebSocket (detalhes no changelog).
 - Evidências de aprovação: **—**
 - Pendências / riscos: T01, T03–T07 ainda pendentes de validação completa; Android físico não definido; Rust/Cargo agora instalados. Interfaces e fixtures iniciais não bastam para encerrar a etapa.
 - Data de conclusão: **—**
@@ -65,3 +65,11 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 - Fixture JSON de contrato com bifurcação/reencontro; testes positivos e negativos de schema, coordenadas, referências, ciclos, conectividade e slots.
 - Evidência: `npm run check` aprovado, 15 testes TS e tipos estritos.
 - Pendências: hash canônico e validação de pista em Rust; contrato de rede completo; revisão dos contratos de sessão e testes de plataforma. Nenhuma etapa posterior iniciada e T04 ainda parcial.
+
+### Avanço E00-T04 — Checksum e paridade de pistas — 2026-11-13
+
+- SHA-256 de formato binário canônico v1 implementado em TS/Rust, decisão no ADR-0004.
+- Parser de grafo/spawns equivalente em Rust, com APIs de validação estrutural e de checksum nas duas linguagens.
+- Fixture com frações/expoente, bytes/hash esperados gerados independentemente e 22 casos de mutação compartilhados. Reordenação e zero negativo mantêm hash; mudança de conteúdo é rejeitada pela validação completa.
+- Evidência: `npm run check`, `cargo test --locked`, rustfmt e clippy; 18 testes TS e 7 Rust.
+- T04 continua parcial: mensagens de corrida ainda não especificadas completamente. T01/T03/T05/T06/T07 e aprovação integral da etapa permanecem pendentes.

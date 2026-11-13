@@ -30,8 +30,9 @@ export function parseTrackDefinition(value: unknown): TrackDefinition {
   const t = object(value, 'track');
   if (t.schemaVersion !== 1) fail('schemaVersion', 'unsupported version');
   if (typeof t.version !== 'number' || !Number.isSafeInteger(t.version) || t.version < 1) fail('version', 'expected positive safe integer');
-  // Opaque content identifier until canonical hashing is specified; not verified here.
-  const checksum = id(t.checksum, 'checksum');
+  // Hash verification is asynchronous; use parseVerifiedTrackDefinition at load boundaries.
+  if (typeof t.checksum !== 'string' || !/^[0-9a-f]{64}$/.test(t.checksum)) fail('checksum', 'expected lowercase SHA-256 hex');
+  const checksum = t.checksum;
   const startCheckpointId = id(t.startCheckpointId, 'startCheckpointId');
   const checkpoints: Checkpoint[] = array(t.checkpoints, 'checkpoints').map((value, index) => {
     const path = `checkpoints[${index}]`;

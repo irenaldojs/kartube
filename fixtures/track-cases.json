@@ -1,0 +1,315 @@
+[
+  {
+    "name": "unchanged",
+    "patches": [],
+    "structural": true,
+    "verified": true
+  },
+  {
+    "name": "content changed",
+    "patches": [
+      {
+        "path": "/checkpoints/0/center/x",
+        "value": 0.5
+      }
+    ],
+    "structural": true,
+    "verified": false
+  },
+  {
+    "name": "wrong hash",
+    "patches": [
+      {
+        "path": "/checksum",
+        "value": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ],
+    "structural": true,
+    "verified": false
+  },
+  {
+    "name": "invalid hash",
+    "patches": [
+      {
+        "path": "/checksum",
+        "value": "opaque"
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "unknown schema",
+    "patches": [
+      {
+        "path": "/schemaVersion",
+        "value": 2
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "unsafe version",
+    "patches": [
+      {
+        "path": "/version",
+        "value": 9007199254740992
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "zero version",
+    "patches": [
+      {
+        "path": "/version",
+        "value": 0
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "missing finish",
+    "patches": [
+      {
+        "path": "/startCheckpointId",
+        "value": "missing"
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "duplicate id",
+    "patches": [
+      {
+        "path": "/checkpoints/1/id",
+        "value": "finish"
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "unknown successor",
+    "patches": [
+      {
+        "path": "/checkpoints/1/next",
+        "value": [
+          "missing"
+        ]
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "dead end",
+    "patches": [
+      {
+        "path": "/checkpoints/1/next",
+        "value": []
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "repeated edge",
+    "patches": [
+      {
+        "path": "/checkpoints/1/next",
+        "value": [
+          "main",
+          "main"
+        ]
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "self loop",
+    "patches": [
+      {
+        "path": "/checkpoints/1/next",
+        "value": [
+          "entry"
+        ]
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "unreachable branch",
+    "patches": [
+      {
+        "path": "/checkpoints/1/next",
+        "value": [
+          "main"
+        ]
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "cycle bypassing finish",
+    "patches": [
+      {
+        "path": "/checkpoints/4/next",
+        "value": [
+          "entry",
+          "finish"
+        ]
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "negative extent",
+    "patches": [
+      {
+        "path": "/checkpoints/0/halfExtents/x",
+        "value": -1
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "null coordinate",
+    "patches": [
+      {
+        "path": "/checkpoints/0/center/z",
+        "value": null
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "duplicate slot",
+    "patches": [
+      {
+        "path": "/spawnSlots/0/slotId",
+        "value": 1
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "fractional slot",
+    "patches": [
+      {
+        "path": "/spawnSlots/0/slotId",
+        "value": 0.5
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "out of range slot",
+    "patches": [
+      {
+        "path": "/spawnSlots/0/slotId",
+        "value": 8
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "numeric string",
+    "patches": [
+      {
+        "path": "/spawnSlots/0/yaw",
+        "value": "0"
+      }
+    ],
+    "structural": false,
+    "verified": false
+  },
+  {
+    "name": "missing spawn",
+    "patches": [
+      {
+        "path": "/spawnSlots",
+        "value": [
+          {
+            "slotId": 0,
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": -3
+            },
+            "yaw": 0.3
+          },
+          {
+            "slotId": 1,
+            "position": {
+              "x": 3,
+              "y": 0,
+              "z": -3
+            },
+            "yaw": 0
+          },
+          {
+            "slotId": 2,
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": -6
+            },
+            "yaw": 0
+          },
+          {
+            "slotId": 3,
+            "position": {
+              "x": 3,
+              "y": 0,
+              "z": -6
+            },
+            "yaw": 0
+          },
+          {
+            "slotId": 4,
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": -9
+            },
+            "yaw": 0
+          },
+          {
+            "slotId": 5,
+            "position": {
+              "x": 3,
+              "y": 0,
+              "z": -9
+            },
+            "yaw": 0
+          },
+          {
+            "slotId": 6,
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": -12
+            },
+            "yaw": 0
+          }
+        ]
+      }
+    ],
+    "structural": false,
+    "verified": false
+  }
+]

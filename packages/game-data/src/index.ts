@@ -17,3 +17,4 @@ export interface TrackDefinition {
 }
 
 export { parseTrackDefinition } from './validate-track.ts';
+export { canonicalTrackBytes, computeTrackChecksum, parseVerifiedTrackDefinition } from './track-checksum.ts';

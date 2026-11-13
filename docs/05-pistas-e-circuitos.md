@@ -58,10 +58,10 @@ Uma pista aceita 8 karts, bots percorrem rotas válidas, 3 voltas terminam em to
 
 Regras do schema 1 inicial:
 
-- IDs e checksum não vazios, 1–64 caracteres ASCII alfanuméricos, ponto, hífen ou sublinhado; versão inteira segura positiva. Schema desconhecido é rejeitado.
+- IDs não vazios, 1–64 caracteres ASCII alfanuméricos, ponto, hífen ou sublinhado; checksum SHA-256 com 64 dígitos hexadecimais minúsculos; versão inteira segura positiva. Schema desconhecido é rejeitado.
 - Pelo menos dois checkpoints com IDs únicos e chegada indicada por `startCheckpointId`. Centros finitos em metros; meias extensões AABB estritamente positivas.
 - Cada checkpoint tem sucessores existentes, únicos e não vazios; não pode apontar para si mesmo. Todos devem ser alcançáveis a partir da chegada.
 - Ao remover o nó de chegada, o grafo deve ser acíclico. Assim, toda rota retorna à chegada, sem laços independentes. Bifurcações e reencontros são permitidos. Percursos futuros que precisem de laços internos exigem revisão deliberada do contrato.
 - Exatamente oito slots únicos de 0 a 7, com posição finita e yaw finito em radianos.
 
-O checksum permanece opaco: presença/formato são verificados, conteúdo não é recalculado. Hash canônico e paridade do validador de pista em Rust ainda pendentes. Não há verificação de distância entre spawns, sobreposição de volumes, colisão com cenário ou trajetória física. Ordem de passagem, direção, tempos, teleporte e contagem de voltas pertencem à autoridade de corrida na etapa 02; um grafo estruturalmente válido não comprova esses comportamentos. Os demais campos de produção listados acima serão introduzidos nas etapas correspondentes.
+O parser estrutural verifica formato do checksum; `parseVerifiedTrackDefinition` também recalcula e compara SHA-256. Rust tem parser estrutural e verificado equivalentes, consumindo as mesmas fixtures. O formato canônico está em `16-formato-dados.md` e ADR-0004. Não há verificação de distância entre spawns, sobreposição de volumes, colisão com cenário ou trajetória física. Ordem de passagem, direção, tempos, teleporte e contagem de voltas pertencem à autoridade de corrida na etapa 02; um grafo estruturalmente válido não comprova esses comportamentos. Os demais campos de produção listados acima serão introduzidos nas etapas correspondentes.

@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "id": "track-contract-fixture",
   "version": 1,
-  "checksum": "fixture-not-a-content-hash",
+  "checksum": "786dedf3809bf30c1c817e88e5fa95051b67cf94ea82fbc56a81248a9f48f18c",
   "startCheckpointId": "finish",
   "checkpoints": [
     {
       "id": "finish",
       "center": {
         "x": 0,
-        "y": 0,
+        "y": 0.1,
         "z": 0
       },
       "halfExtents": {
@@ -43,7 +43,7 @@
       "center": {
         "x": 20,
         "y": 0,
-        "z": 0
+        "z": 1e-120
       },
       "halfExtents": {
         "x": 2,
@@ -95,7 +95,7 @@
         "y": 0,
         "z": -3
       },
-      "yaw": 0
+      "yaw": 0.3
     },
     {
       "slotId": 1,

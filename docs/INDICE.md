@@ -35,4 +35,6 @@ Leia [README de etapas](etapas/README.md), depois o arquivo da etapa marcada com
 - [ADR-0002 — sincronização híbrida e autoridade](decisoes/ADR-0002-sincronizacao.md)
 - [ADR-0003 — renderização e física](decisoes/ADR-0003-render-fisica.md)
 
-Os ADRs iniciais têm estado **proposto**: precisam de validação durante a etapa 00 e nos testes técnicos.
+- [ADR-0004 — checksum canônico de pistas](decisoes/ADR-0004-checksum-pistas.md) — aceito para schema 1 experimental.
+
+Os ADRs iniciais 0001–0003 têm estado **proposto**: precisam de validação durante a etapa 00 e nos testes técnicos.

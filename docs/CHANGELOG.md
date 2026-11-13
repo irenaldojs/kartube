@@ -2,6 +2,15 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-13 — E00-T04 — Checksum canônico e pistas em Rust
+
+- Tipo: implementação e decisão (ADR-0004).
+- Formato binário canônico e SHA-256 de pista em TS e Rust, com verificadores de estrutura/integridade separados. Checksum antigo opaco substituído por 64 dígitos hexadecimais minúsculos.
+- Parser de grafo/spawns equivalente em Rust; serde_json com float_roundtrip para preservar a conversão correta dos números binary64.
+- Golden bytes/hash gerados independentemente em Python e 22 casos compartilhados de mutação; fixture inclui frações e expoente. Reordenação e zero negativo preservam hash; conteúdo alterado falha na verificação.
+- Evidência: tipos e 18 testes TS aprovados; 7 testes Rust aprovados; rustfmt e clippy sem warnings. Contratos documentados em dados/pistas e ADR-0004.
+- Etapa 00 em andamento; mensagens completas, contratos de sessão e provas de plataforma continuam pendentes. ADRs 0001–0003 seguem propostos.
+
 ## 2026-11-13 — E00-T04 — Parser de pistas e grafo de checkpoints
 
 - Tipo: implementação e documentação.

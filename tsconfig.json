@@ -10,7 +10,8 @@
     "noEmit": true,
     "verbatimModuleSyntax": true,
     "lib": [
-      "ES2023"
+      "ES2023",
+      "DOM"
     ]
   },
   "include": [
