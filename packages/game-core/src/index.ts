@@ -26,19 +26,6 @@ export interface Participant {
   readonly driverId: string;
   readonly controller: 'human' | 'bot';
 }
-export interface RaceSnapshot {
-  readonly raceId: string;
-  readonly serverTick: number;
-  readonly phase: 'waiting' | 'countdown' | 'racing' | 'finished';
-  readonly participants: readonly Participant[];
-}
-// LocalSession and RemoteSession will implement the same boundary.
-// Only the session authority creates snapshots and results.
-export interface RaceSession {
-  submitInput(input: InputFrame): void;
-  subscribe(listener: (snapshot: RaceSnapshot) => void): () => void;
-  dispose(): void;
-}
 export function validateRoster(participants: readonly Participant[]): void {
   if (participants.length !== PARTICIPANT_COUNT) throw new Error('Expected eight participants');
   const slots = new Set<number>();
@@ -51,3 +38,5 @@ export function validateRoster(participants: readonly Participant[]): void {
     drivers.add(participant.driverId);
   }
 }
+
+export * from './race-contracts.ts';

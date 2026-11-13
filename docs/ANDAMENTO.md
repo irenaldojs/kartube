@@ -4,7 +4,7 @@
 
 | Etapa | Status | Evidência | Próximo critério |
 |---|---|---|---|
-| 00 — Fundamentos | Em andamento | Pistas/checksum TS/Rust, fixtures e spike WebSocket | Validar contratos completos e spikes de plataforma |
+| 00 — Fundamentos | Em andamento | Contratos de sessão/corrida, pistas TS/Rust e spike WebSocket | Validar contratos completos e spikes de plataforma |
 | 01 — Protótipo 3D | Planejada | — | Pista cinza e kart dirigível |
 | 02 — Corrida local | Planejada | — | 3 voltas e resultado válidos |
 | 03 — Bots locais | Planejada | — | 8 pilotos terminam corrida |

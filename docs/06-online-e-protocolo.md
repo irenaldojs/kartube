@@ -66,3 +66,9 @@ Fixtures portáveis em `fixtures/client-messages.json`; testes TS exercitam JSON
 Nesta prova, respostas de diagnóstico são `{protocolVersion:1, seq, payload:{type:"welcome"|"input_ack"}}` para aceitação e `{payload:{type:"error",code}}` para rejeição. Estes acknowledgements não são o contrato futuro de snapshots/resultados, não atribuem slots e não confirmam progresso de corrida. O gate é isolado por conexão; `input` apenas é validado, sem simulação.
 
 `npm run check:spike` inicializa o servidor, verifica versão incompatível, handshake, replay, input válido/inválido via Node WebSocket e abre Chromium headless para enviar hello pela página e conferir welcome. Rust consome fixtures compartilhadas de mensagens e inputs. Ainda faltam Android físico, WebGL2/WASM, Tauri, outras mensagens e testes com latência/partidas.
+
+## Contratos tipados de corrida — E00-T03/T04
+
+`ServerMessage` define envelope com welcome (connectionId) e os eventos de corrida de game-core. Checkpoints, itens e resultados são exclusivamente mensagens da autoridade; o cliente continua enviando input (incluindo useItem), sem poder atribuir slot, alvo oficial ou pontos. `RaceSession` recebe eventos locais/remotos através da mesma interface. Ver campos e invariantes em `16-formato-dados.md` e ciclo de vida em `02-arquitetura-do-sistema.md`.
+
+Esse contrato tipado ainda não é usado pelo endpoint de diagnóstico: welcome/input_ack do spike continuam deliberadamente limitados à prova de transporte. Decoder de servidor, mapeamento Rust, lobby, campeonato, reconexão, rate limit e validação física permanecem entregas futuras.

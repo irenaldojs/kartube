@@ -11,7 +11,7 @@
 | `packages/protocol` (TS e schema gerador/compatível com Rust) | Contratos tipados, versionamento, validação dos pacotes | Depender de bibliotecas visuais |
 | `packages/game-data` (TS/JSON) | Pistas, checkpoints, itens, parâmetros, elenco, IDs estáveis | Conter lógica de renderização |
 
-**Observação:** os caminhos são a **estrutura futura planejada**; ainda não há pastas de código.
+**Estado:** pacotes TS e spike Rust já existem. Aplicativos web de jogo e nativo ainda planejados.
 
 ## Fluxo local e remoto
 
@@ -57,3 +57,13 @@ Cliente perde a conexão → UI informa status e tenta reconectar dentro de uma 
 ## Dependências
 
 Ver [Online](06-online-e-protocolo.md), [Dados](16-formato-dados.md), [Testes](12-testes-e-qualidade.md) e [ADR-0002](decisoes/ADR-0002-sincronizacao.md).
+
+## Contrato de sessão implementado — E00-T03 (parcial)
+
+`game-core/race-contracts.ts` define `RaceSession` comum, snapshots e eventos. A interface não abre socket, carrega assets nem decide regras gráficas. `mode` identifica local/remoto; `localSlotId` é o slot humano local atribuído pela autoridade. `submitInput` enfileira intenção e não confirma checkpoint, item ou resultado. `getSnapshot` devolve último estado oficial ou null antes do primeiro. `subscribe` entrega eventos futuros, sem reproduzir o estado atual: consultar getSnapshot depois de assinar. O retorno cancela a assinatura.
+
+Implementações futuras devem tornar unsubscribe/dispose idempotentes, liberar listeners/conexões no dispose e lançar erro em submitInput/subscribe após descarte; getSnapshot poderá retornar o último estado. Não mutar snapshots já entregues. Emitir race_result uma única vez por raceId/resultId; ignorar repetições de rede. Estas obrigações estão documentadas, mas ainda não existem LocalSession/RemoteSession para testá-las integralmente. InputAdapter fornece amostra normalizada; PlatformAdapter mantém armazenamento assíncrono e tipo de plataforma, com fullscreen/ciclo de vida a ampliar na etapa 10.
+
+Fluxo oficial: waiting → countdown → racing → finished. Qualquer fase ativa pode terminar em aborted; estados terminais são imutáveis. validateRaceTransition verifica snapshots consecutivos, tick crescente, configuração e início estáveis, slots/pilotos preservados e progresso sem regressão. Controlador humano/bot pode mudar, mantendo slot e piloto. Um primeiro snapshot pode chegar já em racing; quando houver lacunas de fase após reconexão, o adapter deve fazer resync completo, validando o snapshot sem fingir uma sequência consecutiva. Esses adapters ainda não estão implementados.
+
+A autoridade LocalSession offline/Rust online emite snapshot, checkpoint_ack, item_granted, item_used e race_result; connection é estado local do adapter. Snapshots contêm poses e progresso oficiais; resposta visual imediata do jogador deve ficar em estado de apresentação separado. O servidor de diagnóstico não implementa estas mensagens.

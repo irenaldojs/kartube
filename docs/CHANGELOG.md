@@ -2,6 +2,15 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-13 — E00-T03/T04 — Sessão, estados e resultado de corrida
+
+- Tipo: implementação de contratos e documentação.
+- RaceSession ampliada com identidade de modo/slot, snapshot consultável e eventos. Snapshot inclui configuração, poses e progresso dos oito pilotos; contrato tipado de servidor inclui eventos de checkpoint/item/resultado.
+- Validadores de invariantes, transições consecutivas e resultado final; preservam identidade dos slots e relógio, rejeitam regressões e pontos inconsistentes. Desempate por slot para chegada no mesmo tick.
+- Documentadas responsabilidades de descarte, resync e emissão única para futuros adapters. Política experimental atribui pontos por posição também a DNF; timeout e ordem entre DNFs ainda pendentes de validação.
+- Evidência: `npm run check` aprovado, 27 testes TS e tipos estritos. Sem alteração no spike de rede/Rust.
+- Etapa 00 em andamento: LocalSession/RemoteSession, codecs de servidor, aprovação de regras e provas de plataforma continuam pendentes.
+
 ## 2026-11-13 — E00-T04 — Checksum canônico e pistas em Rust
 
 - Tipo: implementação e decisão (ADR-0004).

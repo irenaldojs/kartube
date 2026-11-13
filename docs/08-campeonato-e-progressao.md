@@ -39,3 +39,7 @@ Cada transição é autorizada pelo serviço de sessão (local ou Rust), nunca a
 ## Aceite
 
 Um campeonato local ou online com 4 pistas sempre termina com **exatamente 8 posições ordenadas**, soma correta, mesma tabela em todos os clientes e pódio exibido sem divergência.
+
+## Contrato de resultado inicial — Etapa 00
+
+`validateRaceResult` confere oito posições, pontos da tabela, relógio do snapshot final e finishTick de cada slot. Finalistas precedem DNF; chegada no mesmo tick é desempatada por slotId crescente. No contrato experimental, DNF também recebe pontos da posição atribuída pela autoridade. Política de timeout, ordenação entre múltiplos DNF e aceite de produto continuam pendentes para a etapa 02. Não há corrida nem campeonato implementados por este validador.

@@ -17,7 +17,7 @@ npm run check
 
 `npm test` executa testes de contratos; `npm run typecheck` verifica os pacotes em modo estrito. Os exports TypeScript são fontes: o futuro cliente Vite fará o bundle; Node 24 executa os testes com suporte nativo a TypeScript.
 
-- `packages/game-core`: fronteiras de sessão, input, plataforma e invariantes de participantes.
+- `packages/game-core`: contratos de sessão/eventos, input e plataforma; validação de snapshots, transições e resultados.
 - `packages/game-data`: contrato, parser e verificação SHA-256 canônica de pista, checkpoints e spawns.
 - `packages/protocol`: envelope v1, decoder de hello/input e gate de handshake/sequência.
 - `fixtures`: casos canônicos destinados também aos testes Rust futuros.

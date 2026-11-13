@@ -73,3 +73,11 @@ export class ClientMessageGate {
     return 'accepted';
   }
 }
+
+// Race-only wire contract. Lobby/championship messages are added in their stages.
+// Connection events are local adapter state, never server payloads.
+export type RaceServerPayload = Exclude<import('@kartube/game-core').RaceEvent, { readonly type: 'connection' }>;
+export type ServerMessage = Envelope<
+  | { readonly type: 'welcome'; readonly connectionId: string }
+  | RaceServerPayload
+>;
