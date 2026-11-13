@@ -42,3 +42,7 @@ Licenças automáticas de influenciadores, geração 3D automatizada em runtime,
 ## Regras de originalidade
 
 Inspirar-se em **gênero e sensações** de jogos arcade, sem copiar nomes, personagens, circuitos, símbolos, artes, músicas, itens distintivos ou interface reconhecível de outra franquia. Criar marca, identidade de itens e circuito próprios.
+
+## Aceite do escopo inicial — 2026-11-13
+
+O usuário confirmou o MVP documentado e as prioridades P0/P1 de `15-backlog-e-riscos.md`: oito pilotos, quatro pistas, três voltas por padrão, modos locais/online e campeonato. Pontuação e desempates de `08-campeonato-e-progressao.md` aprovados como base. Ajustes de balanceamento e políticas ainda explicitamente abertas serão definidos nas respectivas etapas; esta aprovação não declara funcionalidades implementadas.

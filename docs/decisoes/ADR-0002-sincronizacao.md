@@ -17,3 +17,7 @@ Validação de movimento aproximada **não impede todo cheat** nem divergência 
 
 ## Validação necessária
 2–8 jogadores, bots, perdas/reconexões, itens simultâneos, latência variável, mesmo resultado em todos os clientes, testes de movimento impossível e medição de CPU/RAM/banda.
+
+## Revisão de fundamentos — 2026-11-13
+
+Decisão mantida como proposta de sincronização de partidas. RaceSession local/remota, codecs TS/Rust, fixtures compartilhadas e handshake real comprovam as fronteiras de contrato e transporte. A autoridade local de referência usa fonte injetada/roteirizada; o spike Rust não simula corrida. Essas provas não validam latência, reconexão, anticheat, bots online ou custo de servidor. A aceitação integral depende das etapas 05/06 e dos cenários listados acima; nenhuma sincronização de gameplay é declarada implementada.

@@ -2,6 +2,37 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-13 — Aceite dos fundamentos e início da etapa 01
+
+- Usuário confirmou o MVP documentado, oito pilotos, quatro pistas, três voltas, pontos e desempates. E00-T01 e etapa 00 concluídas; critérios futuros de Tauri/ADRs e DNF não foram declarados implementados.
+- Etapa 01 iniciada; E01-T01 concluída reutilizando estrutura Vite, boot assíncrono e seleção de perfis da prova existente. Próxima tarefa: E01-T02, pista cinza fechada.
+- Documentos de visão, campeonato, etapas, andamento e README alinhados com o aceite. Verificação do boot: `npm run check:web`.
+
+## 2026-11-13 — E00-T07 — Revisão dos ADRs iniciais
+
+- ADR-0001 a 0003 revisados com evidências atuais e validações restantes nas etapas 01 e 05/06. E00-T07 concluída pela revisão prevista no enunciado.
+- Estados Proposto preservados para aceite integral: empacotamento Tauri, sincronização de corridas e pipeline jogável ainda sem prova suficiente. Etapa 00 permanece em andamento por E00-T01 (aceite de produto/regras).
+
+## 2026-11-13 — E00-T05/T06 — Matriz definida e microprovas concluídas
+
+- E00-T06 concluída com WebSocket browser/Rust e prova WebGL2/WASM no S20 FE, conforme o escopo da tarefa.
+- E00-T05 concluída: matriz de plataformas, conjunto mínimo automatizado e roteiro manual publicados em `docs/matriz-plataformas.md`. Evidências executadas e ambientes planejados separados, com limites das medições e identificação pendente de build/SO.
+- Etapa 00 continua em andamento por T01 e T07; Tauri, GLB, áudio e validação de corrida permanecem nos respectivos critérios futuros.
+
+## 2026-11-13 — E00-T06 — Validação manual no S20 FE
+
+- Usuário forneceu relatórios de execução e descarte em Android físico (S20 FE, Adreno 650, Chrome 157): WebGL2/WASM ativos, 60.4 FPS amostrados no perfil equilibrado, pixelRatio 1.5 e colisão em bodyY 0.349.
+- Confirmou aprovação de reinício, pausa, avanço de 120 passos, retomada e ciclos de liberação/reinício. Evidência manual relatada pelo usuário; build/commit não informado.
+- Documentação de andamento, qualidade e ADR-0003 atualizada. Prova básica Android aprovada; perda forçada de contexto no aparelho, matriz completa, Tauri e demais critérios de aceite continuam pendentes. Etapa 00 em andamento.
+
+## 2026-11-13 — E00-T06 — Prova WebGL2/WASM desktop
+
+- Tipo: implementação e documentação.
+- Cliente Vite com Three.js/WebGL2 e Rapier/WASM, queda e colisão a passo fixo, perfis gráficos, pausa, descarte/reinício e exportação JSON.
+- Smoke Playwright cobre renderização real de pixels, repouso após colisão, avanço manual, descarte, perda de contexto, layout móvel e fallback sem WebGL2/WASM. Build e verificação de tipos incluídos; CI com artefatos de evidência.
+- Evidência local: `npm run check` (54 testes TS) e `npm run check:web` em Chromium headless/SwiftShader. Relatório identifica renderização por software e ausência de Android real.
+- Etapa 00 em andamento; T06 parcial e ADR-0003 proposto. Sem pilotagem, pista jogável ou aceite de Android/Tauri.
+
 ## 2026-11-13 — E00-T03 — Sessão local de referência e equivalência
 
 - Tipo: implementação e documentação.

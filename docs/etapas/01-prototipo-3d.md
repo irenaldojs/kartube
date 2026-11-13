@@ -1,6 +1,6 @@
 # Etapa 01 — Protótipo visual 3D
 
-> **Estado:** Planejada · **Execução:** não iniciada
+> **Estado:** Em andamento · **Execução:** iniciada em 2026-11-13
 
 ## Dependências
 
@@ -12,7 +12,7 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 
 ## Tarefas (a realizar)
 
-- [ ] E01-T01 — Criar estrutura de código planejada e primeiro boot com seleção de qualidade gráfica.
+- [x] E01-T01 — Criar estrutura de código planejada e primeiro boot com seleção de qualidade gráfica.
 - [ ] E01-T02 — Exibir pista cinza fechada com linha de largada, chão, guardrails, rampas, boosts, caixa de item e alternativa em geometria simples.
 - [ ] E01-T03 — Carregar kart placeholder por cena GLB ou geometria provisória, câmera em terceira pessoa e sombras de baixo custo.
 - [ ] E01-T04 — Executar movimento básico e colisões com timestep fixo; criar debug de FPS/física.
@@ -36,10 +36,17 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 
 ## Registro de execução (preencher apenas durante o desenvolvimento)
 
-- Responsável / agente: **não definido**
-- Data de início: **não iniciada**
+- Responsável / agente: Codex
+- Data de início: **2026-11-13**
 - Referência de commit/PR: **—**
 - Testes executados e ambiente: **—**
 - Evidências de aprovação: **—**
 - Pendências / riscos: **—**
 - Data de conclusão: **—**
+
+### E01-T01 — Estrutura e boot — 2026-11-13
+
+- Reaproveitada a estrutura validada na microprova: `apps/web` com Vite/TypeScript, boot em `src/main.ts`, renderização em `src/view.ts` e física em `src/physics.ts`.
+- Perfis leve/equilibrado selecionáveis; troca reinicializa a cena e libera os recursos anteriores. Boot assíncrono trata falhas de WebGL2/WASM e permite reinício. Scripts de desenvolvimento, build e smoke disponíveis na raiz.
+- E01-T01 concluída com a implementação existente, sem duplicar o laboratório. Verificação: `npm run check:web` (tipos, build e smoke Chromium).
+- Próxima tarefa: E01-T02, pista cinza fechada com os elementos de geometria provisória. Kart dirigível, câmera de acompanhamento e Tauri ainda não implementados.

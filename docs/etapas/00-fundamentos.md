@@ -1,6 +1,6 @@
 # Etapa 00 — Fundamentos e contratos
 
-> **Estado:** Em andamento · **Execução:** iniciada em 2026-11-13
+> **Estado:** Concluída · **Execução:** iniciada em 2026-11-13
 
 ## Dependências
 
@@ -12,19 +12,19 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 
 ## Tarefas (a realizar)
 
-- [ ] E00-T01 — Confirmar com o time os objetivos, escopo P0/P1 e pontuação/tie-break em documentos de domínio.
+- [x] E00-T01 — Confirmar com o time os objetivos, escopo P0/P1 e pontuação/tie-break em documentos de domínio.
 - [x] E00-T02 — Fixar esquema de monorepo futuro (apps e packages) e normas TypeScript/Rust; escolher ferramenta de workspaces na execução.
 - [x] E00-T03 — Validar arquitetura local/online, APIs `RaceSession`, `InputAdapter`, `PlatformAdapter` e responsabilidades server/client.
 - [x] E00-T04 — Especificar contrato de pista/checkpoint, envelope de protocolo e casos canônicos compartilhados TS/Rust.
-- [ ] E00-T05 — Planejar conjunto mínimo de testes e matriz real de aparelhos alvo, incluindo Android físico.
-- [ ] E00-T06 — Executar microprovas técnicas de WebSocket entre browser e Rust e carregamento de WebGL2/WASM no Android tão logo houver código.
-- [ ] E00-T07 — Aceitar ou revisar ADR-0001 a 0003 com evidência.
+- [x] E00-T05 — Planejar conjunto mínimo de testes e matriz real de aparelhos alvo, incluindo Android físico.
+- [x] E00-T06 — Executar microprovas técnicas de WebSocket entre browser e Rust e carregamento de WebGL2/WASM no Android tão logo houver código.
+- [x] E00-T07 — Aceitar ou revisar ADR-0001 a 0003 com evidência.
 
 ## Critérios de aceite
 
 - [x] Contratos e responsabilidades escritos sem ambiguidades de autoridade.
-- [ ] Um checklist de validação por plataforma aprovado; ADRs com estado atualizado.
-- [ ] Nenhuma implementação posterior começa sem interfaces de pista e sessão acordadas.
+- [x] Um checklist de validação por plataforma aprovado; ADRs com estado atualizado (revisados, com aceite integral pendente onde indicado).
+- [x] Nenhuma implementação posterior começa sem interfaces de pista e sessão acordadas.
 
 ## Documentos que devem ser revisados
 
@@ -41,9 +41,9 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 - Data de início: 2026-11-13
 - Referência de commit/PR: primeiro commit de implementação (`chore: initialize Kartube foundations`); consultar git log.
 - Testes executados e ambiente: Node.js 24.22.2 / npm 11.19.1 / Rust 1.100.0 em Linux; tipos e 54 testes TS, 8 testes Rust, rustfmt, clippy e `npm run check:spike` aprovados. Chromium headless confirmou hello/welcome por WebSocket (detalhes no changelog).
-- Evidências de aprovação: **—**
-- Pendências / riscos: T01, T05–T07 ainda pendentes de validação completa; Android físico não definido; Rust/Cargo agora instalados. Interfaces e fixtures iniciais não bastam para encerrar a etapa.
-- Data de conclusão: **—**
+- Evidências de aprovação: relatórios do S20 FE e confirmação dos testes manuais; usuário autorizou o encerramento e confirmou o escopo/regras em 2026-11-13.
+- Pendências / riscos: sem pendências bloqueantes de fundamentos. Tauri, testes da matriz completa, políticas de DNF/timeout e aceite integral dos ADRs continuam nas etapas correspondentes.
+- Data de conclusão: **2026-11-13**
 
 ### Avanço E00-T04 — 2026-11-13
 
@@ -103,3 +103,37 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 - Evidência: `npm run check`, 54 testes TS e tipos estritos; `npm run check:spike` aprovado com Node/adapter remoto/Rust/Chromium.
 - T03 e T04 concluídas no escopo de contratos iniciais: fronteiras de sessão/input/plataforma documentadas, duas implementações de referência, pista/checksum/envelope e casos canônicos TS/Rust verificados. Codecs de lobby/campeonato e adapters de dispositivos serão ampliados nas etapas de domínio, sem manter artificialmente estas tarefas de contrato abertas. Isso não equivale a gameplay implementado ou compatibilidade de plataformas validada.
 - Etapa 00 continua em andamento: T01 (aceite de produto/regras), T05 (matriz real), T06 (WebGL2/WASM/Android) e T07 (ADRs 0001–0003) permanecem pendentes.
+
+### Avanço E00-T06 — WebGL2/WASM no navegador — 2026-11-13
+
+- `apps/web` com Vite, Three.js e Rapier/WASM: cena provisória, queda/colisão, passo fixo de 1/60 s e perfis leve/equilibrado.
+- Pausa, avanço de 120 passos, descarte/reinício, tratamento de perda de contexto e exportação de relatório com navegador/GPU/versões/FPS/recursos.
+- `npm run check:web`: build e smoke Playwright em Chromium headless/SwiftShader, incluindo pixels da cena, altura de repouso, liberação/reinício, perda de contexto, layout móvel e ausência de WebGL2/WASM. CI configurada para repetir a prova e armazenar captura/relatório.
+- T06 permanece parcial: emulação de viewport móvel e renderização por software não validam Android físico, GPU real ou Tauri. ADR-0003 segue proposto; etapa 01 não iniciada.
+
+### Validação manual Android físico — 2026-11-13
+
+- Samsung Galaxy S20 FE, Chrome 157; GPU informada pelo relatório: Qualcomm Adreno 650. A versão real do Android não foi confirmada (o user agent reduzido informa Android 10).
+- Relatório fornecido pelo usuário: WebGL2/WASM ativos, perfil equilibrado, pixelRatio 1.5, FPS amostrado 60.4, bodyY 0.349, 8 geometrias e 1 textura. Three.js 187 e Rapier 0.12.0. Medição da cena mínima, sem benchmark de corrida ou memória total.
+- Segundo relatório: status disposed e resourcesReleased true. Contadores de memória são da última amostra antes do descarte.
+- Usuário confirmou aprovação de todos os testes manuais orientados: reinício, pausa, avanço exato de 120 passos, retomada e ciclos de liberação/reinício. Evidência relatada pelo usuário, sem execução remota pelo agente; commit/build não informado.
+- Perda forçada de contexto no aparelho não foi incluída no roteiro manual e segue sem evidência Android; cobertura automatizada existente é em Chromium desktop. Tauri, GLB, áudio, controles de gameplay e matriz completa continuam pendentes.
+- Resultado: prova básica WebGL2/WASM aprovada neste Android físico; etapa 00 continua em andamento e ADR-0003 segue proposto.
+
+### Encerramento E00-T05/T06 — 2026-11-13
+
+- E00-T06 concluída no escopo escrito: WebSocket browser/Rust e WebGL2/WASM em Android físico, com relatórios e confirmação manual do usuário no S20 FE. Perda forçada de contexto Android e Tauri não foram declarados aprovados.
+- E00-T05 concluída: [matriz de plataformas](../matriz-plataformas.md) define conjunto mínimo automatizado, aparelhos conhecidos, roteiro manual, evidências e ambientes planejados. Isso encerra o planejamento da matriz, sem declarar todos os ambientes testados.
+- Próxima tarefa da etapa: E00-T07, revisar ADR-0001 a 0003 à luz das evidências. E00-T01 continua exigindo aceite das regras/escopo; nenhuma aprovação de produto foi inferida do teste técnico.
+
+### Encerramento E00-T07 — 2026-11-13
+
+- ADR-0001 a 0003 revisados com evidências implementadas, limites e critérios restantes atribuídos às etapas correspondentes. T07 permite aceitar ou revisar: a revisão foi concluída sem declarar aceite integral de tecnologias ainda sem prova nativa/online.
+- Monorepo e interfaces comprovados; empacotamento compartilhado ainda na etapa 01. Transporte/contratos comprovados; sincronização de corrida ainda nas etapas 05/06. Render/física básicos comprovados em Android; protótipo jogável e pipeline nativo ainda na etapa 01.
+- Pendência atual da etapa 00: E00-T01, aceite de objetivos/escopo e regras de pontuação/desempate. O teste Android não constitui esse aceite de produto.
+
+### Encerramento da etapa 00 — 2026-11-13
+
+- Usuário confirmou o escopo e as regras apresentados: MVP documentado, oito pilotos, quatro pistas, três voltas e tabela 15/12/10/8/6/4/2/1; desempates mantidos conforme o documento de campeonato. E00-T01 concluída.
+- E00-T01 a T07 concluídas no escopo dos fundamentos. Roteiro de testes e matriz registrados, contratos acordados e ADRs revisados. Evidências históricas de pendências acima descrevem estados anteriores.
+- Etapa 01 liberada. A conclusão dos fundamentos não representa aceite de Tauri, gameplay online ou desempenho de corrida completa.

@@ -25,3 +25,7 @@ Escolhido npm workspaces. `npm run check` passou com importação de `@kartube/g
 ## Extensão da prova de interfaces — 2026-11-13
 
 Adicionado pacote network-client para manter transporte e ciclo de conexão fora de game-core/protocol; decisão específica no ADR-0005. O desenho dos três aplicativos distribuíveis permanece o mesmo. ADR-0001 continua proposto até validar empacotamento compartilhado.
+
+## Revisão de fundamentos — 2026-11-13
+
+Decisão mantida como proposta para distribuição multiplataforma. npm workspaces, dependências entre pacotes, testes e build Vite estão implementados. O cliente técnico web ainda não importa os contratos de sessão para gameplay; a prova de empacotamento Tauri compartilhado não foi executada. A validação restante fica na etapa 01: reutilizar o build de apps/web no wrapper nativo e verificar inicialização WASM e importações dos pacotes. Não há evidência suficiente para aceitar a parte nativa deste ADR.

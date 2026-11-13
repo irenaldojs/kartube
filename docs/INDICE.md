@@ -40,3 +40,5 @@ Leia [README de etapas](etapas/README.md), depois o arquivo da etapa marcada com
 - [ADR-0005 — adapter remoto e continuidade](decisoes/ADR-0005-adapter-remoto.md) — aceito para a prova da etapa 00.
 
 Os ADRs iniciais 0001–0003 têm estado **proposto**: precisam de validação durante a etapa 00 e nos testes técnicos.
+
+- [Matriz de validação por plataforma e roteiro manual](matriz-plataformas.md)
