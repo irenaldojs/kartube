@@ -13,7 +13,7 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 ## Tarefas (a realizar)
 
 - [x] E01-T01 — Criar estrutura de código planejada e primeiro boot com seleção de qualidade gráfica.
-- [ ] E01-T02 — Exibir pista cinza fechada com linha de largada, chão, guardrails, rampas, boosts, caixa de item e alternativa em geometria simples.
+- [x] E01-T02 — Exibir pista cinza fechada com linha de largada, chão, guardrails, rampas, boosts, caixa de item e alternativa em geometria simples.
 - [ ] E01-T03 — Carregar kart placeholder por cena GLB ou geometria provisória, câmera em terceira pessoa e sombras de baixo custo.
 - [ ] E01-T04 — Executar movimento básico e colisões com timestep fixo; criar debug de FPS/física.
 - [ ] E01-T05 — Carregar e liberar assets sem vazamento; separar malhas e colisores.
@@ -38,8 +38,8 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 
 - Responsável / agente: Codex
 - Data de início: **2026-11-13**
-- Referência de commit/PR: **—**
-- Testes executados e ambiente: **—**
+- Referência de commit/PR: boot/fundamentos em `1fadf59`; pista no commit `feat(web): add greybox prototype circuit`.
+- Testes executados e ambiente: `npm run check:web`, build/tipos e smoke Chromium headless/SwiftShader; captura da pista inspecionada visualmente.
 - Evidências de aprovação: **—**
 - Pendências / riscos: **—**
 - Data de conclusão: **—**
@@ -50,3 +50,11 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 - Perfis leve/equilibrado selecionáveis; troca reinicializa a cena e libera os recursos anteriores. Boot assíncrono trata falhas de WebGL2/WASM e permite reinício. Scripts de desenvolvimento, build e smoke disponíveis na raiz.
 - E01-T01 concluída com a implementação existente, sem duplicar o laboratório. Verificação: `npm run check:web` (tipos, build e smoke Chromium).
 - Próxima tarefa: E01-T02, pista cinza fechada com os elementos de geometria provisória. Kart dirigível, câmera de acompanhamento e Tauri ainda não implementados.
+
+### E01-T02 — Pista cinza fechada — 2026-11-13
+
+- `src/track.ts` define primitivas em metros/radianos: circuito retangular contínuo com largura de 8 m, largada quadriculada, chão, guardrails com aberturas, duas rampas, três zonas visuais de boost, três caixas e uma alternativa ligando as retas laterais.
+- Renderizador usa uma geometria de caixa compartilhada para os elementos da pista; Rapier recebe colisores estáticos separados a partir dos descritores sólidos (vias, guardrails e rampas). Boosts/caixas ainda não têm triggers ou regras de gameplay.
+- Visão geral da pista é a cena inicial; seletor mantém disponível o laboratório de queda. Trocas de cena liberam/recriam recursos. Kart provisório nasce sobre uma reta.
+- Smoke confirma cena, diagnóstico dos elementos, repouso físico no spawn, liberação/reinício e retorno ao laboratório com as verificações anteriores. Captura em `/tmp/kartube-track.png`, incluída nos artefatos da CI.
+- E01-T02 concluída no escopo visual/geométrico. Checkpoints, voltas, efeitos de boost/itens e dirigibilidade não são parte desta entrega. Próxima tarefa: E01-T03, câmera em terceira pessoa e sombras de baixo custo para o kart provisório.

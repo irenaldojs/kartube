@@ -5,7 +5,7 @@
 | Etapa | Status | Evidência | Próximo critério |
 |---|---|---|---|
 | 00 — Fundamentos | Concluída | Sessões local/remota, codecs TS/Rust, pistas, WebSocket e prova WebGL2/WASM desktop e S20 FE | Critérios de fundamentos atendidos; validações futuras nos respectivos marcos |
-| 01 — Protótipo 3D | Em andamento | E01-T01: boot e perfis gráficos reutilizados da prova técnica | E01-T02: pista cinza fechada |
+| 01 — Protótipo 3D | Em andamento | Boot/perfis e pista cinza com colisores e alternativa | E01-T03: câmera em terceira pessoa e sombras |
 | 02 — Corrida local | Planejada | — | 3 voltas e resultado válidos |
 | 03 — Bots locais | Planejada | — | 8 pilotos terminam corrida |
 | 04 — Mecânicas | Planejada | — | Rampas, boosts, itens e atalho |
@@ -38,3 +38,5 @@ Rust/Cargo instalados e prova local WebSocket implementada. Prova básica WebGL2
 - 2026-11-13: E00-T07 concluída por revisão documentada dos ADRs 0001–0003, mantidos propostos para critérios ainda sem evidência. E00-T01 é a pendência atual de fundamentos.
 
 - 2026-11-13: usuário confirmou escopo/regras; E00-T01 e etapa 00 concluídas. Etapa 01 iniciada, E01-T01 concluída pela estrutura/boot/perfis já implementados; próxima tarefa E01-T02.
+
+- 2026-11-13: E01-T02 concluída: circuito cinza fechado, largada, guardrails, rampas, marcadores de boosts/caixas e alternativa. Próxima tarefa E01-T03.

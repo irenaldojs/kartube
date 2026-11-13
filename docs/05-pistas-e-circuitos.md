@@ -65,3 +65,9 @@ Regras do schema 1 inicial:
 - Exatamente oito slots únicos de 0 a 7, com posição finita e yaw finito em radianos.
 
 O parser estrutural verifica formato do checksum; `parseVerifiedTrackDefinition` também recalcula e compara SHA-256. Rust tem parser estrutural e verificado equivalentes, consumindo as mesmas fixtures. O formato canônico está em `16-formato-dados.md` e ADR-0004. Não há verificação de distância entre spawns, sobreposição de volumes, colisão com cenário ou trajetória física. Ordem de passagem, direção, tempos, teleporte e contagem de voltas pertencem à autoridade de corrida na etapa 02; um grafo estruturalmente válido não comprova esses comportamentos. Os demais campos de produção listados acima serão introduzidos nas etapas correspondentes.
+
+## Geometria de protótipo implementada — E01-T02
+
+`apps/web/src/track.ts` descreve a pista cinza provisória: anel retangular de 8 m de largura, largada quadriculada, guardrails, duas rampas e uma ligação alternativa entre as retas laterais. Três boosts e três caixas são marcadores visuais. A mesma descrição fornece dimensões de malhas e colisores estáticos independentes; só vias, rampas e guardrails colidem. A cena pode ser selecionada no laboratório web, com câmera de visão geral.
+
+Não é ainda uma `TrackDefinition` de corrida: checkpoints, checksum, oito spawns, respawn e linha de IA serão ligados ao contrato nas etapas de gameplay. A prova atual cobre construção/renderização e repouso físico no spawn, sem declarar circuito percorrível por piloto/bot ou mecânicas de itens concluídas.

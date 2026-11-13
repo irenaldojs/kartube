@@ -2,6 +2,13 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-13 — E01-T02 — Circuito cinza de protótipo
+
+- Cena inicial com pista fechada, largada quadriculada, guardrails, duas rampas, três boosts visuais, três caixas e caminho alternativo conectado.
+- Descritores de geometria separados de Three.js/Rapier; malha de caixa compartilhada, colisores estáticos para pista/rampas/guardrails e spawn sobre a via. Seletor preserva o laboratório de queda.
+- Verificação: `npm run check:web`, captura inspecionada, repouso físico no spawn, troca/liberação/reinício de cena e regressão da prova WebGL2/WASM. CI inclui captura da pista.
+- E01-T02 concluída; próxima E01-T03. Sem gameplay de boost/item, pilotagem ou checkpoints nesta entrega.
+
 ## 2026-11-13 — Aceite dos fundamentos e início da etapa 01
 
 - Usuário confirmou o MVP documentado, oito pilotos, quatro pistas, três voltas, pontos e desempates. E00-T01 e etapa 00 concluídas; critérios futuros de Tauri/ADRs e DNF não foram declarados implementados.

@@ -1,8 +1,9 @@
 import * as THREE from 'three';
+import { TRACK_PARTS, TRACK_SUMMARY, type SceneKind } from './track.ts';
 export type Quality = 'low' | 'balanced';
-export function createView(host: HTMLElement, quality: Quality, onContextLost: () => void) {
+export function createView(host: HTMLElement, quality: Quality, onContextLost: () => void, sceneKind: SceneKind = 'drop') {
   const canvas = document.createElement('canvas');
-  canvas.setAttribute('aria-label', 'Kart de teste sobre uma plataforma');
+  canvas.setAttribute('aria-label', sceneKind === 'track' ? 'Pista cinza fechada com kart, rampas e caminho alternativo' : 'Kart de teste sobre uma plataforma');
   const gl = canvas.getContext('webgl2', { antialias: quality === 'balanced', alpha: false });
   if (!gl) throw new Error('WebGL2 não está disponível neste navegador. Tente outro navegador ou aparelho.');
   const renderer = new THREE.WebGLRenderer({ canvas, context: gl });
@@ -10,8 +11,9 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
   renderer.setPixelRatio(ratio);
   renderer.setClearColor(0x222d32);
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 120);
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 240);
   camera.position.set(13, 10, 14); camera.lookAt(0, 0.8, 0);
+  if (sceneKind === 'track') { camera.position.set(48, 58, 62); camera.lookAt(0, 0, 0); }
   scene.add(new THREE.HemisphereLight(0xffffff, 0x36464c, 2.4));
   const light = new THREE.DirectionalLight(0xffffff, 3); light.position.set(4, 9, 2); scene.add(light);
   const geometries: THREE.BufferGeometry[] = [];
@@ -21,9 +23,22 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
     const material = new THREE.MeshStandardMaterial({ color, roughness: 0.85 }); materials.push(material);
     return new THREE.Mesh(geometry, material);
   }
+  if (sceneKind === 'track') {
+    const geometry = new THREE.BoxGeometry(1, 1, 1); geometries.push(geometry);
+    const colors = { road: 0x707b80, rail: 0xb8c1c5, ramp: 0x9b8970, boost: 0x66d8bf, item: 0xd5a651, start: 0xf1f3e9, ground: 0x36474b };
+    const palette = new Map<string, THREE.MeshStandardMaterial>();
+    for (const part of TRACK_PARTS) {
+      let material = palette.get(part.kind);
+      if (!material) { material = new THREE.MeshStandardMaterial({ color: colors[part.kind], roughness: 0.9 }); palette.set(part.kind, material); materials.push(material); }
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.scale.set(...part.size); mesh.position.set(...part.position); mesh.rotation.z = part.rotationZ ?? 0;
+      scene.add(mesh);
+    }
+  } else {
   const floor = box(20, 0.5, 14, 0x536368); floor.position.y = -0.25; scene.add(floor);
   const grid = new THREE.GridHelper(20, 20, 0x94b5a5, 0x667c7b); grid.position.y = 0.01; scene.add(grid);
   geometries.push(grid.geometry); materials.push(...(Array.isArray(grid.material) ? grid.material : [grid.material]));
+  }
   const kart = new THREE.Group();
   const chassis = box(1.8, 0.45, 2.8, 0xe8a64e); kart.add(chassis);
   const seat = box(0.9, 0.6, 1, 0x233137); seat.position.set(0, 0.45, -0.3); kart.add(seat);
@@ -43,7 +58,7 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
   canvas.addEventListener('webglcontextlost', lost);
   const debug = gl.getExtension('WEBGL_debug_renderer_info');
   return {
-    info: { threeVersion: THREE.REVISION, webgl2: true, gpu: String(gl.getParameter(debug ? debug.UNMASKED_RENDERER_WEBGL : gl.RENDERER)), pixelRatio: ratio },
+    info: { scene: sceneKind, ...(sceneKind === 'track' ? { track: TRACK_SUMMARY } : {}), threeVersion: THREE.REVISION, webgl2: true, gpu: String(gl.getParameter(debug ? debug.UNMASKED_RENDERER_WEBGL : gl.RENDERER)), pixelRatio: ratio },
     render(position: { x: number; y: number; z: number }) {
       if (disposed) return;
       kart.position.copy(position); renderer.render(scene, camera);

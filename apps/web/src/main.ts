@@ -4,6 +4,7 @@ function element<T extends HTMLElement>(id: string): T {
   const node = document.getElementById(id); if (!node) throw new Error(`Missing ${id}`); return node as T;
 }
 const host = element('viewport'), status = element('status'), output = element('report');
+const scene = element<HTMLSelectElement>('scene');
 const quality = element<HTMLSelectElement>('quality');
 const pause = element<HTMLButtonElement>('pause'), step = element<HTMLButtonElement>('step');
 const restart = element<HTMLButtonElement>('restart'), release = element<HTMLButtonElement>('release');
@@ -19,6 +20,7 @@ function controls(active: boolean) { pause.disabled = !active; step.disabled = t
 function stop() { generation++; cleanup?.(); cleanup = null; controls(false); }
 async function boot() {
   stop(); const token = generation;
+  const sceneKind = scene.value === 'track' ? 'track' : 'drop';
   const profile: Quality = quality.value === 'low' ? 'low' : 'balanced';
   status.textContent = 'Carregando o motor…'; publish({ status: 'loading', quality: profile }); restart.disabled = true;
   let view: ReturnType<typeof import('./view.ts').createView> | null = null;
@@ -34,11 +36,11 @@ async function boot() {
     view = createView(host, profile, () => {
       stop(); status.textContent = 'O contexto gráfico foi perdido. Reinicie o teste.';
       publish({ ...report, status: 'error', error: 'webgl_context_lost' });
-    });
+    }, sceneKind);
     if (typeof WebAssembly === 'undefined') throw new Error('WebAssembly não está disponível. A física precisa de WASM para iniciar.');
     const { createPhysics, PHYSICS_DT } = await import('./physics.ts');
     if (token !== generation) return;
-    physics = await createPhysics();
+    physics = await createPhysics(sceneKind);
     if (token !== generation) { physics.dispose(); return; }
     const world = physics, display = view;
     let frames = 0, sampledFrames = 0, sampleTime = performance.now(), fps = 0;
@@ -72,6 +74,7 @@ async function boot() {
   }
 }
 restart.onclick = () => { void boot(); };
+scene.onchange = () => { void boot(); };
 quality.onchange = () => { void boot(); };
 release.onclick = () => { stop(); status.textContent = 'Recursos liberados. Reinicie quando quiser.'; publish({ ...report, status: 'disposed', resourcesReleased: true }); };
 element<HTMLButtonElement>('export').onclick = () => {

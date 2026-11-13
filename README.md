@@ -25,7 +25,7 @@ npm run check
 - `docs`: plano, decisões e evidências de desenvolvimento.
 - `assets`: estrutura reservada, sem conteúdo final.
 
-Leia [índice](docs/INDICE.md), [andamento](docs/ANDAMENTO.md) e [etapa ativa](docs/etapas/01-prototipo-3d.md) antes de alterar o projeto. Prova básica WebGL2/WASM aprovada pelo usuário no S20 FE (Adreno 650). Próximo passo: pista cinza fechada (E01-T02). Escopo e regras iniciais aprovados; ampliar a matriz real de aparelhos permanece no plano. Pistas e checksum já têm fixtures compartilhadas TS/Rust. O spike local Rust/WebSocket passou em Chromium. Os ADRs permanecem propostos até suas provas de aceitação.
+Leia [índice](docs/INDICE.md), [andamento](docs/ANDAMENTO.md) e [etapa ativa](docs/etapas/01-prototipo-3d.md) antes de alterar o projeto. Prova básica WebGL2/WASM aprovada pelo usuário no S20 FE (Adreno 650). Pista cinza fechada implementada (E01-T02). Próximo passo: câmera em terceira pessoa e sombras (E01-T03). Escopo e regras iniciais aprovados; ampliar a matriz real de aparelhos permanece no plano. Pistas e checksum já têm fixtures compartilhadas TS/Rust. O spike local Rust/WebSocket passou em Chromium. Os ADRs permanecem propostos até suas provas de aceitação.
 
 ## Prova WebSocket (Etapa 00)
 
@@ -59,7 +59,7 @@ npm ci
 npm run dev:web -- --host 0.0.0.0
 ```
 
-Abra a URL indicada pelo Vite. A cena mostra um kart provisório caindo sobre uma plataforma, com Three.js/WebGL2 e Rapier/WASM a 60 passos por segundo. É um diagnóstico de renderização e colisão, sem pilotagem ou corrida. Os controles permitem pausar, avançar 120 passos, trocar o perfil gráfico, liberar recursos, reiniciar e exportar o relatório JSON.
+Abra a URL indicada pelo Vite. O seletor de cena abre a visão geral da pista cinza e permite voltar ao teste de queda sobre a plataforma, com Three.js/WebGL2 e Rapier/WASM a 60 passos por segundo. É um diagnóstico de renderização e colisão, sem pilotagem ou corrida. Os controles permitem pausar, avançar 120 passos, trocar o perfil gráfico, liberar recursos, reiniciar e exportar o relatório JSON.
 
 ```sh
 npx playwright install --with-deps chromium

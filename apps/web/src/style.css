@@ -39,3 +39,5 @@ h2 { font-size:23px; font-weight:550; margin:0; letter-spacing:-.5px; }
 pre { margin:0; padding:20px; border:1px solid #354047; background:#10181c; border-radius:4px; font:11px/1.6 ui-monospace,monospace; overflow:auto; max-height:320px; color:#bcd5c0; }
 footer { border-top:1px solid #354047; display:flex; justify-content:space-between; padding:22px 0; color:#8e9da5; font:10px ui-monospace,monospace; letter-spacing:1px; }
 @media(max-width:800px) { main { padding:0 20px; } .intro { grid-template-columns:1fr; gap:20px; } .lab { grid-template-columns:1fr; } .viewport { height:360px; } .panel { border-left:0; border-top:1px solid #3d494f; } .panel-heading { margin-bottom:15px; } .diagnostics { grid-template-columns:1fr; gap:20px; } .tag { font-size:9px; letter-spacing:1px; } footer { gap:20px; line-height:1.6; } }
+
+#scene { margin-bottom:16px; }
