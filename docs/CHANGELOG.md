@@ -2,6 +2,15 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-13 — E00-T04 — Parser de pistas e grafo de checkpoints
+
+- Tipo: implementação e documentação.
+- `parseTrackDefinition` valida dados desconhecidos, versão, IDs, vetores finitos, volumes positivos e oito spawns únicos.
+- Grafo exige chegada existente, referências válidas, todos os nós alcançáveis e ausência de ciclos fora da chegada. Rotas alternativas podem bifurcar e se reencontrar.
+- Fixture de contrato adicionada; não constitui pista jogável. Sem validação de movimento, contagem de voltas ou cálculo de checksum.
+- Evidência: `npm run check` aprovado em Node 24.22.2, 15 testes e tipos estritos; documentação de pistas e dados atualizada.
+- Etapa 00 segue em andamento; hash canônico, paridade do parser Rust e demais entregas pendentes.
+
 ## 2026-11-13 — E00-T06 — Prova local WebSocket browser/Rust
 
 - Tipo: implementação e documentação.

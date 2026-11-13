@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "id": "track-contract-fixture",
+  "version": 1,
+  "checksum": "fixture-not-a-content-hash",
+  "startCheckpointId": "finish",
+  "checkpoints": [
+    {
+      "id": "finish",
+      "center": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "halfExtents": {
+        "x": 2,
+        "y": 2,
+        "z": 1
+      },
+      "next": [
+        "entry"
+      ]
+    },
+    {
+      "id": "entry",
+      "center": {
+        "x": 10,
+        "y": 0,
+        "z": 0
+      },
+      "halfExtents": {
+        "x": 2,
+        "y": 2,
+        "z": 1
+      },
+      "next": [
+        "main",
+        "alternate"
+      ]
+    },
+    {
+      "id": "main",
+      "center": {
+        "x": 20,
+        "y": 0,
+        "z": 0
+      },
+      "halfExtents": {
+        "x": 2,
+        "y": 2,
+        "z": 1
+      },
+      "next": [
+        "merge"
+      ]
+    },
+    {
+      "id": "alternate",
+      "center": {
+        "x": 30,
+        "y": 0,
+        "z": 0
+      },
+      "halfExtents": {
+        "x": 2,
+        "y": 2,
+        "z": 1
+      },
+      "next": [
+        "merge"
+      ]
+    },
+    {
+      "id": "merge",
+      "center": {
+        "x": 40,
+        "y": 0,
+        "z": 0
+      },
+      "halfExtents": {
+        "x": 2,
+        "y": 2,
+        "z": 1
+      },
+      "next": [
+        "finish"
+      ]
+    }
+  ],
+  "spawnSlots": [
+    {
+      "slotId": 0,
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -3
+      },
+      "yaw": 0
+    },
+    {
+      "slotId": 1,
+      "position": {
+        "x": 3,
+        "y": 0,
+        "z": -3
+      },
+      "yaw": 0
+    },
+    {
+      "slotId": 2,
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -6
+      },
+      "yaw": 0
+    },
+    {
+      "slotId": 3,
+      "position": {
+        "x": 3,
+        "y": 0,
+        "z": -6
+      },
+      "yaw": 0
+    },
+    {
+      "slotId": 4,
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -9
+      },
+      "yaw": 0
+    },
+    {
+      "slotId": 5,
+      "position": {
+        "x": 3,
+        "y": 0,
+        "z": -9
+      },
+      "yaw": 0
+    },
+    {
+      "slotId": 6,
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -12
+      },
+      "yaw": 0
+    },
+    {
+      "slotId": 7,
+      "position": {
+        "x": 3,
+        "y": 0,
+        "z": -12
+      },
+      "yaw": 0
+    }
+  ]
+}

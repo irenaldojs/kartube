@@ -51,3 +51,17 @@ Nomes/temas podem mudar após validação de identidade. Cada mapa deve ter comp
 ## Definição de pista pronta
 
 Uma pista aceita 8 karts, bots percorrem rotas válidas, 3 voltas terminam em todas as plataformas alvo, não há shortcut impossível, itens/boosts respondem, respawns são seguros e os testes de FPS mínimos passam nos aparelhos de referência.
+
+## Validação estrutural implementada — E00-T04
+
+`parseTrackDefinition(unknown)` em `@kartube/game-data` valida o contrato mínimo de gameplay e devolve dados tipados reconstruídos. Erros lançam `Error` com caminho/campo; o chamador deve tratá-los antes de carregar uma pista. A fixture `fixtures/track-definition.json` contém um grafo com bifurcação e reencontro, destinado exclusivamente a testes; não é a pista cinza nem conteúdo jogável.
+
+Regras do schema 1 inicial:
+
+- IDs e checksum não vazios, 1–64 caracteres ASCII alfanuméricos, ponto, hífen ou sublinhado; versão inteira segura positiva. Schema desconhecido é rejeitado.
+- Pelo menos dois checkpoints com IDs únicos e chegada indicada por `startCheckpointId`. Centros finitos em metros; meias extensões AABB estritamente positivas.
+- Cada checkpoint tem sucessores existentes, únicos e não vazios; não pode apontar para si mesmo. Todos devem ser alcançáveis a partir da chegada.
+- Ao remover o nó de chegada, o grafo deve ser acíclico. Assim, toda rota retorna à chegada, sem laços independentes. Bifurcações e reencontros são permitidos. Percursos futuros que precisem de laços internos exigem revisão deliberada do contrato.
+- Exatamente oito slots únicos de 0 a 7, com posição finita e yaw finito em radianos.
+
+O checksum permanece opaco: presença/formato são verificados, conteúdo não é recalculado. Hash canônico e paridade do validador de pista em Rust ainda pendentes. Não há verificação de distância entre spawns, sobreposição de volumes, colisão com cenário ou trajetória física. Ordem de passagem, direção, tempos, teleporte e contagem de voltas pertencem à autoridade de corrida na etapa 02; um grafo estruturalmente válido não comprova esses comportamentos. Os demais campos de produção listados acima serão introduzidos nas etapas correspondentes.

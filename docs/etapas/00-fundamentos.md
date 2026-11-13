@@ -40,7 +40,7 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 - Responsável / agente: Codex
 - Data de início: 2026-11-13
 - Referência de commit/PR: primeiro commit de implementação (`chore: initialize Kartube foundations`); consultar git log.
-- Testes executados e ambiente: Node.js 24.22.2 / npm 11.19.1 / Rust 1.100.0 em Linux; tipos e 9 testes TS, 4 testes Rust, rustfmt, clippy e `npm run check:spike` aprovados. Chromium headless confirmou hello/welcome por WebSocket (detalhes no changelog).
+- Testes executados e ambiente: Node.js 24.22.2 / npm 11.19.1 / Rust 1.100.0 em Linux; tipos e 15 testes TS, 4 testes Rust, rustfmt, clippy e `npm run check:spike` aprovados. Chromium headless confirmou hello/welcome por WebSocket (detalhes no changelog).
 - Evidências de aprovação: **—**
 - Pendências / riscos: T01, T03–T07 ainda pendentes de validação completa; Android físico não definido; Rust/Cargo agora instalados. Interfaces e fixtures iniciais não bastam para encerrar a etapa.
 - Data de conclusão: **—**
@@ -49,7 +49,7 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 
 - Decoder v1 para hello/input, limite UTF-8, verificação de versão e gate de handshake/sequência implementados.
 - Fixtures canônicas de envelope adicionadas; documentação de rede alinhada com o formato real.
-- T04 permanece aberta: contrato de pista validado em runtime, demais mensagens e paridade Rust ainda pendentes. T06 permanece aberta até todas as provas de plataforma; o avanço seguinte registra o teste browser/Rust.
+- T04 permanece aberta: validação de pista em runtime registrada no avanço seguinte; demais mensagens e paridade completa Rust ainda pendentes. T06 permanece aberta até todas as provas de plataforma; o avanço seguinte registra o teste browser/Rust.
 
 ### Avanço E00-T06 — 2026-11-13
 
@@ -58,3 +58,10 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 - Decoder/gate Rust e fixtures compartilhadas com TS; 4 testes Rust.
 - Teste integrado Node WebSocket e navegador Chromium automatizado; comandos e CI no README.
 - ADRs seguem propostos: transporte local não valida sincronização de corridas, renderização ou empacotamento. T06 segue parcial até WebGL2/WASM no Android físico.
+
+### Avanço E00-T04 — Validação de pista — 2026-11-13
+
+- Parser runtime de `TrackDefinition` em game-data, erros com caminho/campo, grafo de rotas alternativas e oito spawns validados.
+- Fixture JSON de contrato com bifurcação/reencontro; testes positivos e negativos de schema, coordenadas, referências, ciclos, conectividade e slots.
+- Evidência: `npm run check` aprovado, 15 testes TS e tipos estritos.
+- Pendências: hash canônico e validação de pista em Rust; contrato de rede completo; revisão dos contratos de sessão e testes de plataforma. Nenhuma etapa posterior iniciada e T04 ainda parcial.

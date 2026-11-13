@@ -15,3 +15,5 @@ export interface TrackDefinition {
   readonly checkpoints: readonly Checkpoint[];
   readonly spawnSlots: readonly { readonly slotId: number; readonly position: Vector3; readonly yaw: number }[];
 }
+
+export { parseTrackDefinition } from './validate-track.ts';
