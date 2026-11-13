@@ -56,6 +56,58 @@ try {
   await page.getByRole('button', { name: 'Reiniciar teste' }).click(); await readyScene();
   assert.equal((await read()).scene, 'track');
   assert.equal(await page.locator('canvas').count(), 1);
+  await page.locator('#viewport').focus();
+  await page.keyboard.down('ArrowUp');
+  await page.waitForFunction(() => JSON.parse(document.getElementById('report').textContent).position.z < 5);
+  await page.keyboard.up('ArrowUp');
+  await page.keyboard.down('Space');
+  await page.waitForFunction(() => JSON.parse(document.getElementById('report').textContent).driving.speed < 0.1);
+  await page.keyboard.up('Space');
+  await page.keyboard.down('ArrowUp');
+  await page.keyboard.down('ArrowRight');
+  await page.waitForFunction(() => JSON.parse(document.getElementById('report').textContent).driving.yaw < -0.15);
+  await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+  await page.waitForFunction(() => {
+    const input = JSON.parse(document.getElementById('report').textContent).driving.input;
+    return input.throttle === 0 && input.steering === 0;
+  });
+  await page.keyboard.up('ArrowUp'); await page.keyboard.up('ArrowRight');
+  await page.getByRole('button', { name: 'Reposicionar kart' }).click();
+  assert.ok(Math.abs((await read()).position.z - 7) < 0.05);
+  // Pointer controls remain usable with the track visible on a phone viewport.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: 'Acelerar', exact: true }).scrollIntoViewIfNeeded();
+  const accelerator = await page.getByRole('button', { name: 'Acelerar', exact: true }).boundingBox();
+  await page.mouse.move(accelerator.x + accelerator.width / 2, accelerator.y + accelerator.height / 2);
+  await page.mouse.down();
+  await page.waitForFunction(() => JSON.parse(document.getElementById('report').textContent).position.z < 5);
+  await page.mouse.up();
+  await page.waitForFunction(() => JSON.parse(document.getElementById('report').textContent).driving.input.throttle === 0);
+  const touch = await page.context().newCDPSession(page);
+  await touch.send('Emulation.setTouchEmulationEnabled', { enabled: true });
+  const right = await page.getByRole('button', { name: 'Virar à direita', exact: true }).boundingBox();
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [
+    { x: accelerator.x + accelerator.width / 2, y: accelerator.y + accelerator.height / 2, id: 1 },
+    { x: right.x + right.width / 2, y: right.y + right.height / 2, id: 2 },
+  ] });
+  await page.waitForFunction(() => {
+    const input = JSON.parse(document.getElementById('report').textContent).driving.input;
+    return input.throttle === 1 && input.steering === 1;
+  });
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await page.waitForFunction(() => {
+    const input = JSON.parse(document.getElementById('report').textContent).driving.input;
+    return input.throttle === 0 && input.steering === 0;
+  });
+  await touch.detach();
+  await page.screenshot({ path: '/tmp/kartube-driving-mobile.png', fullPage: true });
+  await page.getByRole('button', { name: 'Pausar', exact: true }).click();
+  const pausedSteps = (await read()).physicsSteps;
+  await page.locator('#viewport').focus(); await page.keyboard.down('ArrowUp');
+  await page.locator('#camera').selectOption('overview');
+  assert.equal((await read()).physicsSteps, pausedSteps);
+  await page.keyboard.up('ArrowUp');
+  await page.setViewportSize({ width: 1280, height: 1000 });
   await page.locator('#scene').selectOption('drop'); await readyScene();
   await page.getByRole('button', { name: 'Pausar', exact: true }).click();
   const before = await read();

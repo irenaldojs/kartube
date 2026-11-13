@@ -2,6 +2,14 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-13 — E01-T04 — Pilotagem básica
+
+- Controlador arcade Rapier a 60 Hz: acelerar, frear, dar ré, esterçar, aderência lateral e CCD, com ajustes em módulo próprio. Gravidade/colisões preservadas e tração condicionada a apoio.
+- Teclado e controles de toque sobre a cena, velocímetro, reset manual e recuperação básica de queda. Entradas limpas na pausa, blur, ocultação e descarte.
+- Corrigido degrau de entrada das rampas detectado por teste de percurso. Driver de teste completa o circuito com ambas as rampas sem teleporte/reset; não representa bots de gameplay.
+- Verificação: `npm run check` (59 testes), `npm run check:web` (teclado, freio, curva, blur, pausa, ponteiro/multitouch móvel e regressões). Captura móvel na CI. Evidência Android anterior não se aplica automaticamente ao novo build.
+- E01-T04 concluída; próxima E01-T05. Drift, triggers de boosts/itens e regras de corrida permanecem pendentes.
+
 ## 2026-11-13 — E01-T03 — Câmera em terceira pessoa e sombra
 
 - Câmera acompanha o kart provisório com suavização por tempo e orientação; troca para visão geral preserva física e pausa.

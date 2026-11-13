@@ -42,3 +42,11 @@ Terceira pessoa acompanhando o kart, amortecimento de movimentos, FOV dinâmico 
 ## Ajustes a validar em playtest
 
 Velocidade máxima, duração da volta, tamanho de atalhos, quanto drift compensa, tempo de recuperação de hit, frequência de itens e equilíbrio entre líder e retardatário.
+
+## Protótipo implementado — E01-T04
+
+`apps/web/src/driving.ts` concentra os ajustes iniciais; `physics.ts` aplica inputs em Rapier a 60 Hz. Há aceleração, frenagem, ré limitada, arrasto, aderência e direção proporcional à velocidade, com rotação apenas em yaw e CCD. Gravidade e colisão vertical continuam no motor; tração depende de apoio por raycast. São parâmetros de protótipo, sem balanceamento final.
+
+WASD/setas funcionam com a cena focada; Espaço freia e R reposiciona. Botões sobre a cena aceitam aceleração e direção simultâneas por ponteiros; entradas são limpas ao pausar, perder foco ou ocultar a página. O velocímetro e o relatório expõem diagnóstico da física. Há reset manual e recuperação básica após queda abaixo de -8 m, sem progresso de corrida para preservar ainda.
+
+Testes com Rapier cobrem aceleração, freio, ré, guardrails, esterçamento e circuito completo com rampas usando apenas inputs. O driver roteirizado do teste não é um bot do produto. Drift, boosts, itens, superfícies especiais e controles aéreos ainda estão pendentes, assim como playtest de dirigibilidade no Android físico.

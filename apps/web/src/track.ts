@@ -23,8 +23,8 @@ for (const z of [-16, 16]) add('rail', [32, 1, 0.5], [0, 0.5, z], true);
 // Gaps in the inner side rails let karts enter and leave the alternative.
 for (const x of [-16, 16]) for (const z of [-9.5, 9.5]) add('rail', [0.5, 1, 13], [x, 0.5, z], true);
 for (const z of [-2.75, 2.75]) add('rail', [31, 0.65, 0.4], [0, 0.325, z], true);
-add('ramp', [7, 0.4, 6], [-7, 0.45, -20], true, 0.14);
-add('ramp', [7, 0.4, 6], [10, 0.45, 20], true, -0.14);
+add('ramp', [7, 0.4, 6], [-7, 0.29, -20], true, 0.14);
+add('ramp', [7, 0.4, 6], [10, 0.29, 20], true, -0.14);
 for (const [x, z] of [[8, -20], [20, 8], [-5, 0]]) add('boost', [3, 0.04, 4], [x!, 0.03, z!]);
 for (const [x, z] of [[-20, -9], [2, 20], [4, 0]]) add('item', [1.2, 1.2, 1.2], [x!, 0.85, z!]);
 for (let x = -23.5; x < -16; x += 1) for (let row = 0; row < 2; row++) {

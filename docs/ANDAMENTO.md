@@ -5,7 +5,7 @@
 | Etapa | Status | Evidência | Próximo critério |
 |---|---|---|---|
 | 00 — Fundamentos | Concluída | Sessões local/remota, codecs TS/Rust, pistas, WebSocket e prova WebGL2/WASM desktop e S20 FE | Critérios de fundamentos atendidos; validações futuras nos respectivos marcos |
-| 01 — Protótipo 3D | Em andamento | Pista cinza, kart provisório, câmera em terceira pessoa e sombra de contato | E01-T04: movimento e colisões com passo fixo |
+| 01 — Protótipo 3D | Em andamento | Kart dirigível, teclado/toque, câmera e circuito físico testado | E01-T05: ciclo de assets e descarte de recursos |
 | 02 — Corrida local | Planejada | — | 3 voltas e resultado válidos |
 | 03 — Bots locais | Planejada | — | 8 pilotos terminam corrida |
 | 04 — Mecânicas | Planejada | — | Rampas, boosts, itens e atalho |
@@ -42,3 +42,5 @@ Rust/Cargo instalados e prova local WebSocket implementada. Prova básica WebGL2
 - 2026-11-13: E01-T02 concluída: circuito cinza fechado, largada, guardrails, rampas, marcadores de boosts/caixas e alternativa. Próxima tarefa E01-T03.
 
 - 2026-11-13: E01-T03 concluída com câmera de acompanhamento, visão geral selecionável e sombra de contato; próxima tarefa E01-T04.
+
+- 2026-11-13: E01-T04 concluída com pilotagem básica, colisões, teclado/toque e teste do circuito completo; próxima E01-T05. Novo build ainda requer playtest Android.

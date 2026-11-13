@@ -44,6 +44,7 @@ jobs:
         with:
           name: webgl-smoke
           path: |
+            /tmp/kartube-driving-mobile.png
             /tmp/kartube-chase.png
             /tmp/kartube-track.png
             /tmp/kartube-webgl.png

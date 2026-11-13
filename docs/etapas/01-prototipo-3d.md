@@ -15,14 +15,14 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 - [x] E01-T01 — Criar estrutura de código planejada e primeiro boot com seleção de qualidade gráfica.
 - [x] E01-T02 — Exibir pista cinza fechada com linha de largada, chão, guardrails, rampas, boosts, caixa de item e alternativa em geometria simples.
 - [x] E01-T03 — Carregar kart placeholder por cena GLB ou geometria provisória, câmera em terceira pessoa e sombras de baixo custo.
-- [ ] E01-T04 — Executar movimento básico e colisões com timestep fixo; criar debug de FPS/física.
+- [x] E01-T04 — Executar movimento básico e colisões com timestep fixo; criar debug de FPS/física.
 - [ ] E01-T05 — Carregar e liberar assets sem vazamento; separar malhas e colisores.
 - [ ] E01-T06 — Realizar spike do mesmo build no browser e Tauri Android em aparelho físico.
 - [ ] E01-T07 — Registrar FPS, RAM, WebGL2, áudio e problemas de WebView por plataforma.
 
 ## Critérios de aceite
 
-- [ ] Kart pode percorrer o traçado cinza e câmera mantém alvo sem glitches críticos.
+- [x] Kart pode percorrer o traçado cinza e câmera mantém alvo sem glitches críticos (percurso físico automatizado e smoke de câmera; playtest Android do novo build pendente).
 - [ ] WebGL2/física funcionam no navegador e há registro de resultado real Android (aprovado ou bloqueio).
 - [ ] Assets e colisão estão isolados de regras de corrida.
 
@@ -67,3 +67,13 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 - Verificação: `npm run check` (56 testes, incluindo orientação em quatro direções e suavização a 30/60 Hz); `npm run check:web` (convergência após queda, sombra sobre a pista, troca de câmera sem alterar physicsSteps, descarte/reinício e regressões). Captura em `/tmp/kartube-chase.png` incluída na CI e inspecionada visualmente.
 - E01-T03 concluída. Ainda sem pilotagem; colisão/oclusão de câmera em movimento será avaliada com o kart dirigível. Sombra é aproximação visual de contato, sem sombras dinâmicas do cenário. Medições anteriores do S20 FE não validam este novo build.
 - Próxima tarefa: E01-T04, movimento básico e colisões a timestep fixo, reaproveitando diagnóstico de FPS/física existente.
+
+### E01-T04 — Pilotagem básica e colisões — 2026-11-13
+
+- Controlador arcade em Rapier com passo fixo de 1/60 s, aceleração até 12 m/s, frenagem, ré até 4 m/s, arrasto, aderência lateral e esterçamento dependente da velocidade. Parâmetros concentrados em `src/driving.ts`; corpo com CCD e orientação yaw, preservando gravidade/colisão vertical. Tração/direção exigem apoio detectado por raycast.
+- Teclado WASD/setas ao focar a cena; Espaço freia, R reposiciona. Controles de ponteiro sobre a cena suportam toque simultâneo de aceleração/direção. Blur, ocultação, pausa, troca de foco e descarte limpam entradas; soltura/cancelamento de ponteiro remove a ação.
+- Velocímetro e relatório com posição/yaw/velocidade/apoio/reset/input e timestep. Reposicionamento manual e recuperação básica após queda abaixo de -8 m; regras formais de respawn ficam na corrida local.
+- Entradas das duas rampas rebaixadas para encontrar o piso sem degrau que prendia o kart, problema encontrado pelo teste de percurso completo.
+- Verificação: `npm run check` (59 testes; aceleração, freio, ré, reset, guardrail, direção e circuito completo com rampas por inputs, sem teleporte); `npm run check:web` (teclado, freio, direção, perda de foco, pausa, ponteiro, multitouch em viewport móvel e regressões). Captura móvel em `/tmp/kartube-driving-mobile.png`.
+- E01-T04 concluída. Test driver existe só no teste, sem implementar bots de gameplay. Drift, boost/item, gamepad, configuração de controles e corrida com checkpoints/voltas não estão implementados. Sem nova medição ou aprovação física Android deste build.
+- Próxima tarefa: E01-T05, revisar ciclo de assets, descarte e isolamento entre malhas e colisores, com evidências de recursos.

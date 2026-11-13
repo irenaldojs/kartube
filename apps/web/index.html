@@ -11,7 +11,11 @@
       <header><a class="brand" href="/">KARTUBE<span>LAB / 01</span></a><span class="tag">PROVA TÉCNICA</span></header>
       <section class="intro"><p class="eyebrow">PRIMEIRO CONTATO</p><h1>O circuito começa<br>a tomar forma.</h1><p>Acompanhe o kart ou explore a visão geral da pista cinza: circuito fechado, rampas e caminho alternativo. Use o laboratório para repetir a prova de queda e colisão.</p></section>
       <section class="lab" aria-label="Laboratório de renderização">
-        <div class="viewport" id="viewport" aria-label="Cena 3D com kart de teste"><span class="scene-label">01 / PROTÓTIPO 3D</span></div>
+        <div class="viewport" id="viewport" tabindex="0" aria-label="Cena 3D com kart de teste"><span class="scene-label">01 / PROTÓTIPO 3D</span><output id="speed" aria-label="Velocidade">0 km/h</output>          <div id="driving" class="driving" aria-label="Controles de pilotagem">
+            <button data-drive="left" aria-label="Virar à esquerda" disabled>←</button><button data-drive="forward" aria-label="Acelerar" disabled>↑</button><button data-drive="right" aria-label="Virar à direita" disabled>→</button>
+            <button data-drive="brake" aria-label="Frear" disabled>Freio</button><button data-drive="reverse" aria-label="Frear e dar ré" disabled>↓ Ré</button>
+          </div>
+</div>
         <div class="panel">
           <div class="panel-heading"><span class="dot"></span><p id="status" role="status" aria-live="polite">Carregando o motor…</p></div>
           <label for="scene">Cena</label><select id="scene"><option value="track" selected>Pista cinza</option><option value="drop">Laboratório · teste de queda</option></select>
@@ -20,7 +24,8 @@
           <div class="actions"><button id="pause" disabled>Pausar</button><button id="step" disabled>Avançar 120 passos</button></div>
           <button id="restart" disabled>Reiniciar teste</button>
           <button id="release" class="quiet" disabled>Liberar recursos</button>
-          <p class="note">Pilotagem ainda em desenvolvimento. Rampas têm colisão; boosts e caixas são marcadores visuais. O perfil leve limita a resolução; resultados de desempenho dependem do aparelho.</p>
+          <button id="reset-kart" class="quiet" disabled>Reposicionar kart</button>
+          <p class="note">Clique na cena: WASD ou setas para pilotar, Espaço para frear e R para reposicionar. No celular, segure os botões; direção e aceleração podem ser usadas juntas. Rampas têm colisão; boosts e caixas são marcadores visuais. O perfil leve limita a resolução; resultados de desempenho dependem do aparelho.</p>
         </div>
       </section>
       <section class="diagnostics"><div><p class="eyebrow">REGISTRO DO AMBIENTE</p><h2>O que está rodando</h2><p>Exporte o relatório para registrar o navegador, a GPU e o resultado desta prova.</p><button id="export" class="quiet">Exportar relatório JSON</button></div><pre id="report" aria-label="Relatório técnico">{ "status": "loading" }</pre></section>

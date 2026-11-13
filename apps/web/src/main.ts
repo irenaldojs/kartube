@@ -1,4 +1,5 @@
 import './style.css';
+import { createDrivingInput } from './input.ts';
 import type { Quality } from './view.ts';
 function element<T extends HTMLElement>(id: string): T {
   const node = document.getElementById(id); if (!node) throw new Error(`Missing ${id}`); return node as T;
@@ -8,6 +9,8 @@ const scene = element<HTMLSelectElement>('scene');
 const camera = element<HTMLSelectElement>('camera');
 const quality = element<HTMLSelectElement>('quality');
 const pause = element<HTMLButtonElement>('pause'), step = element<HTMLButtonElement>('step');
+const driving = element('driving'), resetKart = element<HTMLButtonElement>('reset-kart');
+const speed = element('speed');
 const restart = element<HTMLButtonElement>('restart'), release = element<HTMLButtonElement>('release');
 let generation = 0;
 let cleanup: (() => void) | null = null;
@@ -17,7 +20,7 @@ function publish(data: Record<string, unknown>) {
   output.textContent = JSON.stringify(report, null, 2);
   document.body.dataset.status = String(report.status);
 }
-function controls(active: boolean) { camera.disabled = !active; pause.disabled = !active; step.disabled = true; release.disabled = !active; restart.disabled = false; }
+function controls(active: boolean) { resetKart.disabled = !active || scene.value !== 'track'; driving.querySelectorAll('button').forEach(button => { button.disabled = !active || scene.value !== 'track'; }); camera.disabled = !active; pause.disabled = !active; step.disabled = true; release.disabled = !active; restart.disabled = false; }
 function stop() { generation++; cleanup?.(); cleanup = null; controls(false); }
 async function boot() {
   stop(); const token = generation;
@@ -26,10 +29,11 @@ async function boot() {
   status.textContent = 'Carregando o motor…'; publish({ status: 'loading', quality: profile }); restart.disabled = true;
   let view: ReturnType<typeof import('./view.ts').createView> | null = null;
   let physics: Awaited<ReturnType<typeof import('./physics.ts').createPhysics>> | null = null;
+  let input: ReturnType<typeof createDrivingInput> | null = null;
   let destroyed = false, raf = 0;
-  const destroy = () => { if (destroyed) return; destroyed = true; cancelAnimationFrame(raf); pause.onclick = null; step.onclick = null; camera.onchange = null; document.removeEventListener('visibilitychange', visibility); physics?.dispose(); view?.dispose(); physics = null; view = null; };
+  const destroy = () => { if (destroyed) return; destroyed = true; cancelAnimationFrame(raf); pause.onclick = null; step.onclick = null; camera.onchange = null; resetKart.onclick = null; input?.dispose(); document.removeEventListener('visibilitychange', visibility); physics?.dispose(); view?.dispose(); physics = null; view = null; };
   let previous = performance.now(), accumulator = 0, paused = false;
-  const visibility = () => { previous = performance.now(); accumulator = 0; };
+  const visibility = () => { input?.clear(); previous = performance.now(); accumulator = 0; };
   cleanup = destroy;
   try {
     const { createView } = await import('./view.ts');
@@ -46,15 +50,15 @@ async function boot() {
     const world = physics, display = view;
     let frames = 0, sampledFrames = 0, sampleTime = performance.now(), fps = 0;
     const update = () => publish({ status: paused ? 'paused' : 'running', quality: profile, ...display.info, wasm: true, rapierVersion: world.version,
-      physicsSteps: world.steps, renderFrames: frames, bodyY: Number(world.position.y.toFixed(4)), fps: Number(fps.toFixed(1)), memory: display.memory });
-    const draw = (elapsed = 0) => { display.render(world.position, elapsed); frames++; };
+      physicsSteps: world.steps, renderFrames: frames, bodyY: Number(world.position.y.toFixed(4)), fps: Number(fps.toFixed(1)), memory: display.memory, physicsDt: PHYSICS_DT, position: world.pose, driving: { ...world.telemetry, input: input?.read() ?? null } });
+    const draw = (elapsed = 0) => { display.render(world.pose, elapsed); frames++; speed.textContent = `${(world.telemetry.speed * 3.6).toFixed(0)} km/h`; };
     const animate = (now: number) => {
       if (destroyed) return;
       const elapsed = Math.min(Math.max((now - previous) / 1000, 0), 0.1); previous = now;
       if (!paused && !document.hidden) {
         accumulator += elapsed;
         let iterations = 0;
-        while (accumulator >= PHYSICS_DT && iterations < 8) { world.step(); accumulator -= PHYSICS_DT; iterations++; }
+        while (accumulator >= PHYSICS_DT && iterations < 8) { world.step(input?.read()); accumulator -= PHYSICS_DT; iterations++; }
         if (iterations === 8) accumulator = 0;
       }
       if (!document.hidden) draw(elapsed);
@@ -62,9 +66,12 @@ async function boot() {
       raf = requestAnimationFrame(animate);
     };
     document.addEventListener('visibilitychange', visibility);
-    pause.onclick = () => { paused = !paused; accumulator = 0; previous = performance.now(); pause.textContent = paused ? 'Retomar' : 'Pausar'; step.disabled = !paused; status.textContent = paused ? 'Simulação pausada' : 'Renderização e física ativas'; update(); };
+    pause.onclick = () => { paused = !paused; input?.clear(); accumulator = 0; previous = performance.now(); pause.textContent = paused ? 'Retomar' : 'Pausar'; step.disabled = !paused; status.textContent = paused ? 'Simulação pausada' : 'Renderização e física ativas'; update(); };
     step.onclick = () => { if (!paused || destroyed) return; for (let i = 0; i < 120; i++) world.step(); draw(); update(); };
     camera.onchange = () => { display.setCameraMode(camera.value === 'overview' ? 'overview' : 'chase'); draw(); update(); };
+    const reset = () => { input?.clear(); world.reset(); draw(); update(); };
+    if (sceneKind === 'track') input = createDrivingInput(host, driving, reset);
+    resetKart.onclick = reset;
     controls(true); pause.textContent = 'Pausar'; status.textContent = 'Renderização e física ativas';
     previous = performance.now(); draw(); update(); raf = requestAnimationFrame(animate);
   } catch (error) {
