@@ -37,7 +37,7 @@ Bots **simulados logicamente no servidor** por waypoints/estado simplificado, co
 
 - Cliente → servidor: `hello`, `create_room`, `join_room`, `ready`, `input`, `use_item`, `heartbeat`, `resume`.
 - Servidor → cliente: `welcome`, `room_state`, `race_countdown`, `snapshot`, `item_granted`, `item_used`, `checkpoint_ack`, `race_result`, `championship_result`, `error`.
-- Envelope obrigatório: `protocolVersion`, `sessionId?`, `roomId?`, `seq`, `tick?`, `type`, `payload`.
+- Envelope v1 implementado: `protocolVersion`, `eventId`, `seq`, `payload`; o discriminante `type` fica dentro de `payload`. Identificadores de sessão/sala e tick serão definidos ao ampliar as mensagens.
 - Definir rate limit, payload máximo, intervalo de heartbeat, timeouts e idempotência antes de testar em rede pública.
 
 ## Tratamento de falhas
@@ -50,3 +50,11 @@ Bots **simulados logicamente no servidor** por waypoints/estado simplificado, co
 ## Testes obrigatórios
 
 1, 3 e 8 jogadores humanos com bots complementares; duas salas paralelas; latência 0/80/150/250 ms; perda 1/3/5%; reordenação artificial; queda/reconexão; duas tentativas de uso do mesmo item; checkpoints inválidos; término simultâneo e resultado igual para todos.
+
+## Fronteira implementada — E00-T04 (parcial)
+
+`decodeClientMessage` aceita texto JSON de até 4096 bytes UTF-8 e retorna uma união de sucesso/erro sem lançar por JSON inválido. Somente `hello` e `input` estão implementados. IDs/build usam 1–64 caracteres ASCII alfanuméricos, ponto, hífen ou sublinhado; `seq` é inteiro seguro não negativo. Campos desconhecidos são ignorados para evolução aditiva; tipos de mensagem desconhecidos são rejeitados. Versão divergente retorna `incompatible_version`. A versão 1 ainda é experimental e não foi publicada como contrato estável.
+
+`ClientMessageGate` pertence a uma conexão: exige `hello` antes de input, aceita sequência estritamente crescente (lacunas permitidas), descarta repetidos/antigos e rejeita novo `hello`. Rejeições não alteram a sequência aceita. `eventId` identifica o evento para diagnóstico; deduplicação nesta conexão usa `seq`. Reconexões exigirão novo handshake e futura validação de token; esta classe não implementa resume nem autoridade de corrida. O transporte deve limitar frames antes de acumulá-los em memória. Rate limit, heartbeat, timeout e demais mensagens permanecem pendentes antes de exposição pública.
+
+Fixtures portáveis em `fixtures/client-messages.json`; testes TS exercitam JSON inválido, versão, campos, UTF-8, handshake e replay. Ainda falta executar os mesmos casos em Rust e a prova browser↔Rust; não há socket aberto nesta entrega.

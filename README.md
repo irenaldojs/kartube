@@ -19,7 +19,7 @@ npm run check
 
 - `packages/game-core`: fronteiras de sessão, input, plataforma e invariantes de participantes.
 - `packages/game-data`: contrato inicial de pista e checkpoints.
-- `packages/protocol`: envelope v1 e validador de input.
+- `packages/protocol`: envelope v1, decoder de hello/input e gate de handshake/sequência.
 - `fixtures`: casos canônicos destinados também aos testes Rust futuros.
 - `docs`: plano, decisões e evidências de desenvolvimento.
 - `assets`: estrutura reservada, sem conteúdo final.

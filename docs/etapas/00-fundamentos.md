@@ -40,7 +40,13 @@ Definir fronteiras, ambiente de desenvolvimento e requisitos verificáveis antes
 - Responsável / agente: Codex
 - Data de início: 2026-11-13
 - Referência de commit/PR: primeiro commit de implementação (`chore: initialize Kartube foundations`); consultar git log.
-- Testes executados e ambiente: Node.js 24.22.2 / npm 11.19.1; `npm run check` (resultado registrado no changelog).
+- Testes executados e ambiente: Node.js 24.22.2 / npm 11.19.1; `npm run check`: tipos aprovados e 9 testes passando, incluindo decoder e gate de protocolo (detalhes no changelog).
 - Evidências de aprovação: **—**
 - Pendências / riscos: T01, T03–T07 ainda pendentes de validação completa; Rust/Cargo ausentes, Android físico não definido. Interfaces e fixtures iniciais não bastam para encerrar a etapa.
 - Data de conclusão: **—**
+
+### Avanço E00-T04 — 2026-11-13
+
+- Decoder v1 para hello/input, limite UTF-8, verificação de versão e gate de handshake/sequência implementados.
+- Fixtures canônicas de envelope adicionadas; documentação de rede alinhada com o formato real.
+- T04 permanece aberta: contrato de pista validado em runtime, demais mensagens e paridade Rust ainda pendentes. T06 permanece aberta: nenhum teste real browser/Rust ou Android executado.

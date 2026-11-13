@@ -2,6 +2,15 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-13 — E00-T04 — Validação inicial do protocolo
+
+- Tipo: implementação e documentação.
+- Decoder de hello/input verifica versão, estrutura e limite de 4096 bytes UTF-8; gate por conexão exige handshake e rejeita replay por sequência.
+- Fixtures JSON portáveis para futura paridade Rust e testes de mensagens malformadas/multibyte/ordenação.
+- Corrigida divergência documental: discriminante type pertence ao payload; eventId faz parte do envelope.
+- Evidência: `npm run check` aprovado, 9 testes, Node 24.22.2. Nenhuma prova de rede ou Android executada.
+- Etapa 00 segue em andamento; E00-T04 e E00-T06 permanecem abertas.
+
 ## 2026-11-13 — E00-T02 — Início dos fundamentos
 
 - Tipo: implementação e documentação.

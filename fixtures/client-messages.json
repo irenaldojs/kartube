@@ -1,0 +1,25 @@
+[
+  {
+    "name": "hello",
+    "raw": "{\"protocolVersion\": 1, \"eventId\": \"hello-1\", \"seq\": 0, \"payload\": {\"type\": \"hello\", \"build\": \"dev\"}}",
+    "ok": true
+  },
+  {
+    "name": "invalid-json",
+    "raw": "{",
+    "ok": false,
+    "code": "invalid_json"
+  },
+  {
+    "name": "version-mismatch",
+    "raw": "{\"protocolVersion\": 2, \"eventId\": \"hello-1\", \"seq\": 0, \"payload\": {\"type\": \"hello\", \"build\": \"dev\"}}",
+    "ok": false,
+    "code": "incompatible_version"
+  },
+  {
+    "name": "negative-sequence",
+    "raw": "{\"protocolVersion\": 1, \"eventId\": \"hello-1\", \"seq\": -1, \"payload\": {\"type\": \"hello\", \"build\": \"dev\"}}",
+    "ok": false,
+    "code": "invalid_message"
+  }
+]
