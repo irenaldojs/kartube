@@ -1,0 +1,30 @@
+[
+  {
+    "name": "neutral",
+    "valid": true,
+    "input": {
+      "seq": 0,
+      "clientTick": 0,
+      "steer": 0,
+      "throttle": 0,
+      "brake": 0,
+      "drift": false,
+      "jump": false,
+      "useItem": false
+    }
+  },
+  {
+    "name": "out-of-range",
+    "valid": false,
+    "input": {
+      "seq": 1,
+      "clientTick": 1,
+      "steer": 2,
+      "throttle": 0,
+      "brake": 0,
+      "drift": false,
+      "jump": false,
+      "useItem": false
+    }
+  }
+]
