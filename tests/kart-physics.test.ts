@@ -65,3 +65,28 @@ test('fixed-step control inputs traverse the complete circuit and both ramps wit
     assert.equal(kart.telemetry.resets, 0);
   } finally { kart.dispose(); }
 });
+test('holding reverse first brakes forward motion and then reverses from rest', async () => {
+  const kart = await createPhysics('track');
+  try {
+    for (let i = 0; i < 120; i++) kart.step();
+    for (let i = 0; i < 60; i++) kart.step(forward);
+    const movingZ = kart.position.z, movingSpeed = kart.telemetry.speed;
+    const reverse = { throttle: -1, steering: 0, brake: false };
+    for (let i = 0; i < 20; i++) kart.step(reverse);
+    assert.ok(kart.telemetry.speed < movingSpeed);
+    assert.ok(kart.position.z < movingZ, 'Kart must brake before changing direction');
+    const brakingZ = kart.position.z;
+    for (let i = 0; i < 90; i++) kart.step(reverse);
+    assert.ok(kart.position.z > brakingZ + 2, 'The same held control must reverse after stopping');
+    assert.ok(kart.telemetry.speed <= 4.1);
+  } finally { kart.dispose(); }
+});
+test('physics worlds and colliders can be released repeatedly without touching freed WASM', async () => {
+  for (let cycle = 0; cycle < 4; cycle++) {
+    const kart = await createPhysics(cycle % 2 === 0 ? 'track' : 'drop');
+    assert.equal(kart.resources.worlds, 1); assert.equal(kart.resources.bodies, 1);
+    assert.ok(kart.resources.colliders >= 2);
+    kart.dispose(); kart.dispose(); kart.step(forward); kart.reset();
+    assert.deepEqual(kart.resources, { worlds: 0, bodies: 0, colliders: 0 });
+  }
+});

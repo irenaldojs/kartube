@@ -4,7 +4,7 @@ import RAPIER from '@dimforge/rapier3d-compat';
 let initialization: Promise<void> | undefined;
 export const PHYSICS_DT = 1 / 60;
 export async function createPhysics(sceneKind: SceneKind = 'drop') {
-  initialization ??= RAPIER.init();
+  initialization ??= RAPIER.init().catch((error: unknown) => { initialization = undefined; throw error; });
   await initialization;
   const world = new RAPIER.World({ x: 0, y: -9.81, z: 0 });
   try {
@@ -62,6 +62,7 @@ export async function createPhysics(sceneKind: SceneKind = 'drop') {
       version: RAPIER.version(),
       step, reset,
       get steps() { return steps; },
+      get resources() { return { worlds: disposed ? 0 : 1, bodies: disposed ? 0 : world.bodies.len(), colliders: disposed ? 0 : world.colliders.len() }; },
       get position() { return body.translation(); },
       get pose() { return { ...body.translation(), yaw }; },
       get telemetry() { const velocity = body.linvel(); return { grounded, yaw, speed: Math.hypot(velocity.x, velocity.z), resets }; },

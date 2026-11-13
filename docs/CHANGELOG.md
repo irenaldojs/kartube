@@ -2,6 +2,14 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-13 — E01-T05 — Assets e liberação de recursos
+
+- Propriedade única e descarte idempotente de geometrias/materiais; caixa unitária/material por cor compartilhados entre malhas. Pista com 2 geometrias, laboratório com 3.
+- Cleanup de inicialização gráfica parcial; relatório passa a mostrar recursos do renderer após liberação e contadores de assets/mundo físico, sem confundir esses dados com RAM total. Retry da inicialização WASM após rejeição.
+- Botões móveis de freio e ré unificados a pedido do usuário: freia o avanço e, ao parar, passa à ré mantendo o botão pressionado; tem prioridade sobre o acelerador.
+- Verificação: 63 testes TS/tipos e smoke Chromium com ciclos de cenas/perfis, descarte com contadores zerados, falha de inicialização injetada, troca de perfil durante carregamento e regressões. Sem nova medição física Android de memória.
+- E01-T05 concluída; próxima E01-T06, build compartilhado em Tauri Android.
+
 ## 2026-11-13 — Correção de multitouch na pilotagem móvel
 
 - Usuário relatou que acelerar impedia acionar a direção no celular. O smoke anterior iniciava dois dedos juntos e não cobria a sequência relatada nem troca de foco entre botões.

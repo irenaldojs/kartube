@@ -13,7 +13,11 @@ const driving = element('driving'), resetKart = element<HTMLButtonElement>('rese
 const speed = element('speed');
 const restart = element<HTMLButtonElement>('restart'), release = element<HTMLButtonElement>('release');
 let generation = 0;
-let cleanup: (() => void) | null = null;
+type View = ReturnType<typeof import('./view.ts').createView>;
+type Physics = Awaited<ReturnType<typeof import('./physics.ts').createPhysics>>;
+type ReleaseReport = { graphics: ReturnType<View['dispose']> | null; physics: Physics['resources'] | null; inputReleased: boolean; animationStopped: boolean };
+let cleanup: (() => ReleaseReport) | null = null;
+let lastRelease: ReleaseReport | null = null;
 let report: Record<string, unknown> = { status: 'loading' };
 function publish(data: Record<string, unknown>) {
   report = { ...data, userAgent: navigator.userAgent };
@@ -21,17 +25,26 @@ function publish(data: Record<string, unknown>) {
   document.body.dataset.status = String(report.status);
 }
 function controls(active: boolean) { resetKart.disabled = !active || scene.value !== 'track'; driving.querySelectorAll('button').forEach(button => { button.disabled = !active || scene.value !== 'track'; }); camera.disabled = !active; pause.disabled = !active; step.disabled = true; release.disabled = !active; restart.disabled = false; }
-function stop() { generation++; cleanup?.(); cleanup = null; controls(false); }
+function stop() { generation++; if (cleanup) lastRelease = cleanup(); cleanup = null; controls(false); }
 async function boot() {
   stop(); const token = generation;
   const sceneKind = scene.value === 'track' ? 'track' : 'drop';
   const profile: Quality = quality.value === 'low' ? 'low' : 'balanced';
   status.textContent = 'Carregando o motor…'; publish({ status: 'loading', quality: profile }); restart.disabled = true;
-  let view: ReturnType<typeof import('./view.ts').createView> | null = null;
-  let physics: Awaited<ReturnType<typeof import('./physics.ts').createPhysics>> | null = null;
+  let view: View | null = null;
+  let physics: Physics | null = null;
   let input: ReturnType<typeof createDrivingInput> | null = null;
   let destroyed = false, raf = 0;
-  const destroy = () => { if (destroyed) return; destroyed = true; cancelAnimationFrame(raf); pause.onclick = null; step.onclick = null; camera.onchange = null; resetKart.onclick = null; input?.dispose(); document.removeEventListener('visibilitychange', visibility); physics?.dispose(); view?.dispose(); physics = null; view = null; };
+  let releaseReport: ReleaseReport | null = null;
+  const destroy = (): ReleaseReport => {
+    if (releaseReport) return releaseReport;
+    destroyed = true; cancelAnimationFrame(raf); pause.onclick = null; step.onclick = null; camera.onchange = null; resetKart.onclick = null;
+    input?.dispose(); input = null; document.removeEventListener('visibilitychange', visibility);
+    physics?.dispose();
+    releaseReport = { graphics: view?.dispose() ?? null, physics: physics?.resources ?? null, inputReleased: true, animationStopped: true };
+    physics = null; view = null;
+    return releaseReport;
+  };
   let previous = performance.now(), accumulator = 0, paused = false;
   const visibility = () => { input?.clear(); previous = performance.now(); accumulator = 0; };
   cleanup = destroy;
@@ -50,7 +63,7 @@ async function boot() {
     const world = physics, display = view;
     let frames = 0, sampledFrames = 0, sampleTime = performance.now(), fps = 0;
     const update = () => publish({ status: paused ? 'paused' : 'running', quality: profile, ...display.info, wasm: true, rapierVersion: world.version,
-      physicsSteps: world.steps, renderFrames: frames, bodyY: Number(world.position.y.toFixed(4)), fps: Number(fps.toFixed(1)), memory: display.memory, physicsDt: PHYSICS_DT, position: world.pose, driving: { ...world.telemetry, input: input?.read() ?? null } });
+      physicsSteps: world.steps, renderFrames: frames, bodyY: Number(world.position.y.toFixed(4)), fps: Number(fps.toFixed(1)), memory: display.memory, memorySample: 'running', physicsResources: world.resources, previousRelease: lastRelease, physicsDt: PHYSICS_DT, position: world.pose, driving: { ...world.telemetry, input: input?.read() ?? null } });
     const draw = (elapsed = 0) => { display.render(world.pose, elapsed); frames++; speed.textContent = `${(world.telemetry.speed * 3.6).toFixed(0)} km/h`; };
     const animate = (now: number) => {
       if (destroyed) return;
@@ -75,17 +88,18 @@ async function boot() {
     controls(true); pause.textContent = 'Pausar'; status.textContent = 'Renderização e física ativas';
     previous = performance.now(); draw(); update(); raf = requestAnimationFrame(animate);
   } catch (error) {
-    destroy();
+    const released = destroy();
     if (token !== generation) return;
+    lastRelease = released;
     controls(false);
     status.textContent = error instanceof Error ? error.message : 'Não foi possível iniciar o motor.';
-    publish({ status: 'error', quality: profile, error: status.textContent });
+    publish({ status: 'error', quality: profile, error: status.textContent, release: lastRelease });
   }
 }
 restart.onclick = () => { void boot(); };
 scene.onchange = () => { void boot(); };
 quality.onchange = () => { void boot(); };
-release.onclick = () => { stop(); status.textContent = 'Recursos liberados. Reinicie quando quiser.'; publish({ ...report, status: 'disposed', resourcesReleased: true }); };
+release.onclick = () => { stop(); status.textContent = 'Recursos liberados. Reinicie quando quiser.'; publish({ ...report, status: 'disposed', resourcesReleased: lastRelease?.graphics?.assets.closed === true && (lastRelease.physics === null || lastRelease.physics.worlds === 0), memory: lastRelease?.graphics?.rendererMemory ?? null, memorySample: 'after-release', release: lastRelease }); };
 element<HTMLButtonElement>('export').onclick = () => {
   const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob), link = document.createElement('a'); link.href = url; link.download = 'kartube-prova-3d.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 0);

@@ -62,7 +62,7 @@ export function createDrivingInput(host: HTMLElement, buttons: HTMLElement, rese
   return {
     clear,
     read(): DrivingInput { return {
-      throttle: Number(held('forward', 'KeyW', 'ArrowUp')) - Number(held('reverse', 'KeyS', 'ArrowDown')),
+      throttle: held('reverse', 'KeyS', 'ArrowDown') ? -1 : Number(held('forward', 'KeyW', 'ArrowUp')),
       steering: Number(held('right', 'KeyD', 'ArrowRight')) - Number(held('left', 'KeyA', 'ArrowLeft')),
       brake: held('brake', 'Space'),
     }; },

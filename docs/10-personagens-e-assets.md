@@ -41,3 +41,9 @@ assets/
 ## Catálogo de direitos (obrigatório quando houver conteúdo externo)
 
 Campos sugeridos: `assetId`, `origin`, `creator`, `sourceUrl`, `license`, `commercialUse`, `modificationAllowed`, `attribution`, `consentRecord`, `expiry`, `reviewedAt`. Documentos pessoais/termos assinados devem permanecer em armazenamento privado apropriado, **não neste repositório público**.
+
+## Ciclo procedural implementado — E01-T05
+
+`apps/web/src/assets.ts` registra geometrias e materiais compartilhados por identidade e os libera uma única vez. O renderizador reutiliza a caixa unitária para kart/pista e mantém a sombra/grid como recursos separados. Ao encerrar, limpa cena, observador, listener, superfícies de raycast, renderer e contexto; falha parcial de inicialização também libera o que já foi criado. Rapier recebe descritores geométricos puros e é liberado separadamente.
+
+O relatório distingue amostra ativa de contadores após descarte e expõe criação/liberação dos recursos registrados. Testes repetem cenas/perfis e verificam contadores estáveis. Isso não mede RAM total ou memória de driver/WASM, nem comprova ainda carregamento/descarte de GLB/texturas externas; o checklist de assets finais acima continua obrigatório quando forem introduzidos.

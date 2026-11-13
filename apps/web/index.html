@@ -13,7 +13,7 @@
       <section class="lab" aria-label="Laboratório de renderização">
         <div class="viewport" id="viewport" tabindex="0" aria-label="Cena 3D com kart de teste"><span class="scene-label">01 / PROTÓTIPO 3D</span><output id="speed" aria-label="Velocidade">0 km/h</output>          <div id="driving" class="driving" aria-label="Controles de pilotagem">
             <button data-drive="left" aria-label="Virar à esquerda" disabled>←</button><button data-drive="forward" aria-label="Acelerar" disabled>↑</button><button data-drive="right" aria-label="Virar à direita" disabled>→</button>
-            <button data-drive="brake" aria-label="Frear" disabled>Freio</button><button data-drive="reverse" aria-label="Frear e dar ré" disabled>↓ Ré</button>
+            <button data-drive="reverse" aria-label="Freio e ré" disabled>Freio / Ré</button>
           </div>
 </div>
         <div class="panel">
@@ -25,7 +25,7 @@
           <button id="restart" disabled>Reiniciar teste</button>
           <button id="release" class="quiet" disabled>Liberar recursos</button>
           <button id="reset-kart" class="quiet" disabled>Reposicionar kart</button>
-          <p class="note">Clique na cena: WASD ou setas para pilotar, Espaço para frear e R para reposicionar. No celular, segure os botões; direção e aceleração podem ser usadas juntas. Rampas têm colisão; boosts e caixas são marcadores visuais. O perfil leve limita a resolução; resultados de desempenho dependem do aparelho.</p>
+          <p class="note">Clique na cena: WASD ou setas para pilotar, Espaço para frear e R para reposicionar. No celular, segure os botões; direção e aceleração podem ser usadas juntas. Freio / Ré reduz a velocidade e, ao parar, passa a dar ré. Rampas têm colisão; boosts e caixas são marcadores visuais. O perfil leve limita a resolução; resultados de desempenho dependem do aparelho.</p>
         </div>
       </section>
       <section class="diagnostics"><div><p class="eyebrow">REGISTRO DO AMBIENTE</p><h2>O que está rodando</h2><p>Exporte o relatório para registrar o navegador, a GPU e o resultado desta prova.</p><button id="export" class="quiet">Exportar relatório JSON</button></div><pre id="report" aria-label="Relatório técnico">{ "status": "loading" }</pre></section>

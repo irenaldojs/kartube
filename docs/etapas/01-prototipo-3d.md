@@ -16,7 +16,7 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 - [x] E01-T02 — Exibir pista cinza fechada com linha de largada, chão, guardrails, rampas, boosts, caixa de item e alternativa em geometria simples.
 - [x] E01-T03 — Carregar kart placeholder por cena GLB ou geometria provisória, câmera em terceira pessoa e sombras de baixo custo.
 - [x] E01-T04 — Executar movimento básico e colisões com timestep fixo; criar debug de FPS/física.
-- [ ] E01-T05 — Carregar e liberar assets sem vazamento; separar malhas e colisores.
+- [x] E01-T05 — Carregar e liberar assets sem vazamento; separar malhas e colisores.
 - [ ] E01-T06 — Realizar spike do mesmo build no browser e Tauri Android em aparelho físico.
 - [ ] E01-T07 — Registrar FPS, RAM, WebGL2, áudio e problemas de WebView por plataforma.
 
@@ -24,7 +24,7 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 
 - [x] Kart pode percorrer o traçado cinza e câmera mantém alvo sem glitches críticos (percurso físico automatizado e smoke de câmera; playtest Android do novo build pendente).
 - [ ] WebGL2/física funcionam no navegador e há registro de resultado real Android (aprovado ou bloqueio).
-- [ ] Assets e colisão estão isolados de regras de corrida.
+- [x] Assets e colisão estão isolados de regras de corrida.
 
 ## Documentos que devem ser revisados
 
@@ -83,3 +83,13 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 - Multitouch da E01-T04 falhou no celular segundo o usuário; sucesso do smoke anterior não representou o gesto sequencial real.
 - Rastreamento por Touch.identifier e foco do teclado separado das ações de toque; controles bloqueiam gestos/menu nativos e exibem ações mantidas.
 - Regressão cobre primeiro acelerar, depois virar, trocar foco entre controles, soltar só direção, trocar para o outro lado, soltar só acelerador e cancelar o toque restante. Verificação automatizada em Chromium com suporte touch; usuário confirmou a correção no celular nesta sessão; registro manual, sem nova medição de desempenho.
+
+### E01-T05 — Ciclo de assets e descarte — 2026-11-13
+
+- `SceneAssets` concentra propriedade de geometrias/materiais, com registro único por recurso, contadores e descarte idempotente. Uma geometria de caixa atende pista e kart; materiais de mesma cor são compartilhados. Cena da pista usa 2 geometrias (caixa/sombra); laboratório usa 3 (caixa/sombra/grid).
+- Inicialização gráfica protegida por cleanup em falha parcial. Descarte desconecta ResizeObserver, remove listener/contexto/canvas, limpa superfícies de raycast e libera recursos registrados/renderer. Inicialização WASM rejeitada pode ser tentada novamente; mundo e colisores têm estado de liberação verificável sem acessar memória WASM já liberada.
+- Relatório disposed passa a amostrar contadores do renderer após descarte (`memorySample: after-release`), com release de gráficos/física/inputs/animação. Execução seguinte inclui previousRelease. Esses contadores evidenciam recursos gerenciados liberados, sem medir RAM total, memória do driver ou redução do heap WASM compartilhado.
+- Malhas ficam no renderizador; física recebe apenas descritores sólidos de track.ts, sem importar Three.js, assets ou regras de corrida. Assets atuais são primitivas procedurais; GLB/texturas e falhas de rede serão validados no pipeline correspondente.
+- Verificação: `npm run check` (63 testes, incluindo registro de recurso compartilhado, descarte repetido, adoção tardia e ciclos de mundo Rapier); `npm run check:web` (ciclos de liberar/reiniciar/trocar cena/perfil com contadores estáveis e zerados após liberação, falha de inicialização gráfica injetada, troca de perfil durante carregamento pendente de física e regressões de input/render/física).
+- Também atendido o ajuste solicitado: botão de toque Freio / Ré único; o mesmo comando desacelera o avanço até parar e depois engata ré, com teste de física dedicado; tem prioridade sobre acelerar quando ambos são pressionados.
+- E01-T05 concluída no escopo procedural do protótipo. Próxima E01-T06: empacotar o mesmo build em Tauri Android e testar no aparelho físico. E01-T07 (RAM/áudio/WebView) permanece aberta.

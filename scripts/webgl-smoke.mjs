@@ -22,10 +22,22 @@ try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 1000 }, hasTouch: true });
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   const read = async () => JSON.parse(await page.locator('#report').textContent());
+  const assertReleased = report => {
+    assert.equal(report.resourcesReleased, true);
+    assert.equal(report.memorySample, 'after-release');
+    assert.equal(report.release.graphics.canvasRemoved, true);
+    assert.equal(report.release.graphics.contextLossRequested, true);
+    assert.deepEqual(report.release.graphics.assets.live, { geometries: 0, materials: 0 });
+    assert.deepEqual(report.release.graphics.assets.created, report.release.graphics.assets.released);
+    assert.deepEqual(report.release.physics, { worlds: 0, bodies: 0, colliders: 0 });
+    assert.equal(report.memory.geometries, 0);
+  };
   const readyScene = async () => page.waitForFunction(() => document.body.dataset.status === 'running', { timeout: 30_000 });
   await page.goto('http://127.0.0.1:4173'); await readyScene();
   const track = await read();
   assert.equal(track.camera.mode, 'chase'); assert.equal(track.shadow, 'contact');
+  assert.equal(track.assets.live.geometries, 2);
+  assert.equal(track.physicsResources.worlds, 1);
   assert.equal(track.scene, 'track'); assert.equal(track.track.ramps, 2);
   assert.equal(track.track.boosts, 3); assert.equal(track.track.itemBoxes, 3);
   assert.equal(track.track.alternativeRoutes, 1);
@@ -53,6 +65,7 @@ try {
   assert.equal((await read()).physicsSteps, settledTrack.physicsSteps);
   await page.getByRole('button', { name: 'Liberar recursos' }).click();
   assert.equal(await page.locator('canvas').count(), 0);
+  assertReleased(await read());
   await page.getByRole('button', { name: 'Reiniciar teste' }).click(); await readyScene();
   assert.equal((await read()).scene, 'track');
   assert.equal(await page.locator('canvas').count(), 1);
@@ -120,6 +133,12 @@ try {
     const input = JSON.parse(document.getElementById('report').textContent).driving.input;
     return input.throttle === 0 && input.steering === 0;
   });
+  const reverse = await page.getByRole('button', { name: 'Freio e ré', exact: true }).boundingBox();
+  const reversePoint = { x: reverse.x + reverse.width / 2, y: reverse.y + reverse.height / 2, id: 4 };
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [pedalPoint, reversePoint] });
+  await page.waitForFunction(() => JSON.parse(document.getElementById('report').textContent).driving.input.throttle === -1);
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await page.waitForFunction(() => JSON.parse(document.getElementById('report').textContent).driving.input.throttle === 0);
   await touch.detach();
   await page.screenshot({ path: '/tmp/kartube-driving-mobile.png', fullPage: true });
   await page.getByRole('button', { name: 'Pausar', exact: true }).click();
@@ -151,12 +170,20 @@ try {
   await writeFile('/tmp/kartube-webgl-report.json', JSON.stringify({ ...report, validation: { browser: 'Chromium headless', graphics: 'SwiftShader (software)', realAndroid: false, collisionRestHeightPassed: true } }, null, 2) + '\n');
   const download = page.waitForEvent('download'); await page.getByRole('button', { name: 'Exportar relatório JSON' }).click();
   assert.equal((await download).suggestedFilename(), 'kartube-prova-3d.json');
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 4; i++) {
     await page.getByRole('button', { name: 'Liberar recursos' }).click();
-    assert.equal(await page.locator('canvas').count(), 0); assert.equal((await read()).resourcesReleased, true);
+    assert.equal(await page.locator('canvas').count(), 0); assertReleased(await read());
     await page.getByRole('button', { name: 'Reiniciar teste' }).click(); await readyScene();
     assert.equal(await page.locator('canvas').count(), 1);
-    assert.ok((await read()).memory.geometries <= 9);
+    const restarted = await read();
+    assert.equal(restarted.assets.live.geometries, 3);
+    assert.deepEqual(restarted.previousRelease.graphics.assets.live, { geometries: 0, materials: 0 });
+    assert.ok(restarted.memory.geometries <= 3);
+    await page.locator('#scene').selectOption('track'); await readyScene();
+    assert.equal((await read()).assets.live.geometries, 2);
+    await page.locator('#quality').selectOption(i % 2 ? 'low' : 'balanced'); await readyScene();
+    assert.equal((await read()).assets.live.geometries, 2);
+    await page.locator('#scene').selectOption('drop'); await readyScene();
   }
   await page.locator('#quality').selectOption('low'); await readyScene();
   assert.equal((await read()).quality, 'low'); assert.ok((await read()).pixelRatio <= 1);
@@ -168,6 +195,24 @@ try {
   await page.setViewportSize({ width: 390, height: 844 });
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
   assert.deepEqual(errors, []);
+  const pending = await browser.newPage();
+  let unblock;
+  const loadingGate = new Promise(resolve => { unblock = resolve; });
+  await pending.route('**/physics-*.js', async route => { await loadingGate; await route.continue(); });
+  await pending.goto('http://127.0.0.1:4173', { waitUntil: 'domcontentloaded' });
+  await pending.waitForFunction(() => document.body.dataset.status === 'loading' && document.querySelectorAll('canvas').length === 1);
+  await pending.locator('#quality').selectOption('low');
+  await pending.waitForFunction(() => {
+    const report = JSON.parse(document.getElementById('report').textContent);
+    return report.status === 'loading' && report.quality === 'low' && document.querySelectorAll('canvas').length === 1;
+  });
+  unblock();
+  await pending.waitForFunction(() => document.body.dataset.status === 'running');
+  const pendingReport = JSON.parse(await pending.locator('#report').textContent());
+  assert.equal(pendingReport.quality, 'low');
+  assert.deepEqual(pendingReport.previousRelease.graphics.assets.live, { geometries: 0, materials: 0 });
+  assert.equal(await pending.locator('canvas').count(), 1);
+  await pending.close();
   const fallback = await browser.newPage();
   await fallback.addInitScript(() => {
     const original = HTMLCanvasElement.prototype.getContext;
@@ -182,6 +227,14 @@ try {
   await wasmFallback.waitForFunction(() => document.body.dataset.status === 'error');
   assert.match(await wasmFallback.locator('#status').textContent(), /WebAssembly/);
   assert.equal(await wasmFallback.locator('canvas').count(), 0);
+  const initializationFailure = await browser.newPage();
+  await initializationFailure.addInitScript(() => {
+    window.ResizeObserver = class { constructor() { throw new Error('injected_resize_failure'); } };
+  });
+  await initializationFailure.goto('http://127.0.0.1:4173');
+  await initializationFailure.waitForFunction(() => document.body.dataset.status === 'error');
+  assert.match(await initializationFailure.locator('#status').textContent(), /injected_resize_failure/);
+  assert.equal(await initializationFailure.locator('canvas').count(), 0);
   console.log('WebGL2/WASM smoke passed: render, collision, release/restart, context loss, mobile layout and unsupported fallback');
 } finally {
   await browser?.close();
