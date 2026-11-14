@@ -1,6 +1,6 @@
 # Andamento do desenvolvimento
 
-> **Data-base:** 2026-11-13. Fundamentos concluídos; protótipo 3D em andamento, ainda sem corrida jogável.
+> **Data-base:** 2026-11-14. Fundamentos concluídos; protótipo 3D em andamento, ainda sem corrida jogável.
 
 | Etapa | Status | Evidência | Próximo critério |
 |---|---|---|---|
@@ -52,3 +52,7 @@ Rust/Cargo instalados e prova local WebSocket implementada. Prova básica WebGL2
 ## Checkpoint de retomada — 2026-11-13
 
 Execução encerrada a pedido do usuário para continuar depois. Consulte [CHECKPOINT.md](../CHECKPOINT.md) antes de retomar. E01-T06 continua em andamento: wrapper/CI/documentação preparados; Rust Android ARM64 compilou, porém builds desktop e Gradle foram interrompidos antes dos pacotes. Não há APK/instalador gerado nem aprovação do smoke nativo ou Windows/Android físico. Testes TS/tipos: 63 aprovados.
+
+## Retomada — 2026-11-14
+
+Linux `.deb` gerado e smoke Tauri/WebKitGTK aprovado (WebGL2/WASM, pilotagem, pausa, descarte/reinício). Evidências locais em `artifacts/native/`. APK debug ARM64 gerado, identificador/arquitetura e assinatura v2 Android Debug conferidos; cópia em `artifacts/native/`. Sem medição de GPU física; Android físico e Windows continuam pendentes. E01-T06 permanece aberta.

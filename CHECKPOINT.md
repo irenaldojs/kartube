@@ -1,82 +1,65 @@
 # Checkpoint para retomar o Kartube
 
-**Data:** 2026-11-13 (America/Sao_Paulo). Checkpoint solicitado pelo usuário para continuar em outra sessão. **Etapa ativa: 01; tarefa atual: E01-T06 — empacotamento e prova Tauri.**
+**Data:** 2026-11-14 (America/Sao_Paulo). **Etapa ativa: 01; tarefa atual: E01-T06 — prova Tauri no S20 FE.**
 
-## Onde paramos
+## Estado atual
 
-- Etapa 00 concluída, com escopo/regras aprovados: oito pilotos, quatro pistas, três voltas padrão, pontos 15/12/10/8/6/4/2/1 e desempates documentados.
-- E01-T01 a T05 concluídas: boot/perfis, pista cinza fechada, câmera em terceira pessoa, sombra de contato, kart dirigível, teclado/toque, Freio / Ré único, recursos compartilhados e descarte verificado.
-- Usuário quer **navegador + apps nativos desktop (Windows/Linux) + Android**, todos com o mesmo jogo web. Não substituir a opção de navegador.
-- E01-T06 em andamento: wrapper Tauri em `apps/native`, frontendDist em `apps/web/dist`, projeto Gradle Android versionado, scripts na raiz, ícone original, guia nativo e CI para Linux `.deb`, Windows NSIS e APK debug ARM64.
-- Relatório identifica `runtime: browser` ou `runtime: tauri`. Entrada de toque corrigida por identificador de dedo; Freio / Ré tem prioridade sobre acelerar.
+- Etapa 00 e E01-T01 a T05 concluídas. Não refazer tarefas anteriores.
+- Mesmo cliente web em navegador e wrapper Tauri desktop/Android. Projeto Android já versionado: **não executar android:init novamente**.
+- Linux: build release e pacote `.deb` amd64 concluídos. Smoke real Tauri/WebKitGTK aprovado sob Xvfb: runtime tauri, WebGL2/WASM, repouso físico, pilotagem, pausa, descarte e reinício com um canvas. Captura inspecionada.
+- Android: **APK debug ARM64 gerado**, identificador `io.kartube.game.debug`, versão 0.1.0 (1000), min SDK 24, target SDK 36. `aapt` confirmou somente `arm64-v8a`; `apksigner verify` aprovou assinatura v2 com certificado Android Debug.
+- Windows: workflow configurado, sem build/CI remoto executado. Nenhum instalador Windows gerado.
+- **E01-T06 permanece aberta até a prova física documentada do APK no S20 FE.** Teste anterior no Chrome não valida Tauri Android. E01-T07 permanece aberta.
 
-Commits anteriores relevantes:
+Verificações finais: `npm run check` e `npm run check:web` aprovados; `git diff --check` sem erros.
 
-| Commit | Entrega |
-|---|---|
-| `1fadf59` | Prova WebGL2/WASM e fundamentos |
-| `c9c7cc5` | Pista cinza |
-| `5dbd272` | Câmera e sombra |
-| `a84337f` | Pilotagem |
-| `85ed663` | Correção multitouch |
-| `9f7513c` | Ciclo de assets e Freio / Ré |
+## Artefatos locais
 
-O commit deste checkpoint contém o wrapper nativo ainda em validação; consulte `git log -1`. Não refazer as tarefas anteriores.
+Arquivos em `artifacts/native/`, ignorados pelo Git:
 
-## Evidências desta sessão
+- `Kartube_0.1.0_arm64_debug.apk` — APK de desenvolvimento, cerca de 129 MiB (biblioteca Rust com símbolos de debug).
+- `Kartube_0.1.0_amd64.deb` — pacote Linux (3.687.248 bytes).
+- `kartube-native.png` e `kartube-native-report.json` — prova Linux. Execução em contêiner com renderização de teste; FPS/string GPU não representam desempenho/hardware físico.
 
-- `npm run check`: **63 testes e tipos aprovados** com a estrutura nativa adicionada.
-- `cargo fmt --manifest-path apps/native/src-tauri/Cargo.toml --check`: aprovado.
-- `node --check scripts/native-smoke.mjs`: aprovado (sintaxe; não equivale a smoke executado).
-- Android: Rust ARM64 compilou em 9m42s. Biblioteca em `apps/native/src-tauri/target/aarch64-linux-android/debug/libkartube_native_lib.so` (artefato local ignorado pelo Git).
-- Gradle iniciou download de 9.6.1. Build interrompido a pedido do usuário antes de gerar APK.
-- Linux: compilação das dependências Rust/WebKitGTK avançou, mas foi interrompida antes do binário/instalador final. Encerramento intencional com código 130; nenhum erro de compilação observado até esse ponto.
-- **Não há APK ou instalador final gerado. Smoke nativo ainda não executado. CI Windows/Linux/Android configurada, porém não executada remotamente.**
-- Nenhum aparelho conectado por adb. Prova anterior no S20 FE foi no Chrome; não validar Tauri Android com essa evidência. Usuário confirmou a correção dos toques na versão web.
+SHA-256:
 
-Builds foram encerrados para este checkpoint. Os caches locais podem acelerar a retomada, mas não são versionados. Logs em `/tmp` são auxiliares e podem desaparecer:
+```text
+756aa77d9a43f8605e8e766bbec6590a3f58f3a54387e04c3c59beaafdc62f24  Kartube_0.1.0_arm64_debug.apk
+2b46e2661d8689ed5b2a0d3241139e38e01c959ab25c60a57c656f41577d3611  Kartube_0.1.0_amd64.deb
+```
 
-- `/tmp/kartube-desktop-build.log`
-- `/tmp/kartube-android-build.log`
-- `/tmp/kartube-native-contracts.log`
+Binários e caches não são versionados. Cópias originais em `apps/native/src-tauri/target/release/bundle/deb/` e `apps/native/src-tauri/gen/android/app/build/outputs/apk/universal/debug/`.
 
-## Próximas ações, em ordem
+## Próxima ação
 
-1. Ler este arquivo, conferir `git status` e continuar a E01-T06. **Não executar android:init de novo:** o projeto Android já está versionado, com SDK/plataforma ajustados.
-2. Concluir build Linux e rodar o smoke no WebView real. Comandos na raiz:
+Entregar/instalar o APK no S20 FE e seguir [matriz e roteiro manual](docs/matriz-plataformas.md): inicialização offline, WebGL2/WASM, pilotagem, acelerar primeiro e depois virar com outro dedo, soltura independente, Freio / Ré, câmera, pausa/retomada, troca de app e descarte/reinício. Registrar relatório com `runtime: tauri`, versão real do Android e Android System WebView. Não inferir versões pelo user agent reduzido.
+
+```sh
+adb install -r artifacts/native/Kartube_0.1.0_arm64_debug.apk
+adb shell am start -n io.kartube.game.debug/io.kartube.game.MainActivity
+```
+
+Só concluir T06 com essa evidência; depois seguir T07 (FPS/RAM/áudio/WebView). Windows exige máquina Windows ou execução remota autorizada; não declarar compatibilidade apenas pela configuração do workflow.
+
+## Reproduzir os builds
+
+Executar sequencialmente, pois ambos usam `apps/web/dist`:
 
 ```sh
 npm ci
 npm run build:desktop -- --bundles deb --ci
 LIBGL_ALWAYS_SOFTWARE=1 WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1 xvfb-run -a npm run check:native
+JAVA_HOME=/usr/local/sdkman/candidates/java/21.0.13.0+2-ms ANDROID_HOME=/home/codespace/android-sdk NDK_HOME=/home/codespace/android-sdk/ndk/29.0.14206865 npm run build:android -- --ci
+npm run check:web
 ```
 
-O smoke requer tauri-driver 2.1.0 e WebKitWebDriver. Ambos, Xvfb e as bibliotecas WebKitGTK foram instalados nesta sessão. A variável de sandbox é para o teste em contêiner, não para o produto distribuído. Inspecionar `/tmp/kartube-native.png` e `/tmp/kartube-native-report.json`; corrigir qualquer falha antes de declarar aprovação.
+Caminhos de JDK/SDK específicos deste ambiente. Smoke WebDriver, preview web e integração Tauri/Gradle abrem portas locais, exigindo permissão fora do sandbox deste ambiente. Variável de sandbox WebKit somente para a prova em contêiner. Não versionar SDK, chaves ou binários.
 
-3. Concluir APK ARM64. Neste ambiente Linux, os caminhos instalados são:
+## Referências
 
-```sh
-export JAVA_HOME=/usr/local/sdkman/candidates/java/21.0.13.0+2-ms
-export ANDROID_HOME=/home/codespace/android-sdk
-export NDK_HOME="$ANDROID_HOME/ndk/29.0.14206865"
-npm run build:android -- --ci
-```
-
-SDK plataforma 36; build tools 36.0.0 e 37.0.0; NDK 29.0.14206865; target Rust `aarch64-linux-android`. Em outro ambiente, configurar os caminhos locais conforme o guia. Rust está fixado em `rust-toolchain.toml`. O JDK padrão do host é 25; usar o JDK 21 acima para esta prova.
-
-4. Verificar pacotes e registrar evidências. Linux: `apps/native/src-tauri/target/release/bundle/deb/*.deb`. Android: `apps/native/src-tauri/gen/android/app/build/outputs/apk/**/*.apk`. Se disponibilizar cópias locais, usar `artifacts/` (ignorado pelo Git); não commitar binários/SDK/chaves. Validar arquitetura, assinatura debug e identificador do APK.
-5. Windows: compilar **em Windows** com `npm run build:desktop -- --bundles nsis --ci` ou executar o workflow `.github/workflows/native.yml` quando houver autorização/contexto para enviar ao remoto. Não declarar instalador Windows gerado a partir apenas da configuração de CI.
-6. Rodar `npm run check:web` após os builds, atualizar evidências e commitar as correções. Executar builds sequencialmente: ambos usam `apps/web/dist`.
-7. Entregar o APK ao usuário para teste físico no S20 FE: inicialização offline, WebGL2/WASM, pilotagem/multitouch sequencial, Freio / Ré, câmera, pausa/retomada, troca de aplicativo, descarte/reinício e relatório com `runtime: tauri`. Registrar SO e Android System WebView reais; não inferir versão pelo user agent reduzido.
-8. **Só concluir E01-T06 com a prova física documentada.** Depois seguir E01-T07 (FPS/RAM/áudio/WebView). Atualizar andamento, changelog e ADRs com evidência, sem aceitar critérios ainda não testados.
-
-## Referências de trabalho
-
-- [Guia nativo: build e instalação](apps/native/README.md)
-- [Etapa 01 e critérios](docs/etapas/01-prototipo-3d.md)
+- [Guia nativo](apps/native/README.md)
+- [Etapa 01](docs/etapas/01-prototipo-3d.md)
 - [Andamento](docs/ANDAMENTO.md)
-- [Matriz e roteiro manual](docs/matriz-plataformas.md)
-- [Estratégia web/desktop/Android](docs/11-clientes-web-e-tauri.md)
 - [Changelog](docs/CHANGELOG.md)
 
-Não há corrida com checkpoints/voltas/resultados implementada ainda. Boosts e caixas da pista são visuais. Áudio, gamepad, GLB final e assinatura de distribuição permanecem em seus marcos; não foram aprovados por este checkpoint.
+Sem corrida com checkpoints/voltas/resultados ainda. Boosts e caixas são visuais. Áudio, gamepad, GLB final e assinatura de distribuição permanecem em seus marcos.

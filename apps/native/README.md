@@ -4,7 +4,7 @@ Wrapper Tauri 2 para Windows, Linux e Android. O jogo continua em `apps/web`: `f
 
 Execute os comandos abaixo na raiz do repositório.
 
-**Checkpoint:** compilações interrompidas a pedido do usuário antes de gerar instaladores/APK. Rust ARM64 compilou; Gradle começou o download inicial. Smoke nativo e CI ainda não executados. Retomada em [CHECKPOINT.md](../../CHECKPOINT.md).
+**Validação local (2026-11-14):** `.deb` Linux gerado e smoke Tauri/WebKitGTK aprovado; APK debug ARM64 gerado e assinatura/identificador conferidos. Cópias locais em `artifacts/native/` na raiz. Teste físico no S20 FE e build Windows continuam pendentes; E01-T06 aberta. Retomada em [CHECKPOINT.md](../../CHECKPOINT.md).
 
 ## Desktop
 

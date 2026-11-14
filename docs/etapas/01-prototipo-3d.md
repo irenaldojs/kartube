@@ -108,3 +108,16 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 - Build Linux: dependências Rust/WebKitGTK em compilação, interrompidas sem pacote gerado. Encerramento intencional (código 130), sem erro de compilação observado nos logs até esse ponto; isso não comprova build final aprovado.
 - Smoke nativo, build Windows/CI e teste Tauri no S20 FE não executados. E01-T06/T07 continuam abertas.
 - Comandos, caminhos de SDK e próximos passos em [CHECKPOINT.md](../../CHECKPOINT.md). Não reiniciar etapas concluídas nem regenerar o projeto Android sem necessidade.
+
+### Retomada E01-T06 — Linux validado — 2026-11-14
+
+- Build Linux release concluído: `Kartube_0.1.0_amd64.deb` (3.687.248 bytes), pacote `kartube` 0.1.0, arquitetura amd64, dependências WebKitGTK 4.1/GTK 3 verificadas com `dpkg-deb --info`.
+- Smoke aprovado em Tauri/WebKitGTK sob Xvfb: cliente embutido com `runtime: tauri`, WebGL2/WASM, repouso físico, pilotagem, pausa, descarte e reinício com um único canvas. Captura inspecionada; renderer zerou geometrias/texturas e física zerou mundos/corpos/colisores após liberação.
+- Pacote, captura e relatório copiados para `artifacts/native/` (ignorado pelo Git). Ambiente de teste em contêiner; FPS e string de GPU desse relatório não representam desempenho ou hardware físico.
+- `npm run check` aprovado. Smoke exigiu execução fora do sandbox para permitir portas locais do WebDriver; variável de sandbox do WebKit restrita a essa prova.
+- Android e Windows permanecem sem aprovação física. E01-T06 continua aberta até prova do APK no S20 FE.
+
+- Android concluído nesta retomada: APK `app-universal-debug.apk`, copiado como `artifacts/native/Kartube_0.1.0_arm64_debug.apk` (cerca de 129 MiB, inclui símbolos Rust debug). `aapt` confirmou `io.kartube.game.debug` 0.1.0 (1000), min SDK 24, target SDK 36 e somente arm64-v8a. `apksigner verify --verbose --print-certs` aprovou assinatura v2 Android Debug. Build precisou abrir WebSocket local fora do sandbox para integração CLI/Gradle. Avisos de APIs antigas de AGP/Kotlin/Java nas fontes geradas/dependências, sem erro final.
+- SHA-256 do APK: `756aa77d9a43f8605e8e766bbec6590a3f58f3a54387e04c3c59beaafdc62f24`. Build e assinatura não comprovam inicialização offline, WebGL2 ou input no aparelho. Próxima ação: instalar no S20 FE e registrar roteiro físico.
+
+- Regressão final: `npm run check:web` aprovado (Chromium/WebGL2/WASM, input móvel, câmera, descarte/reinício, perda de contexto e fallbacks). Preview executado fora do sandbox por exigir porta local.

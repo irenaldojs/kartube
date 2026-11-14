@@ -2,6 +2,13 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-14 — E01-T06 — Pacotes Linux/Android e prova Linux
+
+- Linux release `.deb` amd64 gerado; smoke real Tauri/WebKitGTK aprovado com WebGL2/WASM, pilotagem, pausa e descarte/reinício. Captura inspecionada; evidências locais em `artifacts/native/`.
+- APK debug ARM64 gerado e copiado para `artifacts/native/Kartube_0.1.0_arm64_debug.apk`. Identificador `io.kartube.game.debug`, versão 0.1.0, arquitetura arm64-v8a e assinatura v2 Android Debug conferidos por aapt/apksigner.
+- `npm run check` e `npm run check:web` aprovados. Smoke WebDriver, preview web e integração Tauri/Gradle precisaram de portas locais fora do sandbox. Não houve mudança no gameplay.
+- Checkpoint e guia atualizados. E01-T06 segue aberta até teste físico documentado no S20 FE; Windows/CI remoto e E01-T07 permanecem pendentes. FPS/GPU do contêiner não são medição física.
+
 ## 2026-11-13 — Checkpoint de retomada dos builds nativos
 
 - Usuário pediu commit e ponto de retomada. CHECKPOINT.md registra estado, evidências e comandos; builds em andamento encerrados intencionalmente, sem processos de compilação deixados ativos.
