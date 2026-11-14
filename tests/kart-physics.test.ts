@@ -49,7 +49,7 @@ test('fixed-step control inputs traverse the complete circuit and both ramps wit
   try {
     for (let i = 0; i < 120; i++) kart.step();
     const route = [[-20, -20], [20, -20], [20, 20], [-20, 20], [-20, 7]] as const;
-    let next = 0, highest = 0;
+    let next = 0, highest = 0, airborne = 0, landings = 0, wasGrounded = true;
     for (let tick = 0; tick < 6000 && next < route.length; tick++) {
       const pose = kart.pose, [x, z] = route[next]!;
       highest = Math.max(highest, pose.y);
@@ -59,9 +59,13 @@ test('fixed-step control inputs traverse the complete circuit and both ramps wit
       const error = Math.atan2(Math.sin(desired - pose.yaw), Math.cos(desired - pose.yaw));
       // Test-only driver: all movement goes through the same inputs as human control.
       kart.step({ throttle: 0.35, steering: Math.max(-1, Math.min(1, -error * 2)), brake: false });
+      if (!kart.telemetry.grounded && pose.y > 0.7) airborne++;
+      if (!wasGrounded && kart.telemetry.grounded) landings++;
+      wasGrounded = kart.telemetry.grounded;
     }
     assert.equal(next, route.length, JSON.stringify(kart.pose));
     assert.ok(highest > 1, 'Route must climb the ramps');
+    assert.ok(airborne > 0 && landings >= 2, 'Route must include airborne motion and both landings');
     assert.equal(kart.telemetry.resets, 0);
   } finally { kart.dispose(); }
 });
@@ -89,4 +93,19 @@ test('physics worlds and colliders can be released repeatedly without touching f
     kart.dispose(); kart.dispose(); kart.step(forward); kart.reset();
     assert.deepEqual(kart.resources, { worlds: 0, bodies: 0, colliders: 0 });
   }
+});
+
+test('drift uses the same Rapier body and is cancelled by brake and reset', async () => {
+  const kart = await createPhysics('track');
+  try {
+    for (let i = 0; i < 120; i++) kart.step();
+    for (let i = 0; i < 60; i++) kart.step(forward);
+    for (let i = 0; i < 15; i++) kart.step({ ...forward, steering: 1, drift: true });
+    assert.equal(kart.telemetry.drifting, true);
+    assert.ok(kart.telemetry.yaw < -0.3);
+    kart.step({ ...forward, brake: true, drift: true });
+    assert.equal(kart.telemetry.drifting, false);
+    kart.reset(); assert.equal(kart.telemetry.drifting, false); assert.equal(kart.telemetry.airControl, false);
+    assert.equal(kart.resources.bodies, 1);
+  } finally { kart.dispose(); }
 });

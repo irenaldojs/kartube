@@ -4,7 +4,7 @@ export function createDrivingInput(host: HTMLElement, buttons: HTMLElement, rese
   const keys = new Set<string>(), pointers = new Map<number, string>(), touches = new Map<number, string>();
   const nativeTouch = 'ontouchstart' in window;
   const driveButtons = Array.from(buttons.querySelectorAll<HTMLButtonElement>('[data-drive]'));
-  const codes = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyR']);
+  const codes = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyR', 'ShiftLeft', 'ShiftRight']);
   const paint = () => {
     const actions = [...pointers.values(), ...touches.values()];
     driveButtons.forEach(button => { button.dataset.held = String(actions.includes(button.dataset.drive!)); });
@@ -65,6 +65,7 @@ export function createDrivingInput(host: HTMLElement, buttons: HTMLElement, rese
       throttle: held('reverse', 'KeyS', 'ArrowDown') ? -1 : Number(held('forward', 'KeyW', 'ArrowUp')),
       steering: Number(held('right', 'KeyD', 'ArrowRight')) - Number(held('left', 'KeyA', 'ArrowLeft')),
       brake: held('brake', 'Space'),
+      drift: held('drift', 'ShiftLeft', 'ShiftRight'),
     }; },
     dispose() {
       clear(); host.removeEventListener('keydown', down); window.removeEventListener('keyup', up);

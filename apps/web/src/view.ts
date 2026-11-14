@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createKartModel, loadKartSource } from './kart-model.ts';
 import { SceneAssets } from './assets.ts';
 import { createCameraRig, type CameraMode, type KartPose } from './camera.ts';
 import { TRACK_PARTS, TRACK_SUMMARY, type SceneKind } from './track.ts';
@@ -53,12 +54,8 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
       for (const material of Array.isArray(grid.material) ? grid.material : [grid.material]) assets.material(material);
     }
     const kart = new THREE.Group();
-    const chassis = box(1.8, 0.45, 2.8, 0xe8a64e); kart.add(chassis);
-    const seat = box(0.9, 0.6, 1, 0x233137); seat.position.set(0, 0.45, -0.3); kart.add(seat);
-    for (const x of [-0.9, 0.9]) for (const z of [-0.9, 0.9]) {
-      const wheel = box(0.45, 0.55, 0.65, 0x182126); wheel.position.set(x, -0.08, z); kart.add(wheel);
-    }
     scene.add(kart);
+    let kartModel: { source: string; dimensions: number[] } | null = null;
     // A small untextured contact shadow avoids a shadow-map render pass on mobile.
     const shadowGeometry = assets.geometry(new THREE.CircleGeometry(1, quality === 'low' ? 16 : 24));
     const shadowMaterial = assets.material(new THREE.MeshBasicMaterial({ color: 0x0a1519, transparent: true, opacity: 0.28, depthWrite: false }));
@@ -77,7 +74,13 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
     canvas.addEventListener('webglcontextlost', lost);
     const debug = gl.getExtension('WEBGL_debug_renderer_info');
     return {
-      get info() { return { assets: assets.info, camera: cameraRig.info, shadow: 'contact', shadowVisible: shadow.visible, scene: sceneKind, ...(sceneKind === 'track' ? { track: TRACK_SUMMARY } : {}), threeVersion: THREE.REVISION, webgl2: true, gpu: String(gl.getParameter(debug ? debug.UNMASKED_RENDERER_WEBGL : gl.RENDERER)), pixelRatio: ratio }; },
+      async loadKart() {
+        const data = await loadKartSource();
+        if (disposed) return;
+        const loaded = createKartModel(data, assets); kart.add(loaded.object);
+        kartModel = { source: 'Cart.fbx', dimensions: loaded.dimensions };
+      },
+      get info() { return { kartModel, assets: assets.info, camera: cameraRig.info, shadow: 'contact', shadowVisible: shadow.visible, scene: sceneKind, ...(sceneKind === 'track' ? { track: TRACK_SUMMARY } : {}), threeVersion: THREE.REVISION, webgl2: true, gpu: String(gl.getParameter(debug ? debug.UNMASKED_RENDERER_WEBGL : gl.RENDERER)), pixelRatio: ratio }; },
       setCameraMode(mode: CameraMode) { cameraRig.setMode(mode); },
       render(position: KartPose, elapsed = 0) {
         if (disposed) return;

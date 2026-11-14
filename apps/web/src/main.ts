@@ -64,6 +64,8 @@ async function boot() {
       stop(); status.textContent = 'O contexto gráfico foi perdido. Reinicie o teste.';
       publish({ ...report, status: 'error', error: 'webgl_context_lost' });
     }, sceneKind, camera.value === 'overview' ? 'overview' : 'chase');
+    await view.loadKart();
+    if (token !== generation) return;
     if (typeof WebAssembly === 'undefined') throw new Error('WebAssembly não está disponível. A física precisa de WASM para iniciar.');
     const { createPhysics, PHYSICS_DT } = await import('./physics.ts');
     if (token !== generation) return;
@@ -74,7 +76,7 @@ async function boot() {
     let frames = 0, sampledFrames = 0, sampleTime = performance.now(), fps = 0;
     const update = () => publish({ status: paused ? 'paused' : 'running', quality: profile, ...display.info, wasm: true, rapierVersion: world.version,
       bootMs, frameTiming: frameSample.report, physicsSteps: world.steps, renderFrames: frames, bodyY: Number(world.position.y.toFixed(4)), fps: Number(fps.toFixed(1)), memory: display.memory, memorySample: 'running', physicsResources: world.resources, previousRelease: lastRelease, physicsDt: PHYSICS_DT, position: world.pose, driving: { ...world.telemetry, input: input?.read() ?? null } });
-    const draw = (elapsed = 0) => { display.render(world.pose, elapsed); frames++; speed.textContent = `${(world.telemetry.speed * 3.6).toFixed(0)} km/h`; };
+    const draw = (elapsed = 0) => { display.render(world.pose, elapsed); frames++; speed.textContent = `${(world.telemetry.speed * 3.6).toFixed(0)} km/h${world.telemetry.drifting ? ' · DRIFT' : sceneKind === 'track' && !world.telemetry.grounded ? ' · NO AR' : ''}`; };
     const animate = (now: number) => {
       if (destroyed) return;
       if (sampleNextFrame && !paused && !document.hidden) frameSample.add(now - previous);

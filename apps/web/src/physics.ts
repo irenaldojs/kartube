@@ -1,5 +1,5 @@
 import { TRACK_PARTS, TRACK_SPAWN, type SceneKind } from './track.ts';
-import { KART_TUNING as tuning, NEUTRAL_INPUT, type DrivingInput } from './driving.ts';
+import { controlKart, NEUTRAL_INPUT, type DrivingInput } from './driving.ts';
 import RAPIER from '@dimforge/rapier3d-compat';
 let initialization: Promise<void> | undefined;
 export const PHYSICS_DT = 1 / 60;
@@ -21,40 +21,22 @@ export async function createPhysics(sceneKind: SceneKind = 'drop') {
     body.enableCcd(true);
     world.createCollider(RAPIER.ColliderDesc.cuboid(0.9, 0.35, 1.4).setRestitution(0).setFriction(0), body);
     let disposed = false;
-    let steps = 0, yaw = 0, grounded = false, resets = 0;
+    let steps = 0, yaw = 0, grounded = false, resets = 0, drifting = false, airControl = false;
     const reset = () => {
       if (disposed) return;
       body.setTranslation(spawn, true); body.setLinvel({ x: 0, y: 0, z: 0 }, true);
-      body.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true); yaw = 0; grounded = false; resets++;
+      body.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true); yaw = 0; grounded = false; drifting = false; airControl = false; resets++;
     };
-    const approach = (value: number, target: number, amount: number) => value + Math.max(-amount, Math.min(amount, target - value));
     const step = (input: DrivingInput = NEUTRAL_INPUT) => {
       if (disposed) return;
       if (sceneKind === 'track') {
         if (body.translation().y < -8) reset();
         const hit = world.castRay(new RAPIER.Ray(body.translation(), { x: 0, y: -1, z: 0 }), 0.55, true, undefined, undefined, undefined, body);
         grounded = hit !== null;
-        if (grounded) {
-          const velocity = body.linvel();
-          let forwardX = -Math.sin(yaw), forwardZ = -Math.cos(yaw);
-          let speed = velocity.x * forwardX + velocity.z * forwardZ;
-          const throttle = Number.isFinite(input.throttle) ? Math.max(-1, Math.min(1, input.throttle)) : 0;
-          const steering = Number.isFinite(input.steering) ? Math.max(-1, Math.min(1, input.steering)) : 0;
-          if (input.brake) speed = approach(speed, 0, tuning.braking * PHYSICS_DT);
-          else if (throttle !== 0) {
-            const opposing = speed * throttle < 0;
-            speed = approach(speed, throttle > 0 ? tuning.maxSpeed * throttle : tuning.reverseSpeed * throttle,
-              (opposing ? tuning.braking : tuning.acceleration) * PHYSICS_DT);
-          } else speed = approach(speed, 0, tuning.rollingDrag * PHYSICS_DT);
-          yaw -= steering * tuning.turnRate * Math.min(Math.abs(speed) / 4, 1) * Math.sign(speed) * PHYSICS_DT;
-          yaw = Math.atan2(Math.sin(yaw), Math.cos(yaw));
-          const lateralX = velocity.x - forwardX * (velocity.x * forwardX + velocity.z * forwardZ);
-          const lateralZ = velocity.z - forwardZ * (velocity.x * forwardX + velocity.z * forwardZ);
-          forwardX = -Math.sin(yaw); forwardZ = -Math.cos(yaw);
-          const slip = Math.exp(-tuning.grip * PHYSICS_DT);
-          body.setRotation({ x: 0, y: Math.sin(yaw / 2), z: 0, w: Math.cos(yaw / 2) }, true);
-          body.setLinvel({ x: forwardX * speed + lateralX * slip, y: velocity.y, z: forwardZ * speed + lateralZ * slip }, true);
-        }
+        const controlled = controlKart(body.linvel(), yaw, grounded, input, PHYSICS_DT);
+        yaw = controlled.yaw; drifting = controlled.drifting; airControl = controlled.airControl;
+        body.setRotation({ x: 0, y: Math.sin(yaw / 2), z: 0, w: Math.cos(yaw / 2) }, true);
+        body.setLinvel(controlled.velocity, true);
       }
       world.step(); steps++;
     };
@@ -65,7 +47,7 @@ export async function createPhysics(sceneKind: SceneKind = 'drop') {
       get resources() { return { worlds: disposed ? 0 : 1, bodies: disposed ? 0 : world.bodies.len(), colliders: disposed ? 0 : world.colliders.len() }; },
       get position() { return body.translation(); },
       get pose() { return { ...body.translation(), yaw }; },
-      get telemetry() { const velocity = body.linvel(); return { grounded, yaw, speed: Math.hypot(velocity.x, velocity.z), resets }; },
+      get telemetry() { const velocity = body.linvel(); return { grounded, drifting, airControl, yaw, speed: Math.hypot(velocity.x, velocity.z), resets }; },
       dispose() { if (!disposed) { disposed = true; world.free(); } },
     };
   } catch (error) { world.free(); throw error; }

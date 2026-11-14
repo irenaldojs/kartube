@@ -6,7 +6,7 @@
 |---|---|---|---|
 | 00 — Fundamentos | Concluída | Sessões local/remota, codecs TS/Rust, pistas, WebSocket e prova WebGL2/WASM desktop e S20 FE | Critérios de fundamentos atendidos; validações futuras nos respectivos marcos |
 | 01 — Protótipo 3D | Em andamento | Kart dirigível e ciclo de assets/descarte verificado | Foco web: diagnósticos T07 implementados; ports e provas físicas adiados |
-| 02 — Corrida local | Planejada | — | 3 voltas e resultado válidos |
+| 02 — Corrida local | Em andamento (web) | E02-T01: Cart.fbx, drift e controle aéreo | E02-T02: largada, checkpoints e voltas |
 | 03 — Bots locais | Planejada | — | 8 pilotos terminam corrida |
 | 04 — Mecânicas | Planejada | — | Rampas, boosts, itens e atalho |
 | 05 — Servidor Rust | Planejada | — | Lobby/sala e conexões |
@@ -19,7 +19,7 @@
 
 ## Etapa ativa
 
-**01 — Protótipo 3D**: `etapas/01-prototipo-3d.md`.
+**02 — Corrida local (web)**: `etapas/02-corrida-local.md`. Validações físicas pendentes da etapa 01 continuam abertas e adiadas.
 
 ## Bloqueios atuais
 
@@ -60,3 +60,5 @@ Linux `.deb` gerado e smoke Tauri/WebKitGTK aprovado (WebGL2/WASM, pilotagem, pa
 - 2026-11-14: teste físico adiado pelo usuário. Iniciada E01-T07 com tempos de quadro, heap opcional, identificação de build e teste de áudio por gesto. Tipos/testes e smoke Chromium aprovados; T06/T07 seguem abertas até evidências físicas e RAM/áudio por plataforma.
 
 - 2026-11-14: prioridade revisada pelo usuário: desenvolver primeiro o web; ports Android/desktop ficam para depois. Pendências nativas não bloqueiam o desenvolvimento web da etapa 02, sem marcar T06/T07 completas.
+
+- 2026-11-14: E02-T01 implementada no web: modelo Cart.fbx, drift por Shift/toque e controle aéreo moderado. Tipos/testes aprovados, incluindo circuito com rampas/aterrissagens; próxima E02-T02.

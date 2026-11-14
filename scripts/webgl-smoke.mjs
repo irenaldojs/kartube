@@ -39,6 +39,11 @@ try {
   await page.locator('#test-audio').click();
   await page.waitForFunction(() => JSON.parse(document.getElementById('report').textContent).audio.status === 'completed');
   const track = await read();
+  await page.locator('#viewport').focus();
+  await page.keyboard.down('ShiftLeft');
+  await page.waitForFunction(() => JSON.parse(document.getElementById('report').textContent).driving.input.drift === true);
+  await page.keyboard.up('ShiftLeft');
+  await page.waitForFunction(() => JSON.parse(document.getElementById('report').textContent).driving.input.drift === false);
   assert.equal(track.runtime, 'browser');
   assert.match(track.buildId, /@/);
   assert.ok(track.bootMs >= 0);
@@ -48,7 +53,10 @@ try {
   assert.equal(track.audio.activeContexts, 0);
   assert.equal(track.audio.audibleConfirmed, null);
   assert.equal(track.camera.mode, 'chase'); assert.equal(track.shadow, 'contact');
-  assert.equal(track.assets.live.geometries, 2);
+  assert.equal(track.kartModel.source, 'Cart.fbx');
+  const trackGeometryCount = track.assets.live.geometries;
+  assert.ok(trackGeometryCount > 2);
+  assert.ok(track.kartModel.dimensions[0] <= 1.801 && track.kartModel.dimensions[2] <= 2.801);
   assert.equal(track.physicsResources.worlds, 1);
   assert.equal(track.scene, 'track'); assert.equal(track.track.ramps, 2);
   assert.equal(track.track.boosts, 3); assert.equal(track.track.itemBoxes, 3);
@@ -122,6 +130,18 @@ try {
     const input = JSON.parse(document.getElementById('report').textContent).driving.input;
     return input.throttle === 1 && input.steering === 1;
   });
+  const driftButton = await page.getByRole('button', { name: 'Drift', exact: true }).boundingBox();
+  const driftPoint = { x: driftButton.x + driftButton.width / 2, y: driftButton.y + driftButton.height / 2, id: 5 };
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [pedalPoint, rightPoint, driftPoint] });
+  await page.waitForFunction(() => {
+    const input = JSON.parse(document.getElementById('report').textContent).driving.input;
+    return input.throttle === 1 && input.steering === 1 && input.drift === true;
+  });
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [driftPoint] });
+  await page.waitForFunction(() => {
+    const input = JSON.parse(document.getElementById('report').textContent).driving.input;
+    return input.throttle === 1 && input.steering === 1 && input.drift === false;
+  });
   // CDP touchEnd lists the points to release, rather than those still held.
   await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [rightPoint] });
   await page.waitForFunction(() => {
@@ -188,13 +208,13 @@ try {
     await page.getByRole('button', { name: 'Reiniciar teste' }).click(); await readyScene();
     assert.equal(await page.locator('canvas').count(), 1);
     const restarted = await read();
-    assert.equal(restarted.assets.live.geometries, 3);
+    assert.equal(restarted.assets.live.geometries, trackGeometryCount + 1);
     assert.deepEqual(restarted.previousRelease.graphics.assets.live, { geometries: 0, materials: 0 });
-    assert.ok(restarted.memory.geometries <= 3);
+    assert.ok(restarted.memory.geometries <= trackGeometryCount + 1);
     await page.locator('#scene').selectOption('track'); await readyScene();
-    assert.equal((await read()).assets.live.geometries, 2);
+    assert.equal((await read()).assets.live.geometries, trackGeometryCount);
     await page.locator('#quality').selectOption(i % 2 ? 'low' : 'balanced'); await readyScene();
-    assert.equal((await read()).assets.live.geometries, 2);
+    assert.equal((await read()).assets.live.geometries, trackGeometryCount);
     await page.locator('#scene').selectOption('drop'); await readyScene();
   }
   await page.locator('#quality').selectOption('low'); await readyScene();
@@ -225,6 +245,33 @@ try {
   assert.deepEqual(pendingReport.previousRelease.graphics.assets.live, { geometries: 0, materials: 0 });
   assert.equal(await pending.locator('canvas').count(), 1);
   await pending.close();
+  const failedModel = await browser.newPage();
+  await failedModel.route('**/*.fbx', route => route.fulfill({ status: 503, body: 'Unavailable' }));
+  await failedModel.goto('http://127.0.0.1:4173');
+  await failedModel.waitForFunction(() => document.body.dataset.status === 'error');
+  assert.match(await failedModel.locator('#status').textContent(), /Cart.fbx/);
+  assert.equal(await failedModel.locator('canvas').count(), 0);
+  await failedModel.unroute('**/*.fbx');
+  await failedModel.locator('#restart').click();
+  await failedModel.waitForFunction(() => document.body.dataset.status === 'running');
+  assert.equal(JSON.parse(await failedModel.locator('#report').textContent()).kartModel.source, 'Cart.fbx');
+  await failedModel.close();
+  const delayedModel = await browser.newPage();
+  let releaseModel;
+  const modelGate = new Promise(resolve => { releaseModel = resolve; });
+  await delayedModel.route('**/*.fbx', async route => { await modelGate; await route.continue(); });
+  await delayedModel.goto('http://127.0.0.1:4173', { waitUntil: 'domcontentloaded' });
+  await delayedModel.waitForFunction(() => document.querySelectorAll('canvas').length === 1);
+  await delayedModel.locator('#quality').selectOption('low');
+  releaseModel();
+  await delayedModel.waitForFunction(() => document.body.dataset.status === 'running');
+  const modelReport = JSON.parse(await delayedModel.locator('#report').textContent());
+  assert.equal(modelReport.kartModel.source, 'Cart.fbx');
+  assert.equal(modelReport.quality, 'low');
+  assert.equal(modelReport.assets.live.geometries, trackGeometryCount);
+  assert.deepEqual(modelReport.previousRelease.graphics.assets.live, { geometries: 0, materials: 0 });
+  assert.equal(await delayedModel.locator('canvas').count(), 1);
+  await delayedModel.close();
   const fallback = await browser.newPage();
   await fallback.addInitScript(() => {
     const original = HTMLCanvasElement.prototype.getContext;

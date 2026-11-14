@@ -1,6 +1,6 @@
 # Checkpoint para retomar o Kartube
 
-**Data:** 2026-11-14 (America/Sao_Paulo). **Foco ativo: versão web; E01-T07 — diagnósticos web. Android e desktop nativo adiados pelo usuário.**
+**Data:** 2026-11-14 (America/Sao_Paulo). **Foco ativo: versão web; E02-T01 concluída, próxima E02-T02 — largada/checkpoints/voltas. Android e desktop nativo adiados pelo usuário.**
 
 ## Estado atual
 
@@ -38,7 +38,7 @@ Implementados no web: identificação de build, tempo de boot da cena, janela de
 
 Correção posterior: metadados de build usam `import.meta.env.VITE_BUILD_ID` com fallback `development-unversioned`, evitando ReferenceError em servidor sem a configuração. `npm run check:web:dev` verifica boot com e sem metadados.
 
-Próximo desenvolvimento: jogabilidade web da etapa 02, começando pelo controlador arcade (E02-T01); aproveitar aceleração/freio/ré já existentes, acrescentar drift e controle aéreo conforme o roteiro. Dependências de validação nativa ficam adiadas por decisão do usuário, sem marcar T06/T07 completas.
+E02-T01 implementada: Cart.fbx fornecido pelo usuário substitui a geometria provisória; carregamento, escala e descarte no web; drift por Shift/toque e controle aéreo limitado. Testes de física/controlador/modelo aprovados. Próximo desenvolvimento: E02-T02, largada com contagem regressiva, checkpoints por grafo e voltas configuráveis. Dependências de validação nativa ficam adiadas por decisão do usuário, sem marcar T06/T07 completas.
 
 ## Quando retomar os ports
 
@@ -72,4 +72,4 @@ Caminhos de JDK/SDK específicos deste ambiente. Smoke WebDriver, preview web e 
 - [Andamento](docs/ANDAMENTO.md)
 - [Changelog](docs/CHANGELOG.md)
 
-Sem corrida com checkpoints/voltas/resultados ainda. Boosts e caixas são visuais. Áudio, gamepad, GLB final e assinatura de distribuição permanecem em seus marcos.
+Sem corrida com checkpoints/voltas/resultados ainda. Boosts e caixas são visuais. Áudio, gamepad, pipeline GLB final e assinatura de distribuição permanecem em seus marcos.

@@ -2,6 +2,12 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-14 — E02-T01 — Cart.fbx, drift e controle aéreo web
+
+- Modelo do usuário substitui o kart de caixas: FBX incluído no build web, escala/orientação ajustadas, materiais preservados e câmeras/luzes de autoria removidas. Cache de bytes e descarte por cena; colisor simples permanece separado.
+- Drift explícito por Shift/toque, com momento lateral e recuperação de aderência; sem mini-boost. Direção no ar moderada, sem ganho de velocidade ou interferência na gravidade. Velocímetro indica DRIFT/NO AR.
+- Tipos, testes do controlador/integração Rapier/modelo e smokes web de produção/desenvolvimento aprovados (incluindo multitouch com drift e falha/retry do FBX); circuito completo cobre rampas e duas aterrissagens. Plano/checkpoint passam à E02-T02 web; ports nativos continuam adiados.
+
 ## 2026-11-14 — Correção de boot sem metadados de build
 
 - Corrigido `ReferenceError: __BUILD_ID__ is not defined`: relatório usa `import.meta.env.VITE_BUILD_ID` com fallback `development-unversioned`, preservando a inicialização quando a configuração de metadados não foi carregada.

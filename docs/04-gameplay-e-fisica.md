@@ -50,3 +50,13 @@ Velocidade máxima, duração da volta, tamanho de atalhos, quanto drift compens
 WASD/setas funcionam com a cena focada; Espaço freia e R reposiciona. Botões sobre a cena aceitam aceleração e direção simultâneas por ponteiros; entradas são limpas ao pausar, perder foco ou ocultar a página. O velocímetro e o relatório expõem diagnóstico da física. Há reset manual e recuperação básica após queda abaixo de -8 m, sem progresso de corrida para preservar ainda.
 
 Testes com Rapier cobrem aceleração, freio, ré, guardrails, esterçamento e circuito completo com rampas usando apenas inputs. O driver roteirizado do teste não é um bot do produto. Drift, boosts, itens, superfícies especiais e controles aéreos ainda estão pendentes, assim como playtest de dirigibilidade no Android físico.
+
+## Controlador web — E02-T01 — 2026-11-14
+
+`controlKart` em `driving.ts` calcula yaw/velocidade de forma pura; `physics.ts` mantém o corpo Rapier/CCD e timestep de 1/60 s. O modelo Cart.fbx é apenas visual, normalizado para o colisor existente.
+
+Drift explícito por Shift ou botão de toque: avanço mínimo 4 m/s, aderência 2,2/s e multiplicador de giro 1,3; sem mini-boost. Freio/ré desativam o drift e soltar restaura a aderência 12/s. Conserva momento lateral, com teto de velocidade horizontal de 12 m/s. Parâmetros de protótipo, ainda sujeitos a playtest.
+
+Direção no ar limitada a 0,65 rad/s; trajetória recebe 35% desse giro. Acelerar não adiciona propulsão no ar, e a magnitude horizontal/componente vertical são preservadas pelo controlador; Rapier aplica gravidade, contato e aterrissagem. Drift não fica ativo no ar. Reset/pausa/blur/ocultação continuam limpando as entradas. O relatório expõe `drifting` e `airControl`.
+
+Testes automatizados de circuito cobrem subida, trechos aéreos e duas aterrissagens. Ajuste fino, mini-boost, efeitos de drift, itens, superfícies especiais e etapas de corrida continuam nos respectivos marcos.

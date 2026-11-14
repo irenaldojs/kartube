@@ -36,7 +36,8 @@ A identificação do S20 FE foi fornecida pelo usuário. O user agent reduzido i
 8. Trocar para perfil leve: pixelRatio no máximo 1 e cena funcional. Verificar layout sem rolagem horizontal e controles acessíveis.
 9. Alternar entre aplicativo/aba e cena: observar retomada sem salto prolongado da simulação. Registrar falhas separadamente.
 10. Na pista dirigível, segurar acelerar e só depois pressionar direção com outro dedo. Soltar apenas direção deve manter aceleração; testar o lado oposto, soltar apenas acelerar e cancelar/soltar o último dedo. O teste de queda Android anterior não comprova a pilotagem multitouch do novo build.
-11. Exportar relatórios e anotar quais passos passaram ou falharam. FPS é uma amostra, sem equivaler a média sustentada ou 1% low.
+11. Na versão com Cart.fbx/drift, segurar Shift ou botão Drift em avanço acima de 4 m/s e esterçar; soltar deve recuperar aderência. No toque, manter acelerar/direção/drift e soltar cada dedo separadamente. Verificar direção moderada no ar e aterrissagem nas rampas.
+12. Exportar relatórios e anotar quais passos passaram ou falharam. FPS é uma amostra, sem equivaler a média sustentada ou 1% low.
 
 Perda forçada de contexto e ausência de WebGL2/WASM são cobertas no smoke desktop. Repeti-las no Android exige instrumentação própria; troca de aplicativo ou bloqueio de tela não comprova perda de contexto. Esses casos não foram atribuídos à confirmação manual do usuário.
 
