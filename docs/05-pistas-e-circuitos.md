@@ -86,3 +86,11 @@ Gates checam centro do kart por segmento entre ticks fixos e interseção com pl
 Esses gates estendem o contrato Checkpoint com direção e label; ainda não são o manifesto completo de TrackDefinition com oito spawns e checksum. O cenário continua greybox com boosts/caixas visuais. Teste físico automatizado completa três voltas alternando rotas; playtest humano e políticas de recuperação mais finas permanecem pendentes.
 
 Âncoras de recuperação: 1,8 m atrás de cada plano, no centro da via e com yaw válido; todas verificadas automaticamente por Rapier para apoio e espaço. Na alternativa, preservar o gate aceito mantém o reencontro esperado, sem permitir trocar a recuperação por avanço no grafo.
+
+## Circuito ampliado e curvo — 2026-11-14
+
+A pedido do usuário, circuito substituído por `greybox-v2-rounded`: linha central de aproximadamente 223 m, retas a ±30 m, quatro curvas de raio 10 m e largura de 8 m. Duas rampas e alternativa central preservadas; gates, spawn, âncoras de recuperação e câmera geral reposicionados. `TRACK_CENTERLINE`, `TRACK_MAIN_ROUTE` e `TRACK_ALTERNATIVE_ROUTE` expõem o traçado para a próxima tarefa de progresso/posições.
+
+Superfície visual contínua, colisores segmentados sobrepostos e barreiras renderizadas em lote. Abertura externa da reta esquerda entre z=-10 e z=-4 (centro x=-34, z=-7), indicada por marcas amarelas, permite sair e cair; o terreno visual não tem colisor. Para testar: após a largada/entrada das rotas, virar à esquerda nessa abertura. Limite externo de recuperação ampliado para ±48 m. Teste com inputs reais atravessa a abertura e confirma queda e retorno; corrida de três voltas pelas duas rotas e todas as âncoras continuam validadas em Rapier. Playtest humano permanece pendente.
+
+Validação do circuito curvo: tipos/testes aprovados, smokes web de produção e desenvolvimento aprovados; captura geral inspecionada em `artifacts/web/kartube-track-rounded.png`. O teste de bloqueio automático permanece em cenário físico controlado de parede reta; acelerar reto até a barreira curva não garante ficar preso.

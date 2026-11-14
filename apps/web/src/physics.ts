@@ -13,9 +13,9 @@ export async function createPhysics(sceneKind: SceneKind = 'drop') {
     const supports = new Set<number>();
     if (sceneKind === 'track') {
       for (const part of TRACK_PARTS) if (part.solid) {
-        const angle = (part.rotationZ ?? 0) / 2;
+        const angle = (part.rotationZ ?? 0) / 2, yawAngle = (part.rotationY ?? 0) / 2;
         const collider = world.createCollider(RAPIER.ColliderDesc.cuboid(part.size[0] / 2, part.size[1] / 2, part.size[2] / 2)
-          .setTranslation(...part.position).setRotation({ x: 0, y: 0, z: Math.sin(angle), w: Math.cos(angle) }));
+          .setTranslation(...part.position).setRotation({ x: 0, y: Math.sin(yawAngle), z: Math.sin(angle), w: Math.cos(angle) * Math.cos(yawAngle) }));
         if (part.kind === 'road' || part.kind === 'ramp') supports.add(collider.handle);
       }
     } else supports.add(world.createCollider(RAPIER.ColliderDesc.cuboid(10, 0.25, 7).setTranslation(0, -0.25, 0)).handle);

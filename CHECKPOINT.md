@@ -40,6 +40,13 @@ Correção posterior: metadados de build usam `import.meta.env.VITE_BUILD_ID` co
 
 E02-T01 implementada: Cart.fbx fornecido pelo usuário substitui a geometria provisória; carregamento, escala e descarte no web; drift por Shift/toque e controle aéreo limitado. Testes de física/controlador/modelo aprovados. E02-T02 implementada: Iniciar corrida, 1/3/5 voltas, largada atrás da linha e countdown 3–2–1; gates direcionais com bifurcação/reencontro da alternativa, HUD mínimo e término. Treino livre preservado. Pausa/ocultação congelam ticks. Desde E02-T03, reposicionar/queda/stuck recuperam no último gate válido sem reiniciar a prova. Três voltas automatizadas por inputs Rapier aprovadas nas duas rotas. Colisor arredondado (mesmas dimensões externas) corrige emenda do piso. Smokes web de produção/desenvolvimento aprovados; captura da largada em `artifacts/web/kartube-race.png`. E02-T03 implementada: pontos 1,8 m atrás do gate aceito, apoio/espaço checados em Rapier, orientação correta e velocidade/inputs zerados. Detector de queda/limites e stuck de 3 s sem avanço sob aceleração; repouso, freio e ar não disparam. Rebase autorizado preserva voltas/tempo/rota e evita crédito de teleporte; três voltas automatizadas com recuperação na alternativa aprovadas. Tipos/testes e smokes web de produção/desenvolvimento aprovados; captura de recuperação em `artifacts/web/kartube-recovery.png`. Próximo desenvolvimento: E02-T04 — posições por progresso ao longo do trajeto. Dependências de validação nativa ficam adiadas por decisão do usuário, sem marcar T06/T07 completas.
 
+
+## Circuito ampliado e curvo — 2026-11-14
+
+A pedido do usuário, circuito substituído por `greybox-v2-rounded`: linha central de aproximadamente 223 m, retas a ±30 m, quatro curvas de raio 10 m e largura de 8 m. Duas rampas e alternativa central preservadas; gates, spawn, âncoras de recuperação e câmera geral reposicionados. `TRACK_CENTERLINE`, `TRACK_MAIN_ROUTE` e `TRACK_ALTERNATIVE_ROUTE` expõem o traçado para a próxima tarefa de progresso/posições.
+
+Superfície visual contínua, colisores segmentados sobrepostos e barreiras renderizadas em lote. Abertura externa da reta esquerda entre z=-10 e z=-4 (centro x=-34, z=-7), indicada por marcas amarelas, permite sair e cair; o terreno visual não tem colisor. Para testar: após a largada/entrada das rotas, virar à esquerda nessa abertura. Limite externo de recuperação ampliado para ±48 m. Teste com inputs reais atravessa a abertura e confirma queda e retorno; corrida de três voltas pelas duas rotas e todas as âncoras continuam validadas em Rapier. Playtest humano permanece pendente.
+
 ## Quando retomar os ports
 
 Entregar/instalar o APK no S20 FE e seguir [matriz e roteiro manual](docs/matriz-plataformas.md): inicialização offline, WebGL2/WASM, pilotagem, acelerar primeiro e depois virar com outro dedo, soltura independente, Freio / Ré, câmera, pausa/retomada, troca de app e descarte/reinício. Registrar relatório com `runtime: tauri`, versão real do Android e Android System WebView. Não inferir versões pelo user agent reduzido.
@@ -73,3 +80,5 @@ Caminhos de JDK/SDK específicos deste ambiente. Smoke WebDriver, preview web e 
 - [Changelog](docs/CHANGELOG.md)
 
 Corrida singleplayer com checkpoints/voltas já implementada; playtest humano de três voltas, posições, bots e resultados de oito pilotos ainda pendentes. Boosts e caixas são visuais. Áudio, gamepad, pipeline GLB final e assinatura de distribuição permanecem em seus marcos.
+
+Validação do circuito curvo: tipos/testes aprovados, smokes web de produção e desenvolvimento aprovados; captura geral inspecionada em `artifacts/web/kartube-track-rounded.png`. O teste de bloqueio automático permanece em cenário físico controlado de parede reta; acelerar reto até a barreira curva não garante ficar preso.

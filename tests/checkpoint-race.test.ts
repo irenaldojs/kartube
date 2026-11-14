@@ -1,3 +1,4 @@
+import { TRACK_MAIN_ROUTE, TRACK_ALTERNATIVE_ROUTE } from '../apps/web/src/track.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createCheckpointRace } from '../packages/game-core/src/checkpoint-race.ts';
@@ -16,7 +17,7 @@ function driver(laps = 3) {
     }
   };
   const lap = (alternative = false) => {
-    for (const [x, z] of alternative ? [[-20, 0], [20, 0], [20, 20], [-20, 20], [-20, 7]] : [[-20, -20], [20, -20], [20, 20], [-20, 20], [-20, 7]]) move(x!, z!);
+    for (const [x, z] of alternative ? TRACK_ALTERNATIVE_ROUTE : TRACK_MAIN_ROUTE) move(x!, z!);
   };
   const recover = () => { const point = recoveryPointFor(race.snapshot.lastCheckpointId); position = { x: point.x, y: point.y, z: point.z }; race.rebaseAfterRespawn(position); };
   return { race, move, lap, recover };
@@ -26,7 +27,7 @@ test('countdown uses fixed ticks and initial finish crossing arms without granti
   for (let i = 0; i < 179; i++) race.step(RACE_SPAWN);
   assert.equal(race.phase, 'countdown'); assert.equal(race.snapshot.countdown, 1);
   race.step(RACE_SPAWN); assert.equal(race.phase, 'racing'); assert.equal(race.snapshot.elapsedSeconds, 0);
-  const { race: moving, move } = driver(); move(-20, 7);
+  const { race: moving, move } = driver(); move(-30, 7);
   assert.equal(moving.snapshot.completedLaps, 0); assert.equal(moving.snapshot.armed, true);
   assert.deepEqual(moving.snapshot.expected, ['branch']);
 });
@@ -39,19 +40,19 @@ test('three legal laps accept both graph routes and finish exactly once', () => 
   const single = driver(1); single.lap(true); assert.equal(single.race.phase, 'finished');
 });
 test('finish oscillation, reverse traversal, cut and airborne gate miss cannot grant laps', () => {
-  const forward = driver(); forward.move(-20, 7);
-  for (let i = 0; i < 4; i++) { forward.move(-20, 14); forward.move(-20, 7); }
+  const forward = driver(); forward.move(-30, 7);
+  for (let i = 0; i < 4; i++) { forward.move(-30, 14); forward.move(-30, 7); }
   assert.equal(forward.race.snapshot.completedLaps, 0);
-  forward.move(-20, 0); forward.move(20, 8); forward.move(0, 20); forward.move(-20, 20); forward.move(-20, 7);
+  forward.move(-30, 0); forward.move(30, 8); forward.move(0, 20); forward.move(-30, 20); forward.move(-30, 7);
   assert.equal(forward.race.snapshot.completedLaps, 0);
   const reverse = driver();
-  for (const [x, z] of [[-20, 20], [20, 20], [20, -20], [-20, -20], [-20, 14]]) reverse.move(x!, z!);
+  for (const [x, z] of [[-30, 20], [20, 20], [20, -30], [-30, -30], [-30, 14]]) reverse.move(x!, z!);
   assert.equal(reverse.race.snapshot.completedLaps, 0);
-  const high = driver(); high.move(-20, 7, 8);
+  const high = driver(); high.move(-30, 7, 8);
   assert.equal(high.race.snapshot.armed, false);
 });
 test('teleport invalidates the in-progress route, and malformed checkpoint graphs fail', () => {
-  const { race, move } = driver(); move(-20, 0);
+  const { race, move } = driver(); move(-30, 0);
   race.step({ x: 20, y: 0.35, z: 8 });
   assert.equal(race.snapshot.rejectedJumps, 1); assert.equal(race.snapshot.armed, false);
   assert.deepEqual(race.snapshot.expected, ['finish']);
@@ -67,7 +68,7 @@ test('actual Rapier controls complete three laps with both legal routes and a fa
     const race = createCheckpointRace(config, kart.position);
     for (let i = 0; i < 120; i++) { kart.step(); race.step(kart.position); }
     for (let lap = 0; lap < 3; lap++) {
-      const route = lap === 1 ? [[-20, 0], [20, 0], [20, 20], [-20, 20], [-20, 7]] : [[-20, -20], [20, -20], [20, 20], [-20, 20], [-20, 7]];
+      const route = lap === 1 ? TRACK_ALTERNATIVE_ROUTE : TRACK_MAIN_ROUTE;
       let next = 0;
       for (let tick = 0; tick < 6000 && next < route.length && race.phase !== 'finished'; tick++) {
         const pose = kart.pose, [x, z] = route[next]!, dx = x! - pose.x, dz = z! - pose.z;
@@ -102,10 +103,10 @@ test('authorized recovery preserves completed laps, chosen route and clock witho
   assert.equal(after.completedLaps, 1); assert.equal(after.elapsedSeconds, before.elapsedSeconds);
   assert.equal(after.lastCheckpointId, before.lastCheckpointId); assert.deepEqual(after.expected, before.expected);
   assert.equal(after.armed, before.armed); assert.equal(after.rejectedJumps, 0); assert.equal(after.respawns, 5);
-  run.move(-20, 14); run.move(-20, 7); assert.equal(run.race.snapshot.completedLaps, 1);
-  run.move(-20, 0); run.move(2, 0);
+  run.move(-30, 14); run.move(-30, 7); assert.equal(run.race.snapshot.completedLaps, 1);
+  run.move(-30, 0); run.move(2, 0);
   assert.equal(run.race.snapshot.lastCheckpointId, 'alternative');
   run.recover(); assert.deepEqual(run.race.snapshot.expected, ['merge']);
-  for (const [x, z] of [[20, 0], [20, 20], [-20, 20], [-20, 7]]) run.move(x!, z!);
+  for (const [x, z] of TRACK_ALTERNATIVE_ROUTE.slice(1)) run.move(x!, z!);
   assert.equal(run.race.snapshot.completedLaps, 2); assert.equal(run.race.snapshot.rejectedJumps, 0);
 });

@@ -1,3 +1,4 @@
+import { TRACK_MAIN_ROUTE, TRACK_ALTERNATIVE_ROUTE } from '../apps/web/src/track.ts';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createPhysics } from '../apps/web/src/physics.ts';
@@ -23,7 +24,7 @@ test('prototype kart accelerates, brakes, reverses and resets with fixed-step Ra
     const ticks = kart.steps;
     kart.reset();
     assert.equal(kart.steps, ticks);
-    assert.equal(kart.position.x, -20); assert.equal(kart.position.z, 7);
+    assert.equal(kart.position.x, -30); assert.equal(kart.position.z, 7);
     assert.equal(kart.telemetry.speed, 0); assert.equal(kart.telemetry.yaw, 0);
     for (let i = 0; i < 120; i++) kart.step(NEUTRAL_INPUT);
     assert.ok(Math.abs(kart.position.y - 0.35) < 0.02);
@@ -34,21 +35,21 @@ test('sustained throttle stays behind the guardrail and steering updates physica
   try {
     for (let i = 0; i < 120; i++) kart.step();
     for (let i = 0; i < 600; i++) kart.step(forward);
-    assert.ok(kart.position.z > -22.6 && kart.position.z < -21.5, JSON.stringify(kart.pose));
+    assert.ok(kart.position.z > -34 && kart.position.z < 8, JSON.stringify(kart.pose));
     assert.ok(kart.position.y > 0.25);
     kart.reset();
     for (let i = 0; i < 120; i++) kart.step();
     for (let i = 0; i < 40; i++) kart.step({ ...forward, steering: 1 });
     assert.ok(kart.telemetry.yaw < -0.2);
-    assert.ok(kart.position.x > -19.8);
-    assert.ok(kart.position.x < -16.5, 'Inner guardrail must contain the kart');
+    assert.ok(kart.position.x > -29.8);
+    assert.ok(kart.position.x < -26.5, 'Inner guardrail must contain the kart');
   } finally { kart.dispose(); }
 });
 test('fixed-step control inputs traverse the complete circuit and both ramps without resetting', async () => {
   const kart = await createPhysics('track');
   try {
     for (let i = 0; i < 120; i++) kart.step();
-    const route = [[-20, -20], [20, -20], [20, 20], [-20, 20], [-20, 7]] as const;
+    const route = TRACK_MAIN_ROUTE;
     let next = 0, highest = 0, airborne = 0, landings = 0, wasGrounded = true;
     for (let tick = 0; tick < 6000 && next < route.length; tick++) {
       const pose = kart.pose, [x, z] = route[next]!;

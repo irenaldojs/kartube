@@ -3,7 +3,7 @@ import { RACE_GATES } from './race-track.ts';
 import { createKartModel, loadKartSource } from './kart-model.ts';
 import { SceneAssets } from './assets.ts';
 import { createCameraRig, type CameraMode, type KartPose } from './camera.ts';
-import { TRACK_PARTS, TRACK_SUMMARY, type SceneKind } from './track.ts';
+import { TRACK_PARTS, TRACK_SUMMARY, TRACK_CENTERLINE, type SceneKind } from './track.ts';
 export type Quality = 'low' | 'balanced';
 export function createView(host: HTMLElement, quality: Quality, onContextLost: () => void, sceneKind: SceneKind = 'drop', cameraMode: CameraMode = 'chase') {
   const canvas = document.createElement('canvas');
@@ -13,12 +13,14 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
   const renderer = new THREE.WebGLRenderer({ canvas, context: gl });
   const assets = new SceneAssets();
   const scene = new THREE.Scene();
+  const batches: THREE.InstancedMesh[] = [];
   const shadowSurfaces: THREE.Object3D[] = [];
   let resize: ResizeObserver | undefined, disposed = false;
   const lost = (event: Event) => { event.preventDefault(); onContextLost(); };
   const dispose = () => {
     if (!disposed) {
       disposed = true; resize?.disconnect(); canvas.removeEventListener('webglcontextlost', lost);
+      batches.forEach(batch => batch.dispose()); batches.length = 0;
       assets.dispose(); scene.clear(); shadowSurfaces.length = 0;
       renderer.dispose(); renderer.forceContextLoss(); canvas.remove();
     }
@@ -42,10 +44,34 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
     }
     const gateMarkers = new Map<string, THREE.Mesh>();
     if (sceneKind === 'track') {
-      const colors = { road: 0x707b80, rail: 0xb8c1c5, ramp: 0x9b8970, boost: 0x66d8bf, item: 0xd5a651, start: 0xf1f3e9, ground: 0x36474b };
+      const colors = { road: 0x707b80, rail: 0xb8c1c5, ramp: 0x9b8970, boost: 0x66d8bf, item: 0xd5a651, start: 0xf1f3e9, ground: 0x36474b, warning: 0xecb970 };
+      const vertices: number[] = [];
+      const edges = TRACK_CENTERLINE.map(([x, z], index, points) => {
+        const previous = points[(index + points.length - 1) % points.length]!, next = points[(index + 1) % points.length]!;
+        const dx = next[0] - previous[0], dz = next[1] - previous[1], length = Math.hypot(dx, dz);
+        return [[x + dz / length * 4, 0.01, z - dx / length * 4], [x - dz / length * 4, 0.01, z + dx / length * 4]];
+      });
+      edges.forEach((edge, index) => {
+        const next = edges[(index + 1) % edges.length]!;
+        for (const point of [edge[0]!, edge[1]!, next[0]!, edge[1]!, next[1]!, next[0]!]) vertices.push(...point);
+      });
+      const roadGeometry = assets.geometry(new THREE.BufferGeometry());
+      roadGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3)); roadGeometry.computeVertexNormals();
+      const roadMaterial = box(1, 1, 1, colors.road).material;
+      // Double-sided top ribbon avoids coplanar seams between the physical road slabs.
+      roadMaterial.side = THREE.DoubleSide;
+      const road = new THREE.Mesh(roadGeometry, roadMaterial); scene.add(road); shadowSurfaces.push(road);
+      const rails = TRACK_PARTS.filter(part => part.kind === 'rail');
+      const seed = box(1, 1, 1, colors.rail);
+      const batch = new THREE.InstancedMesh(cube, seed.material, rails.length), transform = new THREE.Object3D();
+      rails.forEach((part, index) => {
+        transform.position.set(...part.position); transform.rotation.set(0, part.rotationY ?? 0, part.rotationZ ?? 0); transform.scale.set(...part.size); transform.updateMatrix(); batch.setMatrixAt(index, transform.matrix);
+      });
+      batch.computeBoundingSphere(); scene.add(batch); batches.push(batch);
       for (const part of TRACK_PARTS) {
+        if (part.kind === 'rail' || (part.kind === 'road' && part.rotationY !== undefined)) continue;
         const mesh = box(...part.size, colors[part.kind]);
-        mesh.position.set(...part.position); mesh.rotation.z = part.rotationZ ?? 0;
+        mesh.position.set(...part.position); mesh.rotation.z = part.rotationZ ?? 0; mesh.rotation.y = part.rotationY ?? 0;
         scene.add(mesh);
         if (part.kind === 'road' || part.kind === 'ramp') shadowSurfaces.push(mesh);
       }

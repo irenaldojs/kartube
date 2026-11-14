@@ -11,7 +11,7 @@ export function createCameraRig(camera: THREE.PerspectiveCamera, scene: SceneKin
     setMode(value: CameraMode) { mode = value; initialized = false; },
     update(pose: KartPose, elapsed: number) {
       if (mode === 'overview') {
-        if (scene === 'track') { desired.set(48, 58, 62); target.set(0, 0, 0); }
+        if (scene === 'track') { desired.set(65, 78, 84); target.set(0, 0, 0); }
         else { desired.set(13, 10, 14); target.set(0, 0.8, 0); }
       } else {
         const yaw = pose.yaw ?? 0;

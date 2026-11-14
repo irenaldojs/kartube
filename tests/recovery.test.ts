@@ -17,7 +17,7 @@ test('stuck detection requires sustained intent without progress, never idle, br
   assert.equal(detector.sample(position, true, forward), 'stuck');
   detector.sample(position, true, NEUTRAL_INPUT); assert.equal(detector.stuckSeconds, 0);
   assert.equal(detector.sample({ x: 0, y: -4, z: 0 }, false, NEUTRAL_INPUT), 'fall');
-  assert.equal(detector.sample({ x: 37, y: 1, z: 0 }, false, NEUTRAL_INPUT), 'fall');
+  assert.equal(detector.sample({ x: 49, y: 1, z: 0 }, false, NEUTRAL_INPUT), 'fall');
 });
 test('every approved anchor has support, space and correct heading; unsafe points are rejected', async () => {
   const kart = await createPhysics('track');
@@ -31,7 +31,7 @@ test('every approved anchor has support, space and correct heading; unsafe point
       assert.equal(kart.telemetry.speed, 0);
     }
     const safe = kart.telemetry.recoveryPoint;
-    assert.equal(kart.setRecoveryPoint({ x: -16, y: 0.4, z: 10, yaw: 0 }), false);
+    assert.equal(kart.setRecoveryPoint({ x: -26, y: 0.4, z: 10, yaw: 0 }), false);
     assert.equal(kart.setRecoveryPoint({ x: 0, y: 0.4, z: 10, yaw: 0 }), false);
     assert.equal(kart.setRecoveryPoint({ x: NaN, y: 0.4, z: 0, yaw: 0 }), false);
     assert.deepEqual(kart.telemetry.recoveryPoint, safe);
@@ -46,7 +46,7 @@ test('Rapier recovers falls and wall-stuck intent to the selected anchor without
     kart.reset({ x: 0, y: -4, z: 10 }); kart.step();
     assert.equal(kart.telemetry.lastRecoveryReason, 'fall'); assert.equal(kart.telemetry.recoveries, 1);
     assert.ok(Math.abs(kart.position.x - anchor.x) < 1e-5); assert.equal(kart.telemetry.yaw, anchor.yaw);
-    kart.reset({ x: -20, y: 0.4, z: -22.3 });
+    kart.reset({ x: -32.7, y: 0.4, z: 10 }, Math.PI / 2);
     for (let i = 0; i < 240; i++) kart.step();
     assert.equal(kart.telemetry.recoveries, 1);
     for (let i = 0; i < 180; i++) kart.step(forward);
@@ -54,5 +54,18 @@ test('Rapier recovers falls and wall-stuck intent to the selected anchor without
     assert.ok(Math.abs(kart.position.x - anchor.x) < 1e-5); assert.equal(kart.telemetry.speed, 0);
     for (let i = 0; i < 240; i++) kart.step();
     assert.equal(kart.telemetry.recoveries, 2); assert.ok(Math.abs(kart.position.y - 0.35) < 0.02);
+  } finally { kart.dispose(); }
+});
+
+test('the marked opening permits a real driven fall and automatic return', async () => {
+  const kart = await createPhysics('track');
+  try {
+    kart.reset({ x: -30, y: 0.4, z: -7 }, Math.PI / 2);
+    let leftRoad = false, fell = false;
+    for (let i = 0; i < 240 && kart.telemetry.recoveries === 0; i++) {
+      kart.step(forward); leftRoad ||= kart.position.x < -34; fell ||= kart.position.y < -1;
+    }
+    assert.ok(leftRoad && fell); assert.equal(kart.telemetry.lastRecoveryReason, 'fall');
+    assert.equal(kart.telemetry.recoveries, 1); assert.ok(Math.abs(kart.position.z - 7) < 0.01);
   } finally { kart.dispose(); }
 });

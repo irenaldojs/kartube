@@ -2,6 +2,12 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-14 — Pista maior com curvas e área de queda
+
+- Circuito de aproximadamente 223 m com curvas de raio 10 m; superfície contínua e barreiras em lote. Checkpoints, respawn e visão geral ajustados; duas rampas e alternativa preservadas.
+- Abertura externa sinalizada em amarelo na reta esquerda permite testar queda e recuperação. Testes físicos cobrem a saída real pela abertura, três voltas e ambas as rotas.
+- Próxima tarefa permanece E02-T04, posições por progresso no traçado; ports nativos adiados.
+
 ## 2026-11-14 — E02-T03 — Respawn seguro e kart preso
 
 - Recuperação manual, por queda/limites e por tentativa de acelerar sem progresso. Pontos atrás do último gate aceito, com chão/espaço/orientação verificados em Rapier.

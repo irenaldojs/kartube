@@ -27,7 +27,7 @@ test('camera smoothing converges consistently at 30/60 Hz and mode changes refra
   slow.info.position.forEach((value, index) => near(value, fast.info.position[index]!));
   assert.ok(Math.abs(slow.info.position[0]! - 8) < 0.01);
   slow.setMode('overview'); slow.update({ x: 8, y: 0.35, z: -5 }, 0);
-  assert.deepEqual(slow.info.position, [48, 58, 62]);
+  assert.deepEqual(slow.info.position, [65, 78, 84]);
   slow.setMode('chase'); slow.update({ x: 8, y: 0.35, z: -5 }, 0);
   slow.info.position.forEach((value, index) => near(value, [8, 5.35, 4][index]!));
 });
