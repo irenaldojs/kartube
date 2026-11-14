@@ -88,3 +88,13 @@ Corrida singleplayer com checkpoints/voltas já implementada; playtest humano de
 Validação do circuito curvo: tipos/testes aprovados, smokes web de produção e desenvolvimento aprovados; captura geral inspecionada em `artifacts/web/kartube-track-rounded.png`. O teste de bloqueio automático permanece em cenário físico controlado de parede reta; acelerar reto até a barreira curva não garante ficar preso.
 
 Validação da revisão arcade/velocidade: tipos, testes e smokes web de produção/desenvolvimento aprovados. Teto comandado estável por 600 ticks com amostras ruidosas; reta física com variação <0,01 m/s e vertical <3 mm no teste. Sensação de gameplay aguarda feedback do usuário.
+
+## Revisão mais recente — movimento e câmera
+
+Rapier agora é só adaptador de raycast/shape cast e colisores: nenhum solver ou corpo dinâmico. `kart-motion.ts` integra posição/velocidade/gravidade próprias e aplica a resposta arcade; `driving.ts` continua independente. Diagnóstico `integration: custom-arcade`, `rapierSolver: false`.
+
+Câmera revisada após relato de trepidação: `render-pose.ts` interpola kart e câmera entre ticks, sem alterar posições de corrida/controle. Câmera acompanha a translação interpolada diretamente e suaviza órbita/altura. Pausa/visibilidade/reset/recuperação sincronizam histórico. Testes de 144 Hz e RAF irregular aprovados; sensação final no aparelho do usuário não presumida.
+
+Usuário aprovou a base interpolada e pediu câmera arcade: implementados órbita elástica, antecipação, FOV 45°→50,6° normal/56° turbo (teto 58° com voo/impacto), banking até ~2,4°, braço/altura de salto e pulso pequeno em batida real. Movimento reduzido por checkbox/pref. do sistema desliga esses efeitos. Base de translação interpolada foi preservada para não voltar a trepidar. Ver docs/17-fisica-arcade.md.
+
+Parâmetros locais de camera.ts preservados: resposta orbital 10/6, velocidade de referência 15 m/s, braço/altura/antecipação ajustados. Sinais de posição/alvo corrigidos para a convenção do jogo (-Z à frente), mantendo a câmera de perseguição atrás do kart.

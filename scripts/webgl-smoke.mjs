@@ -62,6 +62,13 @@ try {
   assert.equal(track.track.boosts, 3); assert.equal(track.track.itemBoxes, 3);
   assert.equal(track.track.alternativeRoutes, 1);
   await page.getByRole('button', { name: 'Pausar', exact: true }).click();
+  const cameraPauseSteps = (await read()).physicsSteps;
+  await page.locator('#reduced-motion').check();
+  const reducedCamera = await read();
+  assert.equal(reducedCamera.camera.reducedMotion, true);
+  assert.equal(reducedCamera.camera.fov, 45); assert.equal(reducedCamera.camera.bankRadians, 0);
+  assert.equal(reducedCamera.physicsSteps, cameraPauseSteps);
+  await page.locator('#reduced-motion').uncheck();
   await page.getByRole('button', { name: 'Avançar 120 passos' }).click();
   await page.waitForFunction(() => {
     const report = JSON.parse(document.getElementById('report').textContent);

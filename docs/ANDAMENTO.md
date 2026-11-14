@@ -70,3 +70,7 @@ Linux `.deb` gerado e smoke Tauri/WebKitGTK aprovado (WebGL2/WASM, pilotagem, pa
 - 2026-11-14: pista ampliada para ~223 m, curvas de raio 10 m e abertura externa amarela para queda real. Gates/âncoras/rotas ajustados, três voltas e queda por inputs aprovadas. Próxima E02-T04 permanece.
 
 - 2026-11-14: física revisada conforme especificação fake arcade do usuário: yaw direto, drift visual desacoplado, teto rígido e mini-turbo de um estágio, atrito físico removido dos pisos, apoio por três sondas e repulsão em barreiras. Referência vigente em `17-fisica-arcade.md`; sensação final depende de playtest.
+
+- 2026-11-14: movimento vetorial separado em `kart-motion.ts`, Rapier só para consultas/colisores e proxy cinemático. Interpolação visual entre ticks e câmera com distância relativa estável, após relato de trepidação. Próxima tarefa estrutural permanece E02-T04; playtest de dirigibilidade/câmera pendente.
+
+- 2026-11-14: usuário aprovou a câmera interpolada; acrescentados órbita elástica, FOV/banking/look-ahead, enquadramento de voo e pulso discreto de impacto, com Movimento reduzido opcional.

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { RACE_GATES } from './race-track.ts';
 import { createKartModel, loadKartSource } from './kart-model.ts';
 import { SceneAssets } from './assets.ts';
-import { createCameraRig, type CameraMode, type KartPose } from './camera.ts';
+import { createCameraRig, type CameraMode, type KartPose, type CameraMotion } from './camera.ts';
 import { TRACK_PARTS, TRACK_SUMMARY, buildRoadSurface, type SceneKind } from './track.ts';
 export type Quality = 'low' | 'balanced';
 export function createView(host: HTMLElement, quality: Quality, onContextLost: () => void, sceneKind: SceneKind = 'drop', cameraMode: CameraMode = 'chase') {
@@ -97,6 +97,7 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
     renderer.setSize(Math.max(host.clientWidth, 1), Math.max(host.clientHeight, 1), false);
     camera.aspect = Math.max(host.clientWidth, 1) / Math.max(host.clientHeight, 1); camera.updateProjectionMatrix();
     canvas.addEventListener('webglcontextlost', lost);
+    let lastTime = 0, bodyYaw = 0;
     const debug = gl.getExtension('WEBGL_debug_renderer_info');
     return {
       async loadKart() {
@@ -108,9 +109,16 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
       get info() { return { kartModel, assets: assets.info, camera: cameraRig.info, shadow: 'contact', shadowVisible: shadow.visible, scene: sceneKind, ...(sceneKind === 'track' ? { track: TRACK_SUMMARY } : {}), threeVersion: THREE.REVISION, webgl2: true, gpu: String(gl.getParameter(debug ? debug.UNMASKED_RENDERER_WEBGL : gl.RENDERER)), pixelRatio: ratio }; },
       setRaceTargets(ids: readonly string[]) { gateMarkers.forEach((marker, id) => { marker.visible = ids.includes(id); }); },
       setCameraMode(mode: CameraMode) { cameraRig.setMode(mode); },
-      render(position: KartPose, elapsed = 0) {
+      render(position: KartPose, _elapsed = 0, motion: CameraMotion = {}) {
         if (disposed) return;
-        kart.position.copy(position); kart.rotation.y = (position.yaw ?? 0) + (position.visualYawOffset ?? 0); kart.rotation.z = position.visualRoll ?? 0;
+        const now = performance.now();
+        const dt = lastTime ? Math.min((now - lastTime) / 1000, 0.1) : 0;
+        lastTime = now;
+        const steer = Math.max(-1, Math.min(1, motion.steering ?? 0));
+        const spd = Math.min(1, Math.abs(motion.speed ?? 0) / 15);
+        const targetBody = -steer * 0.22 * (0.4 + 0.6 * spd) * (motion.drifting ? 1.8 : 1);
+        bodyYaw += (targetBody - bodyYaw) * (1 - Math.exp(-10 * dt));
+        kart.position.copy(position); kart.rotation.y = (position.yaw ?? 0) + (position.visualYawOffset ?? 0) + bodyYaw; kart.rotation.z = position.visualRoll ?? 0;
         // Surface transforms must be current before raycasting, including the first frame.
         scene.updateMatrixWorld(true);
         ray.ray.origin.set(position.x, position.y + 0.1, position.z);
@@ -122,7 +130,7 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
           shadow.quaternion.setFromUnitVectors(up, normal);
           shadowMaterial.opacity = 0.28 / (1 + Math.max(position.y - hit.point.y - 0.35, 0) * 0.5);
         }
-        cameraRig.update(position, elapsed); renderer.render(scene, camera);
+        cameraRig.update(position, dt, motion); renderer.render(scene, camera);
       },
       get memory() { return { ...renderer.info.memory }; },
       dispose,

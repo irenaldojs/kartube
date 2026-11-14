@@ -70,3 +70,7 @@ R/Reposicionar recuperam no ponto do último gate válido, com direção correta
 ## Revisão arcade por solicitação do usuário — 2026-11-14
 
 A especificação vigente passa a ser [Física arcade](17-fisica-arcade.md): yaw direto, movimento sem slip físico, drift visual com lado fixo, mini-turbo de um estágio, teto rígido, três sondas de apoio e repulsão curta em barreiras. Substitui os ajustes de grip/inércia dos registros anteriores. Parâmetros próprios do Kartube, inspirados em comportamento público de Mario Kart e na tabela do usuário; sem afirmar reprodução de código Nintendo.
+
+## Movimento vetorial próprio e câmera interpolada — 2026-11-14
+
+Por solicitação do usuário, Rapier fica restrito a geometria/raycast/shape cast: `kart-motion.ts` integra movimento, gravidade e colisão arcade sem solver; `driving.ts` mantém regras puras. Não há corpo dinâmico, forças ou impulsos. A posição visual e a câmera são interpoladas entre ticks, sem filtrar comandos ou posições usadas pela corrida. A câmera segue a translação interpolada sem lag variável, suavizando somente órbita/altura. Especificação vigente em [Física arcade](17-fisica-arcade.md).

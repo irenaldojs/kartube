@@ -1,4 +1,5 @@
 import './style.css';
+import { createPoseInterpolator } from './render-pose.ts';
 import { createCheckpointRace } from '../../../packages/game-core/src/checkpoint-race.ts';
 import { RACE_GATES, RACE_FINISH_ID, RACE_SPAWN, recoveryPointFor } from './race-track.ts';
 import { NEUTRAL_INPUT } from './driving.ts';
@@ -12,6 +13,8 @@ function element<T extends HTMLElement>(id: string): T {
 const host = element('viewport'), status = element('status'), output = element('report');
 const scene = element<HTMLSelectElement>('scene');
 const camera = element<HTMLSelectElement>('camera');
+const reducedMotion = element<HTMLInputElement>('reduced-motion');
+reducedMotion.checked = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const quality = element<HTMLSelectElement>('quality');
 const pause = element<HTMLButtonElement>('pause'), step = element<HTMLButtonElement>('step');
 const driving = element('driving'), resetKart = element<HTMLButtonElement>('reset-kart');
@@ -55,15 +58,16 @@ async function boot() {
   let releaseReport: ReleaseReport | null = null;
   const destroy = (): ReleaseReport => {
     if (releaseReport) return releaseReport;
-    destroyed = true; cancelAnimationFrame(raf); pause.onclick = null; step.onclick = null; camera.onchange = null; resetKart.onclick = null; startRace.onclick = null; practice.onclick = null;
+    destroyed = true; cancelAnimationFrame(raf); pause.onclick = null; step.onclick = null; camera.onchange = null; resetKart.onclick = null; startRace.onclick = null; practice.onclick = null; reducedMotion.onchange = null;
     input?.dispose(); input = null; document.removeEventListener('visibilitychange', visibility);
     physics?.dispose();
     releaseReport = { graphics: view?.dispose() ?? null, physics: physics?.resources ?? null, inputReleased: true, animationStopped: true };
     physics = null; view = null;
     return releaseReport;
   };
+  let resetRenderPose = () => {};
   let previous = performance.now(), accumulator = 0, paused = false;
-  const visibility = () => { audioProbe.cancel(); sampleNextFrame = false; input?.clear(); previous = performance.now(); accumulator = 0; };
+  const visibility = () => { audioProbe.cancel(); sampleNextFrame = false; input?.clear(); previous = performance.now(); accumulator = 0; resetRenderPose(); };
   cleanup = destroy;
   try {
     const { createView } = await import('./view.ts');
@@ -80,6 +84,8 @@ async function boot() {
     physics = await createPhysics(sceneKind);
     if (token !== generation) { physics.dispose(); return; }
     const world = physics, display = view;
+    const renderPose = createPoseInterpolator(world.pose);
+    resetRenderPose = () => renderPose.snap(world.pose);
     const bootMs = Number((performance.now() - bootStarted).toFixed(2));
     let frames = 0, sampledFrames = 0, sampleTime = performance.now(), fps = 0;
     const raceVisuals = () => {
@@ -97,7 +103,7 @@ async function boot() {
       status.textContent = 'Preparando a largada'; raceVisuals(); draw(); update();
     };
     const recovered = () => {
-      input?.clear(); race?.rebaseAfterRespawn(world.position);
+      input?.clear(); race?.rebaseAfterRespawn(world.position); resetRenderPose();
       display.setCameraMode(camera.value === 'overview' ? 'overview' : 'chase');
       recoveryNoticeTicks = 120;
       recoveryNote.textContent = world.telemetry.lastRecoveryReason === 'stuck' ? 'Kart destravado' : world.telemetry.lastRecoveryReason === 'fall' ? 'De volta à pista' : 'Kart reposicionado';
@@ -106,6 +112,7 @@ async function boot() {
       const recoveries = world.telemetry.recoveries, checkpoint = race?.snapshot.lastCheckpointId;
       const allowed = !race || race.phase === 'racing';
       world.step(allowed ? command : race?.phase === 'finished' ? { ...NEUTRAL_INPUT, brake: true } : NEUTRAL_INPUT);
+      renderPose.push(world.pose);
       if (world.telemetry.recoveries !== recoveries) recovered();
       race?.step(world.position);
       if (race && race.snapshot.lastCheckpointId !== checkpoint) world.setRecoveryPoint(recoveryPointFor(race.snapshot.lastCheckpointId));
@@ -113,7 +120,9 @@ async function boot() {
     };
     const update = () => { raceVisuals(); if (!paused) status.textContent = race?.phase === 'countdown' ? 'Preparando a largada' : race?.phase === 'racing' ? 'Corrida em andamento' : race?.phase === 'finished' ? 'Corrida concluída' : 'Renderização e física ativas'; publish({ status: paused ? 'paused' : 'running', quality: profile, ...display.info, wasm: true, rapierVersion: world.version,
       race: race?.snapshot ?? null, bootMs, frameTiming: frameSample.report, physicsSteps: world.steps, renderFrames: frames, bodyY: Number(world.position.y.toFixed(4)), fps: Number(fps.toFixed(1)), memory: display.memory, memorySample: 'running', physicsResources: world.resources, previousRelease: lastRelease, physicsDt: PHYSICS_DT, position: world.pose, driving: { ...world.telemetry, input: input?.read() ?? null } }); };
-    const draw = (elapsed = 0) => { raceVisuals(); display.render(world.pose, elapsed); frames++; speed.textContent = `${(world.telemetry.speed * 3.6).toFixed(0)} km/h${world.telemetry.boostRemaining > 0 ? ' · TURBO' : world.telemetry.drifting ? world.telemetry.driftCharge >= 1 ? ' · TURBO PRONTO' : ' · DRIFT' : sceneKind === 'track' && !world.telemetry.grounded ? ' · NO AR' : ''}`; };
+    const draw = (elapsed = 0, interpolate = false) => {
+      if (!interpolate) resetRenderPose();
+      raceVisuals(); display.render(renderPose.sample(interpolate && !paused ? accumulator / PHYSICS_DT : 1), elapsed, { speed: world.telemetry.speed, steering: world.telemetry.driftDirection || input?.read().steering || 0, drifting: world.telemetry.drifting, boosting: world.telemetry.boostRemaining > 0, grounded: world.telemetry.grounded, impacts: world.telemetry.bumps, reducedMotion: reducedMotion.checked }); frames++; speed.textContent = `${(world.telemetry.speed * 3.6).toFixed(0)} km/h${world.telemetry.boostRemaining > 0 ? ' · TURBO' : world.telemetry.drifting ? world.telemetry.driftCharge >= 1 ? ' · TURBO PRONTO' : ' · DRIFT' : sceneKind === 'track' && !world.telemetry.grounded ? ' · NO AR' : ''}`; };
     const animate = (now: number) => {
       if (destroyed) return;
       if (sampleNextFrame && !paused && !document.hidden) frameSample.add(now - previous);
@@ -125,12 +134,12 @@ async function boot() {
         while (accumulator >= PHYSICS_DT && iterations < 8) { simulate(); accumulator -= PHYSICS_DT; iterations++; }
         if (iterations === 8) accumulator = 0;
       }
-      if (!document.hidden) draw(elapsed);
+      if (!document.hidden) draw(elapsed, true);
       if (now - sampleTime >= 250) { fps = (frames - sampledFrames) * 1000 / (now - sampleTime); sampledFrames = frames; sampleTime = now; update(); }
       raf = requestAnimationFrame(animate);
     };
     document.addEventListener('visibilitychange', visibility);
-    pause.onclick = () => { paused = !paused; sampleNextFrame = false; audioProbe.cancel(); input?.clear(); accumulator = 0; previous = performance.now(); pause.textContent = paused ? 'Retomar' : 'Pausar'; step.disabled = !paused || race !== null; status.textContent = paused ? 'Simulação pausada' : 'Renderização e física ativas'; update(); };
+    pause.onclick = () => { paused = !paused; resetRenderPose(); sampleNextFrame = false; audioProbe.cancel(); input?.clear(); accumulator = 0; previous = performance.now(); pause.textContent = paused ? 'Retomar' : 'Pausar'; step.disabled = !paused || race !== null; status.textContent = paused ? 'Simulação pausada' : 'Renderização e física ativas'; update(); };
     step.onclick = () => { if (!paused || destroyed || race) return; for (let i = 0; i < 120; i++) simulate(NEUTRAL_INPUT); draw(); update(); };
     camera.onchange = () => { display.setCameraMode(camera.value === 'overview' ? 'overview' : 'chase'); draw(); update(); };
     const reset = () => { if (world.recover('manual')) recovered(); draw(); update(); };
@@ -138,6 +147,7 @@ async function boot() {
     practice.onclick = () => { race = null; recoveryNoticeTicks = 0; recoveryNote.textContent = ''; input?.clear(); world.reset(); world.setRecoveryPoint({ ...world.position, y: 0.4, yaw: 0 }); step.disabled = !paused; draw(); update(); };
     if (sceneKind === 'track') input = createDrivingInput(host, driving, reset);
     resetKart.onclick = reset;
+    reducedMotion.onchange = () => { draw(); update(); };
     controls(true); pause.textContent = 'Pausar'; status.textContent = 'Renderização e física ativas';
     previous = performance.now(); draw(); update(); raf = requestAnimationFrame(animate);
   } catch (error) {

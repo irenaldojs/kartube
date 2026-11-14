@@ -2,6 +2,18 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-14 — Câmera arcade com conforto opcional
+
+- Elasticidade na órbita, look-ahead de curva, FOV por velocidade/turbo, banking leve e enquadramento de salto, preservando a base interpolada e a distância estável na reta.
+- Pulso discreto de FOV em impacto real; sem shake contínuo. Checkbox Movimento reduzido e preferência inicial do sistema para desativar efeitos dinâmicos.
+- Parâmetros e limites em docs/17-fisica-arcade.md; testes de estabilidade, efeitos e opção reduzida aprovados. Itens/ataques permanecem pendentes.
+
+## 2026-11-14 — Movimento vetorial próprio e câmera sem degraus
+
+- Rapier restrito a consultas e colisores; `kart-motion.ts` integra posição/gravidade e resposta arcade sem solver ou corpo dinâmico. Mantidos controles, teto, drift, turbo, rampas e recuperação.
+- Kart e câmera usam a mesma pose interpolada entre ticks. Câmera suaviza órbita/altura, com translação relativa constante na reta, removendo lag variável de lerp no mundo.
+- Testes incluem execução com solver/dinâmica Rapier proibidos, controlador sem engine, render em 144 Hz/RAF irregular e resets sem misturar poses antigas. Ganho de performance e sensação final ainda dependem de medição/playtest.
+
 ## 2026-11-14 — Física fake para foco em diversão
 
 - Especificação do usuário aplicada: direção direta, aceleração/tetos rígidos, drift visual separado do movimento e mini-turbo de um estágio. Removida perda de velocidade causada pela mistura/projeção de vetores.
