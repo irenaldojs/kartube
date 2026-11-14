@@ -81,6 +81,8 @@ finish → branch → north-west → north → east → merge → south → west
              └→ alternative ──────────────────┘
 ```
 
-Gates checam centro do kart por segmento entre ticks fixos e interseção com plano/direção/volume. O gate esperado recebe faixa verde; a bifurcação mostra as duas opções. A alternativa cruza o meio da pista e reencontra a reta leste; seus gates são explícitos. Mudança abrupta de posição invalida a rota em andamento. Reposicionar na UI reinicia a prova até a entrega de respawn seguro.
+Gates checam centro do kart por segmento entre ticks fixos e interseção com plano/direção/volume. O gate esperado recebe faixa verde; a bifurcação mostra as duas opções. A alternativa cruza o meio da pista e reencontra a reta leste; seus gates são explícitos. Mudança abrupta de posição invalida a rota em andamento. Desde E02-T03, reposicionar retorna à âncora do último gate aceito e preserva o progresso sem conceder passagens.
 
 Esses gates estendem o contrato Checkpoint com direção e label; ainda não são o manifesto completo de TrackDefinition com oito spawns e checksum. O cenário continua greybox com boosts/caixas visuais. Teste físico automatizado completa três voltas alternando rotas; playtest humano e políticas de recuperação mais finas permanecem pendentes.
+
+Âncoras de recuperação: 1,8 m atrás de cada plano, no centro da via e com yaw válido; todas verificadas automaticamente por Rapier para apoio e espaço. Na alternativa, preservar o gate aceito mantém o reencontro esperado, sem permitir trocar a recuperação por avanço no grafo.

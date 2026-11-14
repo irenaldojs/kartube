@@ -14,7 +14,7 @@ Transformar movimentação em corrida válida, com progressão, HUD e resultados
 
 - [x] E02-T01 — Construir `KartController` arcade (acelerar/frear/ré/dirigir, drift e controle aéreo).
 - [x] E02-T02 — Adicionar spawn, largada, contagem regressiva, checkpoints por grafo e voltas configuráveis.
-- [ ] E02-T03 — Implementar respawn em posição segura e detecção de queda/stuck.
+- [x] E02-T03 — Implementar respawn em posição segura e detecção de queda/stuck.
 - [ ] E02-T04 — Adicionar sistema de posições por progresso ao longo do trajeto sem depender só da distância euclidiana.
 - [ ] E02-T05 — Criar HUD de volta, velocidade, posição, item (vazio), cronômetro e término.
 - [ ] E02-T06 — Testar limites de mapa, cortes ilegais, respawn e framerate variável.
@@ -41,7 +41,7 @@ Transformar movimentação em corrida válida, com progressão, HUD e resultados
 - Referência de commit/PR: **—**
 - Testes executados e ambiente: `npm run check`, `npm run check:web`, `npm run check:web:dev`; Linux, Rapier e Chromium/SwiftShader.
 - Evidências de aprovação: E02-T01 validada automaticamente; capturas desktop/móvel inspecionadas e copiadas para `artifacts/web/`. Critérios de corrida da etapa continuam pendentes.
-- Pendências / riscos: playtest e calibração de dirigibilidade; respawn seguro e detecção de stuck na E02-T03.
+- Pendências / riscos: playtest e calibração de dirigibilidade; posições por progresso na E02-T04.
 - Data de conclusão: **—**
 
 ### E02-T01 — Controlador arcade e Cart.fbx — 2026-11-14
@@ -66,3 +66,14 @@ Transformar movimentação em corrida válida, com progressão, HUD e resultados
 - Próxima tarefa E02-T03: respawn seguro e detecção de queda/stuck. Posições, HUD completo, itens, bots e resultado de oito pilotos continuam nos marcos seguintes. Ports nativos permanecem adiados.
 
 - Smokes finais `npm run check:web` e `npm run check:web:dev` aprovados. Verificados no navegador: throttle bloqueado no countdown, pausa/ocultação sem avançar ticks, primeira passagem sem crédito de volta, reposicionamento reiniciando countdown e retorno ao treino/laboratório. Captura `/tmp/kartube-race.png` inspecionada e copiada para `artifacts/web/kartube-race.png`. Sem build/port nativo nesta entrega.
+
+### E02-T03 — Recuperação segura de queda/stuck — 2026-11-14
+
+- R e Reposicionar kart agora recuperam a posição sem reiniciar a corrida. Usa âncora 1,8 m atrás do plano do último checkpoint aceito, com yaw no sentido válido; antes do primeiro gate usa o spawn da largada. No treino livre retorna ao spawn da pista.
+- Rapier valida apoio por raycast restrito a vias/rampas e inclinação, recalcula altura de spawn (chão +0,4 m) e rejeita sobreposição com volume de segurança. Âncora é revalidada ao recuperar, com fallback ao spawn seguro; nunca usa malha visual como colisor. Velocidade e drift são zerados; câmera reenquadra e entradas são limpas.
+- Detector a 60 Hz recupera queda abaixo de -3 m ou saída dos limites ±36 m. Kart preso: 3 s de simulação com tentativa de acelerar/ré, apoiado e sem avançar 0,5 m. Soltar, frear, estar no ar ou progredir reinicia o detector. Pausa/ocultação não consomem ticks. Aviso visual distingue recuperação manual, queda e destravamento.
+- Autoridade chama `rebaseAfterRespawn` após recuperação aprovada: mantém voltas, fase, tempo, rota escolhida e próximo gate; reposiciona apenas a origem da próxima amostra e registra respawn. Teleporte desconhecido continua invalidando a rota em andamento. Recuperar repetidamente atrás da chegada não credita voltas. Durante countdown preserva sua contagem; prova finalizada mantém resultado congelado.
+- Tipos/testes aprovados: todas as âncoras com espaço/apoio, rejeição de parede/vazio, orientação e velocidade, queda e stuck reais em Rapier, ausência de recuperação em repouso/ar/freio/movimento, repetição sem ganho de volta, preservação da rota alternativa e três voltas por inputs com queda/respawn na alternativa e conclusão normal.
+- Esta tarefa substitui a política provisória da T02 que reiniciava a prova ao reposicionar/cair. Respawn multi-kart e ocupação dinâmica serão ampliados com os oito pilotos. Próxima E02-T04: posições por progresso no trajeto.
+
+- Validação final: `npm run check`, `npm run check:web` e `npm run check:web:dev` aprovados. Smoke verifica respawn manual sem reiniciar fase/progresso, recuperação mantendo pausa, destravamento real por aceleração contra guardrail e limpeza de inputs. Captura de recuperação inspecionada e copiada para `artifacts/web/kartube-recovery.png`. Nenhum build nativo nesta entrega.

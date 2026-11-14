@@ -15,3 +15,11 @@ export const RACE_GATES: readonly RaceGate[] = [
   gate('south', 'Reta sul', 0, 20, -1, 0, ['west']),
   gate('west', 'Curva da chegada', -20, 16, 0, -1, ['finish']),
 ];
+
+// Place anchors behind the accepted plane: recovery never skips new metres or grants a gate.
+export function recoveryPointFor(checkpointId: string | null) {
+  const checkpoint = RACE_GATES.find(gate => gate.id === checkpointId);
+  if (!checkpoint) return { ...RACE_SPAWN, yaw: 0 };
+  return { x: checkpoint.center.x - checkpoint.forward.x * 1.8, y: 0.4,
+    z: checkpoint.center.z - checkpoint.forward.z * 1.8, yaw: Math.atan2(-checkpoint.forward.x, -checkpoint.forward.z) };
+}

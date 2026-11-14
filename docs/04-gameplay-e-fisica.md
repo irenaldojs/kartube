@@ -60,3 +60,9 @@ Drift explícito por Shift ou botão de toque: avanço mínimo 4 m/s, aderência
 Direção no ar limitada a 0,65 rad/s; trajetória recebe 35% desse giro. Acelerar não adiciona propulsão no ar, e a magnitude horizontal/componente vertical são preservadas pelo controlador; Rapier aplica gravidade, contato e aterrissagem. Drift não fica ativo no ar. Reset/pausa/blur/ocultação continuam limpando as entradas. O relatório expõe `drifting` e `airControl`.
 
 Testes automatizados de circuito cobrem subida, trechos aéreos e duas aterrissagens. Ajuste fino, mini-boost, efeitos de drift, itens, superfícies especiais e etapas de corrida continuam nos respectivos marcos.
+
+## Recuperação web — E02-T03
+
+R/Reposicionar recuperam no ponto do último gate válido, com direção correta, sem reiniciar voltas/relógio/rota. As âncoras ficam 1,8 m atrás do plano aceito; recrossá-lo não concede outra passagem. Rapier verifica chão (vias/rampas), altura e espaço para o kart antes da troca. Velocidade/drift/entradas são zerados e a câmera reenquadra imediatamente. Fallback usa o spawn caso a âncora deixe de ser segura.
+
+`recovery.ts` concentra limites do protótipo: queda y<-3 m ou fora de ±36 m; stuck após 3 s de simulação tentando acelerar/ré sem progresso de 0,5 m. Freio, repouso sem intenção e voo não disparam stuck. Pausar/ocultar suspende os ticks do detector. Telemetria distingue resets brutos, recuperações aprovadas, motivo e ponto seguro. Recuperação aprovada é comunicada à regra pura da corrida para rebasear a posição sem contar um segmento de teleporte.

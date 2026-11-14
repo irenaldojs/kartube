@@ -2,6 +2,12 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-14 — E02-T03 — Respawn seguro e kart preso
+
+- Recuperação manual, por queda/limites e por tentativa de acelerar sem progresso. Pontos atrás do último gate aceito, com chão/espaço/orientação verificados em Rapier.
+- Voltas, tempo, fase e rota preservados; rebase explícito evita contar o teleporte como passagem. Velocidade/drift/inputs limpos, câmera reenquadrada e aviso de recuperação.
+- Tipos, testes e smokes web de produção/desenvolvimento aprovados: âncoras e rejeições, queda/stuck reais, prevenção de falsos positivos, pausa/inputs e três voltas com recuperação na alternativa. Política provisória de reiniciar corrida ao reposicionar substituída; próxima E02-T04 web.
+
 ## 2026-11-14 — E02-T02 — Corrida com largada e voltas no web
 
 - Corrida opt-in com 1/3/5 voltas, spawn atrás da chegada e contagem 3–2–1. Regra pura de checkpoints direcionais por grafo, com bifurcação/reencontro para a alternativa e bloqueio de voltas por passagens fora de ordem.

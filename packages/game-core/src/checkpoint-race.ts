@@ -25,13 +25,18 @@ export function createCheckpointRace(config: CheckpointRaceConfig, initialPositi
   if (visited.size !== gates.size - 1) throw new Error('Unreachable race gate');
   let phase: 'countdown' | 'racing' | 'finished' = config.countdownTicks ? 'countdown' : 'racing';
   let countdownTicks = config.countdownTicks, raceTicks = 0, completedLaps = 0, armed = false;
-  let expected = [config.finishId], lastCheckpointId: string | null = null, rejectedJumps = 0;
+  let expected = [config.finishId], lastCheckpointId: string | null = null, rejectedJumps = 0, respawns = 0;
   let previous = { ...initialPosition };
   return {
     get phase() { return phase; },
     get snapshot() { return { phase, laps: config.laps, completedLaps, currentLap: Math.min(completedLaps + 1, config.laps),
       countdown: Math.ceil(countdownTicks / config.tickRate), elapsedSeconds: raceTicks / config.tickRate,
-      expected: [...expected], nextLabels: expected.map(id => gates.get(id)!.label), lastCheckpointId, armed, rejectedJumps }; },
+      expected: [...expected], nextLabels: expected.map(id => gates.get(id)!.label), lastCheckpointId, armed, rejectedJumps, respawns }; },
+    rebaseAfterRespawn(position: Vector3) {
+      if (![position.x, position.y, position.z].every(Number.isFinite)) throw new Error('Invalid recovery position');
+      previous = { ...position };
+      if (phase !== 'finished') respawns++;
+    },
     step(position: Vector3) {
       if (![position.x, position.y, position.z].every(Number.isFinite)) throw new Error('Invalid race position');
       const from = previous; previous = { ...position };
@@ -40,7 +45,7 @@ export function createCheckpointRace(config: CheckpointRaceConfig, initialPositi
       raceTicks++;
       // Max kart speed is 12 m/s. Two metres in one tick is a discontinuity, not a gate crossing.
       if (Math.hypot(position.x - from.x, position.y - from.y, position.z - from.z) > 2) {
-        expected = [config.finishId]; armed = false; rejectedJumps++; return;
+        expected = [config.finishId]; armed = false; lastCheckpointId = null; rejectedJumps++; return;
       }
       for (const id of expected) {
         const gate = gates.get(id)!;

@@ -1,6 +1,6 @@
 import './style.css';
 import { createCheckpointRace } from '../../../packages/game-core/src/checkpoint-race.ts';
-import { RACE_GATES, RACE_FINISH_ID, RACE_SPAWN } from './race-track.ts';
+import { RACE_GATES, RACE_FINISH_ID, RACE_SPAWN, recoveryPointFor } from './race-track.ts';
 import { NEUTRAL_INPUT } from './driving.ts';
 import { createFrameSample, readHeap } from './diagnostics.ts';
 import { createAudioProbe } from './audio-probe.ts';
@@ -15,6 +15,7 @@ const camera = element<HTMLSelectElement>('camera');
 const quality = element<HTMLSelectElement>('quality');
 const pause = element<HTMLButtonElement>('pause'), step = element<HTMLButtonElement>('step');
 const driving = element('driving'), resetKart = element<HTMLButtonElement>('reset-kart');
+const recoveryNote = element('recovery-note');
 const speed = element('speed'), raceHud = element('race-hud'), countdown = element('race-countdown');
 const startRace = element<HTMLButtonElement>('start-race'), practice = element<HTMLButtonElement>('practice'), laps = element<HTMLSelectElement>('laps');
 const restart = element<HTMLButtonElement>('restart'), release = element<HTMLButtonElement>('release');
@@ -47,7 +48,8 @@ async function boot() {
   let view: View | null = null;
   let physics: Physics | null = null;
   let race: ReturnType<typeof createCheckpointRace> | null = null;
-  raceHud.textContent = 'Treino livre'; countdown.textContent = '';
+  raceHud.textContent = 'Treino livre'; countdown.textContent = ''; recoveryNote.textContent = '';
+  let recoveryNoticeTicks = 0;
   let input: ReturnType<typeof createDrivingInput> | null = null;
   let destroyed = false, raf = 0;
   let releaseReport: ReleaseReport | null = null;
@@ -88,17 +90,26 @@ async function boot() {
       if (countdown.textContent !== message) countdown.textContent = message;
     };
     const beginRace = () => {
-      input?.clear(); world.reset(RACE_SPAWN);
+      input?.clear(); world.reset(RACE_SPAWN); world.setRecoveryPoint(recoveryPointFor(null));
+      recoveryNoticeTicks = 0; recoveryNote.textContent = '';
       race = createCheckpointRace({ gates: RACE_GATES, finishId: RACE_FINISH_ID, laps: Number(laps.value), tickRate: 60, countdownTicks: 180 }, world.position);
       paused = false; sampleNextFrame = false; pause.textContent = 'Pausar'; step.disabled = true; accumulator = 0; previous = performance.now();
       status.textContent = 'Preparando a largada'; raceVisuals(); draw(); update();
     };
-    const simulate = () => {
-      const resets = world.telemetry.resets;
+    const recovered = () => {
+      input?.clear(); race?.rebaseAfterRespawn(world.position);
+      display.setCameraMode(camera.value === 'overview' ? 'overview' : 'chase');
+      recoveryNoticeTicks = 120;
+      recoveryNote.textContent = world.telemetry.lastRecoveryReason === 'stuck' ? 'Kart destravado' : world.telemetry.lastRecoveryReason === 'fall' ? 'De volta à pista' : 'Kart reposicionado';
+    };
+    const simulate = (command = input?.read() ?? NEUTRAL_INPUT) => {
+      const recoveries = world.telemetry.recoveries, checkpoint = race?.snapshot.lastCheckpointId;
       const allowed = !race || race.phase === 'racing';
-      world.step(allowed ? input?.read() ?? NEUTRAL_INPUT : race?.phase === 'finished' ? { ...NEUTRAL_INPUT, brake: true } : NEUTRAL_INPUT);
-      if (race && world.telemetry.resets !== resets) { beginRace(); return; }
+      world.step(allowed ? command : race?.phase === 'finished' ? { ...NEUTRAL_INPUT, brake: true } : NEUTRAL_INPUT);
+      if (world.telemetry.recoveries !== recoveries) recovered();
       race?.step(world.position);
+      if (race && race.snapshot.lastCheckpointId !== checkpoint) world.setRecoveryPoint(recoveryPointFor(race.snapshot.lastCheckpointId));
+      if (recoveryNoticeTicks > 0 && --recoveryNoticeTicks === 0) recoveryNote.textContent = '';
     };
     const update = () => { raceVisuals(); if (!paused) status.textContent = race?.phase === 'countdown' ? 'Preparando a largada' : race?.phase === 'racing' ? 'Corrida em andamento' : race?.phase === 'finished' ? 'Corrida concluída' : 'Renderização e física ativas'; publish({ status: paused ? 'paused' : 'running', quality: profile, ...display.info, wasm: true, rapierVersion: world.version,
       race: race?.snapshot ?? null, bootMs, frameTiming: frameSample.report, physicsSteps: world.steps, renderFrames: frames, bodyY: Number(world.position.y.toFixed(4)), fps: Number(fps.toFixed(1)), memory: display.memory, memorySample: 'running', physicsResources: world.resources, previousRelease: lastRelease, physicsDt: PHYSICS_DT, position: world.pose, driving: { ...world.telemetry, input: input?.read() ?? null } }); };
@@ -120,11 +131,11 @@ async function boot() {
     };
     document.addEventListener('visibilitychange', visibility);
     pause.onclick = () => { paused = !paused; sampleNextFrame = false; audioProbe.cancel(); input?.clear(); accumulator = 0; previous = performance.now(); pause.textContent = paused ? 'Retomar' : 'Pausar'; step.disabled = !paused || race !== null; status.textContent = paused ? 'Simulação pausada' : 'Renderização e física ativas'; update(); };
-    step.onclick = () => { if (!paused || destroyed || race) return; for (let i = 0; i < 120; i++) world.step(); draw(); update(); };
+    step.onclick = () => { if (!paused || destroyed || race) return; for (let i = 0; i < 120; i++) simulate(NEUTRAL_INPUT); draw(); update(); };
     camera.onchange = () => { display.setCameraMode(camera.value === 'overview' ? 'overview' : 'chase'); draw(); update(); };
-    const reset = () => { if (race) beginRace(); else { input?.clear(); world.reset(); draw(); update(); } };
+    const reset = () => { if (world.recover('manual')) recovered(); draw(); update(); };
     startRace.onclick = beginRace;
-    practice.onclick = () => { race = null; input?.clear(); world.reset(); step.disabled = !paused; draw(); update(); };
+    practice.onclick = () => { race = null; recoveryNoticeTicks = 0; recoveryNote.textContent = ''; input?.clear(); world.reset(); world.setRecoveryPoint({ ...world.position, y: 0.4, yaw: 0 }); step.disabled = !paused; draw(); update(); };
     if (sceneKind === 'track') input = createDrivingInput(host, driving, reset);
     resetKart.onclick = reset;
     controls(true); pause.textContent = 'Pausar'; status.textContent = 'Renderização e física ativas';
