@@ -4,7 +4,7 @@
 
 ## Dependências
 
-Etapa 01.
+Etapa 01. Por decisão do usuário em 2026-11-14, priorizar a implementação web: T01–T05 do protótipo e diagnósticos web estão disponíveis; provas e ports nativos de T06/T07 ficam adiados e não bloqueiam o desenvolvimento desta etapa. Isso não encerra os critérios pendentes da etapa 01.
 
 ## Objetivo
 

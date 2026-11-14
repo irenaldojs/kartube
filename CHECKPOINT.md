@@ -1,6 +1,6 @@
 # Checkpoint para retomar o Kartube
 
-**Data:** 2026-11-14 (America/Sao_Paulo). **Etapa ativa: 01; tarefa atual: E01-T06 — prova Tauri no S20 FE.**
+**Data:** 2026-11-14 (America/Sao_Paulo). **Foco ativo: versão web; E01-T07 — diagnósticos web. Android e desktop nativo adiados pelo usuário.**
 
 ## Estado atual
 
@@ -28,9 +28,17 @@ SHA-256:
 2b46e2661d8689ed5b2a0d3241139e38e01c959ab25c60a57c656f41577d3611  Kartube_0.1.0_amd64.deb
 ```
 
-Binários e caches não são versionados. Cópias originais em `apps/native/src-tauri/target/release/bundle/deb/` e `apps/native/src-tauri/gen/android/app/build/outputs/apk/universal/debug/`.
+Binários e caches não são versionados. Diretórios de saída de builds (podem conter builds locais posteriores às cópias acima): `apps/native/src-tauri/target/release/bundle/deb/` e `apps/native/src-tauri/gen/android/app/build/outputs/apk/universal/debug/`.
 
-## Próxima ação
+## Prioridade atual — web
+
+Usuário pediu em 2026-11-14 foco primeiro na versão web e deixou os ports Android/desktop para depois. Não iniciar novos builds nativos nem bloquear desenvolvimento web pelos critérios físicos pendentes. E01-T06 permanece aberta e adiada; T07 tem instrumentação web, sem aceite de RAM total/áudio físico/desempenho sustentado.
+
+Implementados no web: identificação de build, tempo de boot da cena, janela de até 600 intervalos RAF visíveis/não pausados com FPS e percentis, estimativa opcional de heap JS (RAM total null) e tom diagnóstico por gesto com cancelamento/cleanup e fallback sem Web Audio. Ver roteiro atualizado na matriz. Smoke final em Chromium aprovado; relatório local em `artifacts/web/kartube-webgl-report.json`. A amostra curta desse smoke valida instrumentação, não desempenho sustentado. Esses diagnósticos novos ainda não estão nas cópias de APK/.deb em `artifacts/native/`, que preservam os pacotes anteriores.
+
+Próximo desenvolvimento: jogabilidade web da etapa 02, começando pelo controlador arcade (E02-T01); aproveitar aceleração/freio/ré já existentes, acrescentar drift e controle aéreo conforme o roteiro. Dependências de validação nativa ficam adiadas por decisão do usuário, sem marcar T06/T07 completas.
+
+## Quando retomar os ports
 
 Entregar/instalar o APK no S20 FE e seguir [matriz e roteiro manual](docs/matriz-plataformas.md): inicialização offline, WebGL2/WASM, pilotagem, acelerar primeiro e depois virar com outro dedo, soltura independente, Freio / Ré, câmera, pausa/retomada, troca de app e descarte/reinício. Registrar relatório com `runtime: tauri`, versão real do Android e Android System WebView. Não inferir versões pelo user agent reduzido.
 

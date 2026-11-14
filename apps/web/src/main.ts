@@ -1,4 +1,6 @@
 import './style.css';
+import { createFrameSample, readHeap } from './diagnostics.ts';
+import { createAudioProbe } from './audio-probe.ts';
 import { createDrivingInput } from './input.ts';
 import type { Quality } from './view.ts';
 function element<T extends HTMLElement>(id: string): T {
@@ -19,15 +21,22 @@ type ReleaseReport = { graphics: ReturnType<View['dispose']> | null; physics: Ph
 let cleanup: (() => ReleaseReport) | null = null;
 let lastRelease: ReleaseReport | null = null;
 let report: Record<string, unknown> = { status: 'loading' };
+const audioProbe = createAudioProbe(() => publish(report));
+const audioButton = element<HTMLButtonElement>('test-audio');
+audioButton.onclick = () => { void audioProbe.play(); };
 function publish(data: Record<string, unknown>) {
-  report = { ...data, runtime: '__TAURI_INTERNALS__' in window ? 'tauri' : 'browser', userAgent: navigator.userAgent };
+  report = { ...data, runtime: '__TAURI_INTERNALS__' in window ? 'tauri' : 'browser', userAgent: navigator.userAgent, buildId: __BUILD_ID__, heap: readHeap(), audio: audioProbe.report };
+  audioButton.disabled = audioProbe.report.activeContexts === 1 || audioProbe.report.status === 'unsupported';
+  const audioMessages: Record<string, string> = { untested: 'Áudio ainda não testado.', testing: 'Iniciando áudio…', scheduled: 'Reproduzindo tom…', completed: 'Tom enviado. Confirme se ouviu ao registrar o teste.', cancelled: 'Teste de áudio interrompido. Você pode repetir.', unsupported: 'Web Audio não está disponível neste ambiente.', error: 'Não foi possível tocar o tom. Consulte o relatório e tente novamente.' };
+  element('audio-status').textContent = audioMessages[String(audioProbe.report.status)] ?? '';
   output.textContent = JSON.stringify(report, null, 2);
   document.body.dataset.status = String(report.status);
 }
 function controls(active: boolean) { resetKart.disabled = !active || scene.value !== 'track'; driving.querySelectorAll('button').forEach(button => { button.disabled = !active || scene.value !== 'track'; }); camera.disabled = !active; pause.disabled = !active; step.disabled = true; release.disabled = !active; restart.disabled = false; }
-function stop() { generation++; if (cleanup) lastRelease = cleanup(); cleanup = null; controls(false); }
+function stop() { audioProbe.cancel(); generation++; if (cleanup) lastRelease = cleanup(); cleanup = null; controls(false); }
 async function boot() {
-  stop(); const token = generation;
+  stop(); const token = generation; const bootStarted = performance.now();
+  const frameSample = createFrameSample(); let sampleNextFrame = false;
   const sceneKind = scene.value === 'track' ? 'track' : 'drop';
   const profile: Quality = quality.value === 'low' ? 'low' : 'balanced';
   status.textContent = 'Carregando o motor…'; publish({ status: 'loading', quality: profile }); restart.disabled = true;
@@ -46,7 +55,7 @@ async function boot() {
     return releaseReport;
   };
   let previous = performance.now(), accumulator = 0, paused = false;
-  const visibility = () => { input?.clear(); previous = performance.now(); accumulator = 0; };
+  const visibility = () => { audioProbe.cancel(); sampleNextFrame = false; input?.clear(); previous = performance.now(); accumulator = 0; };
   cleanup = destroy;
   try {
     const { createView } = await import('./view.ts');
@@ -61,12 +70,15 @@ async function boot() {
     physics = await createPhysics(sceneKind);
     if (token !== generation) { physics.dispose(); return; }
     const world = physics, display = view;
+    const bootMs = Number((performance.now() - bootStarted).toFixed(2));
     let frames = 0, sampledFrames = 0, sampleTime = performance.now(), fps = 0;
     const update = () => publish({ status: paused ? 'paused' : 'running', quality: profile, ...display.info, wasm: true, rapierVersion: world.version,
-      physicsSteps: world.steps, renderFrames: frames, bodyY: Number(world.position.y.toFixed(4)), fps: Number(fps.toFixed(1)), memory: display.memory, memorySample: 'running', physicsResources: world.resources, previousRelease: lastRelease, physicsDt: PHYSICS_DT, position: world.pose, driving: { ...world.telemetry, input: input?.read() ?? null } });
+      bootMs, frameTiming: frameSample.report, physicsSteps: world.steps, renderFrames: frames, bodyY: Number(world.position.y.toFixed(4)), fps: Number(fps.toFixed(1)), memory: display.memory, memorySample: 'running', physicsResources: world.resources, previousRelease: lastRelease, physicsDt: PHYSICS_DT, position: world.pose, driving: { ...world.telemetry, input: input?.read() ?? null } });
     const draw = (elapsed = 0) => { display.render(world.pose, elapsed); frames++; speed.textContent = `${(world.telemetry.speed * 3.6).toFixed(0)} km/h`; };
     const animate = (now: number) => {
       if (destroyed) return;
+      if (sampleNextFrame && !paused && !document.hidden) frameSample.add(now - previous);
+      sampleNextFrame = !paused && !document.hidden;
       const elapsed = Math.min(Math.max((now - previous) / 1000, 0), 0.1); previous = now;
       if (!paused && !document.hidden) {
         accumulator += elapsed;
@@ -79,7 +91,7 @@ async function boot() {
       raf = requestAnimationFrame(animate);
     };
     document.addEventListener('visibilitychange', visibility);
-    pause.onclick = () => { paused = !paused; input?.clear(); accumulator = 0; previous = performance.now(); pause.textContent = paused ? 'Retomar' : 'Pausar'; step.disabled = !paused; status.textContent = paused ? 'Simulação pausada' : 'Renderização e física ativas'; update(); };
+    pause.onclick = () => { paused = !paused; sampleNextFrame = false; audioProbe.cancel(); input?.clear(); accumulator = 0; previous = performance.now(); pause.textContent = paused ? 'Retomar' : 'Pausar'; step.disabled = !paused; status.textContent = paused ? 'Simulação pausada' : 'Renderização e física ativas'; update(); };
     step.onclick = () => { if (!paused || destroyed) return; for (let i = 0; i < 120; i++) world.step(); draw(); update(); };
     camera.onchange = () => { display.setCameraMode(camera.value === 'overview' ? 'overview' : 'chase'); draw(); update(); };
     const reset = () => { input?.clear(); world.reset(); draw(); update(); };

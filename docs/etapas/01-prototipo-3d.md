@@ -121,3 +121,15 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 - SHA-256 do APK: `756aa77d9a43f8605e8e766bbec6590a3f58f3a54387e04c3c59beaafdc62f24`. Build e assinatura não comprovam inicialização offline, WebGL2 ou input no aparelho. Próxima ação: instalar no S20 FE e registrar roteiro físico.
 
 - Regressão final: `npm run check:web` aprovado (Chromium/WebGL2/WASM, input móvel, câmera, descarte/reinício, perda de contexto e fallbacks). Preview executado fora do sandbox por exigir porta local.
+
+### E01-T07 — Instrumentação e teste físico adiado — 2026-11-14
+
+- Usuário adiou os testes de aparelho e autorizou seguir. T06 permanece aberta; iniciada a parte independente de T07.
+- Relatório passa a incluir `buildId` (revisão/estado das fontes quando Git disponível e instante do build), `bootMs`, janela limitada de 600 intervalos de quadros (FPS médio, p50/p95/p99 e travadas >50 ms), estimativa opcional de heap JS e RAM total explicitamente não medida. Pausa/ocultação não contaminam os intervalos; cada boot reinicia a janela.
+- Botão de tom diagnóstico curto por gesto do usuário; resultado distingue API concluída de som ouvido. Contexto encerrado após o tom e cancelado ao pausar, ocultar, reiniciar ou liberar; fallback sem Web Audio preserva o jogo. Não implementa música/motor/efeitos de gameplay.
+- Roteiro de coleta ampliado na matriz: sessão por perfil, exportações periódicas, RAM total externa/PSS, versões reais de sistema/WebView e confirmação auditiva manual. Sem fechar critérios físicos ou medir desempenho de corrida completa.
+- Verificações: tipos e testes aprovados, incluindo janela limitada/intervalos longos, ausência de heap, cancelamento de resume de áudio pendente; smoke Chromium aprovado com diagnóstico, término do tom sem contexto ativo e fallback sem Web Audio. Som nos alto-falantes não validado.
+
+- Prioridade ajustada pelo usuário: focar no web; ports Android/desktop adiados. Pendências nativas não bloqueiam desenvolvimento da jogabilidade web da etapa 02, mas T06/T07 não são marcadas completas. Pacotes em `artifacts/native/` preservam a versão anterior aos novos diagnósticos.
+
+- Relatório web final copiado para `artifacts/web/kartube-webgl-report.json` (ignorado pelo Git): build identificado com revisão dirty/horário, heap estimado disponível em Chromium, áudio concluído sem contexto ativo e confirmação auditiva null. Janela curta do smoke, sem benchmark sustentado ou validação física.

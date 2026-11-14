@@ -24,6 +24,7 @@ try {
   const read = async () => JSON.parse(await page.locator('#report').textContent());
   const assertReleased = report => {
     assert.equal(report.resourcesReleased, true);
+    assert.equal(report.audio.activeContexts, 0);
     assert.equal(report.memorySample, 'after-release');
     assert.equal(report.release.graphics.canvasRemoved, true);
     assert.equal(report.release.graphics.contextLossRequested, true);
@@ -34,7 +35,18 @@ try {
   };
   const readyScene = async () => page.waitForFunction(() => document.body.dataset.status === 'running', { timeout: 30_000 });
   await page.goto('http://127.0.0.1:4173'); await readyScene();
+  await page.waitForFunction(() => JSON.parse(document.getElementById('report').textContent).frameTiming.samples >= 3);
+  await page.locator('#test-audio').click();
+  await page.waitForFunction(() => JSON.parse(document.getElementById('report').textContent).audio.status === 'completed');
   const track = await read();
+  assert.equal(track.runtime, 'browser');
+  assert.match(track.buildId, /@/);
+  assert.ok(track.bootMs >= 0);
+  assert.ok(track.frameTiming.averageFps > 0);
+  assert.ok(track.frameTiming.frameMsP99 >= track.frameTiming.frameMsP50);
+  assert.equal(track.heap.totalProcessRamBytes, null);
+  assert.equal(track.audio.activeContexts, 0);
+  assert.equal(track.audio.audibleConfirmed, null);
   assert.equal(track.camera.mode, 'chase'); assert.equal(track.shadow, 'contact');
   assert.equal(track.assets.live.geometries, 2);
   assert.equal(track.physicsResources.worlds, 1);
@@ -227,6 +239,13 @@ try {
   await wasmFallback.waitForFunction(() => document.body.dataset.status === 'error');
   assert.match(await wasmFallback.locator('#status').textContent(), /WebAssembly/);
   assert.equal(await wasmFallback.locator('canvas').count(), 0);
+  const noAudio = await browser.newPage();
+  await noAudio.addInitScript(() => { window.AudioContext = undefined; });
+  await noAudio.goto('http://127.0.0.1:4173');
+  await noAudio.waitForFunction(() => document.body.dataset.status === 'running');
+  assert.equal(JSON.parse(await noAudio.locator('#report').textContent()).audio.status, 'unsupported');
+  assert.equal(await noAudio.locator('#test-audio').isDisabled(), true);
+  await noAudio.close();
   const initializationFailure = await browser.newPage();
   await initializationFailure.addInitScript(() => {
     window.ResizeObserver = class { constructor() { throw new Error('injected_resize_failure'); } };

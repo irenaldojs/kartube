@@ -5,7 +5,7 @@
 | Etapa | Status | Evidência | Próximo critério |
 |---|---|---|---|
 | 00 — Fundamentos | Concluída | Sessões local/remota, codecs TS/Rust, pistas, WebSocket e prova WebGL2/WASM desktop e S20 FE | Critérios de fundamentos atendidos; validações futuras nos respectivos marcos |
-| 01 — Protótipo 3D | Em andamento | Kart dirigível e ciclo de assets/descarte verificado | E01-T06 em execução: builds desktop/Android e teste do WebView físico |
+| 01 — Protótipo 3D | Em andamento | Kart dirigível e ciclo de assets/descarte verificado | Foco web: diagnósticos T07 implementados; ports e provas físicas adiados |
 | 02 — Corrida local | Planejada | — | 3 voltas e resultado válidos |
 | 03 — Bots locais | Planejada | — | 8 pilotos terminam corrida |
 | 04 — Mecânicas | Planejada | — | Rampas, boosts, itens e atalho |
@@ -56,3 +56,7 @@ Execução encerrada a pedido do usuário para continuar depois. Consulte [CHECK
 ## Retomada — 2026-11-14
 
 Linux `.deb` gerado e smoke Tauri/WebKitGTK aprovado (WebGL2/WASM, pilotagem, pausa, descarte/reinício). Evidências locais em `artifacts/native/`. APK debug ARM64 gerado, identificador/arquitetura e assinatura v2 Android Debug conferidos; cópia em `artifacts/native/`. Sem medição de GPU física; Android físico e Windows continuam pendentes. E01-T06 permanece aberta.
+
+- 2026-11-14: teste físico adiado pelo usuário. Iniciada E01-T07 com tempos de quadro, heap opcional, identificação de build e teste de áudio por gesto. Tipos/testes e smoke Chromium aprovados; T06/T07 seguem abertas até evidências físicas e RAM/áudio por plataforma.
+
+- 2026-11-14: prioridade revisada pelo usuário: desenvolver primeiro o web; ports Android/desktop ficam para depois. Pendências nativas não bloqueiam o desenvolvimento web da etapa 02, sem marcar T06/T07 completas.

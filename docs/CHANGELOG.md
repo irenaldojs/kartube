@@ -2,6 +2,12 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-14 — E01-T07 — Diagnóstico por plataforma
+
+- Usuário priorizou a versão web e adiou ports Android/desktop e testes físicos; iniciada instrumentação independente de T07. Relatório com buildId, tempo de boot da cena, janela limitada de tempos de quadro/FPS/percentis/travadas e estimativa opcional de heap, sem confundir com RAM total.
+- Tom diagnóstico opt-in com fallback sem Web Audio e cancelamento/fechamento de contexto. Confirmação de áudio audível permanece manual; sem áudio de gameplay.
+- Tipos/testes e smoke Chromium aprovados, incluindo ausência de Web Audio, conclusão/cancelamento do teste e métricas. Matriz e checkpoint atualizados com roteiro de memória externa e coleta por plataforma; T06/T07 continuam abertas.
+
 ## 2026-11-14 — E01-T06 — Pacotes Linux/Android e prova Linux
 
 - Linux release `.deb` amd64 gerado; smoke real Tauri/WebKitGTK aprovado com WebGL2/WASM, pilotagem, pausa e descarte/reinício. Captura inspecionada; evidências locais em `artifacts/native/`.

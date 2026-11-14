@@ -1,6 +1,6 @@
 # Matriz de validação por plataforma
 
-Data-base: 2026-11-13. Esta matriz define a cobertura mínima de E00-T05; uma linha planejada não equivale a compatibilidade aprovada. O aceite abaixo cobre a cena técnica atual, sem estender resultados para uma corrida completa.
+Data-base: 2026-11-14. Esta matriz define a cobertura mínima de E00-T05; uma linha planejada não equivale a compatibilidade aprovada. O aceite abaixo cobre a cena técnica atual, sem estender resultados para uma corrida completa.
 
 ## Ambientes e evidências
 
@@ -12,8 +12,8 @@ Data-base: 2026-11-13. Esta matriz define a cobertura mínima de E00-T05; uma li
 | Chrome / Android de entrada | Aparelho a selecionar | Mesmo roteiro, perfil leve, carregamento e sessão prolongada | Planejado | Dispositivo e execução |
 | Firefox / desktop | PC a selecionar | Cena, WASM, redimensionamento e roteiro manual | Planejado | Dispositivo e execução |
 | Tauri Windows / WebView2 | PC a selecionar | Mesmo build web, carregamento WASM, foco, áudio, controles e descarte | Planejado | Empacotamento e execução na etapa 01 |
-| Tauri Linux / WebKitGTK | PC a selecionar | Mesmo build web, GPU, WASM, foco, áudio e controles | Planejado | Empacotamento e execução |
-| Tauri Android / WebView | S20 FE como primeiro candidato | Mesmo build, WASM, toque, pausa/retomada, áudio e recursos | Planejado | APK/build e teste físico; Chrome não valida WebView |
+| Tauri Linux / WebKitGTK | Contêiner Linux / Xvfb | Cliente embutido, WebGL2/WASM, pilotagem, pausa, descarte/reinício | Smoke aprovado; pacote .deb gerado | GPU física, RAM total, áudio audível e sessão prolongada |
+| Tauri Android / WebView | S20 FE como primeiro candidato | Mesmo build, WASM, toque, pausa/retomada, áudio e recursos | APK debug ARM64 gerado e assinatura conferida | Teste físico adiado pelo usuário; Chrome não valida WebView |
 
 A identificação do S20 FE foi fornecida pelo usuário. O user agent reduzido informa Android 10; a versão real do sistema não foi confirmada. Os resultados manuais foram relatados pelo usuário nesta sessão, sem observação remota do agente e sem commit/build identificado.
 
@@ -48,3 +48,24 @@ Perda forçada de contexto e ausência de WebGL2/WASM são cobertas no smoke des
 - **Etapas de qualidade:** medir corrida com oito pilotos, efeitos e UI, memória total, temperatura, tempo de carregamento, FPS sustentado e travadas. A cena mínima atual não comprova essas metas.
 
 Antes de aprovar uma plataforma para distribuição, todos os testes aplicáveis ao produto implementado devem passar no ambiente correspondente; falhas e exclusões precisam de registro explícito. A partir da E01-T05, relatórios disposed usam memorySample after-release e mostram contadores do renderer após descarte; relatórios antigos continham a última amostra ativa. O campo release detalha recursos registrados e mundo físico liberados. Isso não comprova RAM total, memória do driver ou redução do heap WASM compartilhado.
+
+## E01-T07 — Diagnóstico e coleta
+
+Teste físico adiado pelo usuário em 2026-11-14. E01-T06 permanece aberta; avançamos na instrumentação de T07 sem aprovar aparelho ou desempenho sustentado.
+
+O JSON exportado inclui:
+
+- `buildId`: revisão Git (com `dirty` se houver fontes alteradas) e horário UTC do build; revisão `unknown` se Git estiver ausente ou indisponível. `bootMs`: tempo de inicialização da cena, da chamada de boot até o motor pronto; não inclui toda navegação/download inicial.
+- `frameTiming`: janela de até 600 intervalos RAF visíveis e não pausados, com FPS médio da janela, tempos p50/p95/p99 e quadros acima de 50 ms. Usa intervalos reais, antes do limite aplicado à física. Não inclui intervalos que cruzam pausa/ocultação. Reiniciar/trocar cena/perfil inicia nova janela. Não equivale a benchmark da corrida ou 1% low.
+- `heap`: estimativa `performance.memory` quando disponível (API não padronizada); `null` onde não suportada. `totalProcessRamBytes` permanece `null`: heap JS e contadores do renderer não medem RAM total do processo/GPU.
+- `audio`: teste opt-in com tom curto a 440 Hz, estado, sample rate e latência base informada pela API. `completed` indica que a API terminou o tom; `audibleConfirmed: null` exige confirmação humana. Não representa áudio de gameplay. Pausa, ocultação, reinício/descarte cancelam o teste e solicitam fechamento do contexto.
+
+Roteiro complementar por perfil/plataforma:
+
+1. Registrar versão real do sistema e navegador/WebView, dispositivo, buildId e se está usando GPU física ou renderização de teste.
+2. Aguardar carregamento e aquecimento, pilotar por pelo menos 60 s e exportar JSON antes de pausar. A janela contém apenas os últimos 600 intervalos; para tendência prolongada, exportar em vários pontos (por exemplo 1, 3 e 5 minutos).
+3. Registrar RAM total externamente, com ferramenta, unidade e instante. No Android, usar `adb shell dumpsys meminfo io.kartube.game.debug` e guardar saída completa, incluindo TOTAL PSS; coletar após aquecimento e após ciclos de liberar/reiniciar. PSS não se compara diretamente a heap JS. No desktop, registrar a árvore de processos do aplicativo/WebView e o método de medição.
+4. Pressionar **Testar áudio · tom curto**, anotar se ouviu, e repetir após alternar de aplicativo/aba. Verificar cancelamento ao pausar/ocultar/liberar e repetição após retomar. O smoke automatizado não confirma som nos alto-falantes.
+5. Registrar erros e exclusões explicitamente. Não preencher versões reais de Android/WebView pelo user agent reduzido. T07 só fecha com resultados por plataforma, ou bloqueios documentados.
+
+Referências das APIs: [performance.memory](https://developer.mozilla.org/en-US/docs/Web/API/Performance/memory) e [Web Audio e gesto do usuário](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Best_practices).

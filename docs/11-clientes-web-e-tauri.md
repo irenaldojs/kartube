@@ -4,6 +4,10 @@
 
 **O jogo existe uma única vez em TS.** `apps/web` produz arquivos estáticos e assets; `apps/native` referencia o mesmo build dentro de Tauri 2. Não reimplementar corrida, renderização ou HUD no wrapper nativo.
 
+## Prioridade atual — 2026-11-14
+
+Por decisão do usuário, desenvolver e validar primeiro a versão web. Novos builds, ajustes e testes dos ports Android/desktop ficam adiados. Preservar o wrapper e os pacotes existentes; provas físicas nativas pendentes não bloqueiam desenvolvimento da jogabilidade web. Não marcar compatibilidade nativa aprovada por essa mudança de ordem.
+
 ## Navegador
 
 - Servir HTML/JS/CSS/assets por HTTPS com cache por versão e manifestos.
