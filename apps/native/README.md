@@ -4,9 +4,28 @@ Wrapper Tauri 2 para Windows, Linux e Android. O jogo continua em `apps/web`: `f
 
 Execute os comandos abaixo na raiz do repositório.
 
+<<<<<<< HEAD
 **Validação local (2026-11-14):** `.deb` Linux gerado e smoke Tauri/WebKitGTK aprovado; APK debug ARM64 gerado e assinatura/identificador conferidos. Cópias locais em `artifacts/native/` na raiz. Teste físico no S20 FE e build Windows continuam pendentes; E01-T06 aberta. Retomada em [CHECKPOINT.md](../../CHECKPOINT.md).
+=======
+**Checkpoint (2026-11-14):** `.deb` Linux x64 gerado e smoke aprovado no executável extraído do pacote, com WebKitGTK 2.52.6. Pacote e evidências locais em `artifacts/`. Android adiado a pedido do usuário; Windows/CI e Tauri Android físico ainda não validados. Retomada em [CHECKPOINT.md](../../CHECKPOINT.md).
+>>>>>>> 9165671 (test(native): validate Linux package and reuse installed Chrome)
 
 ## Desktop
+
+Antes de instalar ou baixar ferramentas, confira as disponíveis localmente:
+
+```sh
+node --version
+npm --version
+npm ls --depth=0 --offline
+RUSTUP_TOOLCHAIN=stable rustup toolchain list
+rustup run stable rustc --version
+# Linux
+pkg-config --modversion gtk+-3.0 webkit2gtk-4.1 librsvg-2.0 ayatana-appindicator3-0.1
+command -v tauri-driver WebKitWebDriver xvfb-run
+```
+
+`rust-toolchain.toml` fixa a versão de referência do projeto; executar Cargo sem essa versão instalada pode iniciar um download automático. Para uma prova local com uma toolchain existente que atenda aos requisitos do Cargo e das dependências, selecione-a explicitamente com `RUSTUP_TOOLCHAIN=stable` e registre a versão utilizada. O mínimo declarado pelo wrapper está em `src-tauri/Cargo.toml`. Instale somente os componentes ausentes após essa checagem.
 
 Instale os [pré-requisitos Tauri](https://v2.tauri.app/start/prerequisites/) para seu sistema, Node conforme `.nvmrc` e Rust conforme `rust-toolchain.toml`. Windows requer ferramentas C++/WebView2; Linux requer WebKitGTK 4.1 e bibliotecas nativas.
 
@@ -27,9 +46,11 @@ npm run build:desktop -- --bundles nsis
 
 Saídas: `src-tauri/target/release/bundle/deb/*.deb` ou `src-tauri/target/release/bundle/nsis/*.exe`, dentro de `apps/native`. A CI `native.yml` compila cada instalador no sistema correspondente. A existência do workflow não significa que uma execução remota ou um playtest Windows já ocorreu. Assinatura de distribuição não está configurada.
 
+A prova Linux de 2026-11-14 usou a toolchain já instalada, Rust 1.97.0, selecionada com `RUSTUP_TOOLCHAIN=stable`; Ubuntu 26.04.1 x64 e WebKitGTK 2.52.6. O pacote foi extraído e testado sem instalação no sistema. O smoke com Xvfb/renderização por software não mede GPU física, RAM total ou áudio.
+
 ## Android
 
-Instale SDK/NDK e JDK 21 conforme os [pré-requisitos oficiais](https://v2.tauri.app/start/prerequisites/#android). Configure `JAVA_HOME`, `ANDROID_HOME` e `NDK_HOME` no seu sistema; o NDK usado nesta prova é `29.0.14206865`. O projeto Gradle versionado usa plataforma Android 36; o ambiente desta prova contém build tools 36 e 37 e mantém compatibilidade mínima declarada API 24; isso não substitui testes de aparelhos.
+Android está adiado nesta retomada. Quando for retomado, confira SDK/NDK e JDK existentes antes de instalar componentes conforme os [pré-requisitos oficiais](https://v2.tauri.app/start/prerequisites/#android). Configure `JAVA_HOME`, `ANDROID_HOME` e `NDK_HOME` no seu sistema; a prova de 2026-11-13 usou NDK `29.0.14206865`, JDK 21 e build tools 36 e 37 em outro ambiente. O projeto Gradle versionado usa plataforma Android 36 e compatibilidade mínima declarada API 24; isso não substitui testes de aparelhos.
 
 ```sh
 sdkmanager 'platform-tools' 'platforms;android-36' 'build-tools;36.0.0' 'build-tools;37.0.0' 'ndk;29.0.14206865'

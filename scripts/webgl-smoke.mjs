@@ -18,7 +18,12 @@ try {
     await delay(100);
   }
   assert.equal((await fetch('http://127.0.0.1:4173')).status, 200);
-  browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+  const installedChrome = process.env.KARTUBE_CHROME_EXECUTABLE;
+  browser = await chromium.launch({
+    ...(installedChrome ? { executablePath: installedChrome } : {}),
+    args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
+  });
+  console.log(`Web smoke browser: ${await browser.version()} (${installedChrome ? 'installed Chrome' : 'Playwright Chromium'})`);
   const page = await browser.newPage({ viewport: { width: 1280, height: 1000 }, hasTouch: true });
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   const read = async () => JSON.parse(await page.locator('#report').textContent());
@@ -206,7 +211,7 @@ try {
   })));
   assert.ok(colors > 8, `Expected scene pixels while paused, got ${colors} colors`);
   await page.screenshot({ path: '/tmp/kartube-webgl.png', fullPage: true });
-  await writeFile('/tmp/kartube-webgl-report.json', JSON.stringify({ ...report, validation: { browser: 'Chromium headless', graphics: 'SwiftShader (software)', realAndroid: false, collisionRestHeightPassed: true } }, null, 2) + '\n');
+  await writeFile('/tmp/kartube-webgl-report.json', JSON.stringify({ ...report, validation: { browser: installedChrome ? 'Installed Chrome headless' : 'Playwright Chromium headless', browserVersion: await browser.version(), graphics: 'SwiftShader (software)', realAndroid: false, collisionRestHeightPassed: true } }, null, 2) + '\n');
   const download = page.waitForEvent('download'); await page.getByRole('button', { name: 'Exportar relatório JSON' }).click();
   assert.equal((await download).suggestedFilename(), 'kartube-prova-3d.json');
   for (let i = 0; i < 4; i++) {

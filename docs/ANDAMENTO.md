@@ -1,12 +1,21 @@
 # Andamento do desenvolvimento
 
+<<<<<<< HEAD
 > **Data-base:** 2026-11-14. Fundamentos concluídos; protótipo 3D em andamento, ainda sem corrida jogável.
+=======
+> **Data-base:** 2026-11-14. Fundamentos concluídos; protótipo 3D em andamento, ainda sem corrida jogável. Pacote Linux e smoke nativo aprovados; Android adiado pelo usuário.
+>>>>>>> 9165671 (test(native): validate Linux package and reuse installed Chrome)
 
 | Etapa | Status | Evidência | Próximo critério |
 |---|---|---|---|
 | 00 — Fundamentos | Concluída | Sessões local/remota, codecs TS/Rust, pistas, WebSocket e prova WebGL2/WASM desktop e S20 FE | Critérios de fundamentos atendidos; validações futuras nos respectivos marcos |
+<<<<<<< HEAD
 | 01 — Protótipo 3D | Em andamento | Kart dirigível e ciclo de assets/descarte verificado | Foco web: diagnósticos T07 implementados; ports e provas físicas adiados |
 | 02 — Corrida local | Em andamento (web) | E02-T01/T02/T03: controle, corrida e recuperação segura | E02-T04: posições por progresso |
+=======
+| 01 — Protótipo 3D | Em andamento | Kart dirigível, descarte e pacote Linux com smoke WebKitGTK aprovados | E01-T06 parcial: Windows pendente, Android adiado; E01-T07 aberta |
+| 02 — Corrida local | Planejada | — | 3 voltas e resultado válidos |
+>>>>>>> 9165671 (test(native): validate Linux package and reuse installed Chrome)
 | 03 — Bots locais | Planejada | — | 8 pilotos terminam corrida |
 | 04 — Mecânicas | Planejada | — | Rampas, boosts, itens e atalho |
 | 05 — Servidor Rust | Planejada | — | Lobby/sala e conexões |
@@ -23,9 +32,12 @@
 
 ## Bloqueios atuais
 
-Rust/Cargo instalados e prova local WebSocket implementada. Prova básica WebGL2/WASM aprovada pelo usuário no S20 FE (Adreno 650), incluindo pausa, passos manuais e liberação/reinício. Matriz completa e Tauri permanecem pendentes. Riscos conhecidos estão em [Backlog e riscos](15-backlog-e-riscos.md).
+Rust/Cargo instalados e prova local WebSocket implementada. Prova básica WebGL2/WASM aprovada pelo usuário no S20 FE (Adreno 650), incluindo pausa, passos manuais e liberação/reinício. Tauri Linux validado em WebKitGTK/Xvfb por software; Windows, GPU física e matriz completa permanecem pendentes. Tauri Android foi adiado pelo usuário. Riscos conhecidos estão em [Backlog e riscos](15-backlog-e-riscos.md).
 
 ## Histórico de marcos
+
+- 2026-11-14: E01-T06 avançou com `.deb` Linux x64 e smoke do executável extraído aprovados no Ubuntu 26.04.1/WebKitGTK 2.52.6: runtime Tauri, WebGL2/WASM, pilotagem, pausa e descarte/reinício. Rust 1.97.0 e Chrome 154 existentes reaproveitados após auditoria local. Android adiado; T06 integral e T07 seguem abertas.
+- 2026-11-14: tipos/testes e smoke web aprovados no Chrome instalado 154.0.8037.57/SwiftShader, sem baixar outro navegador. Relatórios, capturas e logs salvos em `artifacts/`.
 
 - 2026-11-13: plano inicial de documentação criado; **somente planejamento**.
 

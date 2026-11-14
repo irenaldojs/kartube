@@ -6,7 +6,7 @@ Jogo de corrida de karts 3D cartoon em desenvolvimento. Plano completo: [Geral.m
 
 ## Estado
 
-Etapa 00 concluída; etapa 01 em andamento, com boot 3D e seleção de qualidade gráfica. Há provas locais de WebSocket com Rust e de renderização WebGL2 com física WASM. Há um protótipo dirigível e um wrapper Tauri para desktop/Android usando o mesmo build web. Corrida com regras e salas online ainda não foram implementadas.
+Etapa 00 concluída; etapa 01 em andamento, com boot 3D e seleção de qualidade gráfica. Há provas locais de WebSocket com Rust e de renderização WebGL2 com física WASM. O protótipo dirigível tem pacote Linux `.deb` e smoke Tauri/WebKitGTK aprovados, usando o mesmo build web. Android está adiado a pedido do usuário; Windows ainda requer build e validação. Corrida com regras e salas online ainda não foram implementadas.
 
 ## Desenvolvimento
 
@@ -27,7 +27,7 @@ npm run check
 - `docs`: plano, decisões e evidências de desenvolvimento.
 - `assets`: estrutura reservada, sem conteúdo final.
 
-Leia [índice](docs/INDICE.md), [andamento](docs/ANDAMENTO.md) e [etapa ativa](docs/etapas/01-prototipo-3d.md) antes de alterar o projeto. Prova básica WebGL2/WASM aprovada pelo usuário no S20 FE (Adreno 650). Pista cinza fechada implementada (E01-T02). Câmera em terceira pessoa e sombra de contato implementadas (E01-T03). Pilotagem básica com teclado/toque e colisões implementada (E01-T04). Ciclo de assets e descarte verificado (E01-T05). Próximo passo: build Tauri Android (E01-T06). Escopo e regras iniciais aprovados; ampliar a matriz real de aparelhos permanece no plano. Pistas e checksum já têm fixtures compartilhadas TS/Rust. O spike local Rust/WebSocket passou em Chromium. Os ADRs permanecem propostos até suas provas de aceitação.
+Leia [índice](docs/INDICE.md), [andamento](docs/ANDAMENTO.md) e [etapa ativa](docs/etapas/01-prototipo-3d.md) antes de alterar o projeto. Prova básica WebGL2/WASM aprovada pelo usuário no S20 FE (Adreno 650). Pista cinza fechada implementada (E01-T02). Câmera em terceira pessoa e sombra de contato implementadas (E01-T03). Pilotagem básica com teclado/toque e colisões implementada (E01-T04). Ciclo de assets e descarte verificado (E01-T05). E01-T06: pacote Linux e smoke nativo aprovados; Android adiado e Windows pendente. Escopo e regras iniciais aprovados; ampliar a matriz real de aparelhos permanece no plano. Pistas e checksum já têm fixtures compartilhadas TS/Rust. O spike local Rust/WebSocket passou em Chromium. Os ADRs permanecem propostos até suas provas de aceitação.
 
 ## Prova WebSocket (Etapa 00)
 
@@ -66,6 +66,12 @@ Abra a URL indicada pelo Vite. O seletor de cena abre a pista cinza com câmera 
 ```sh
 npx playwright install --with-deps chromium
 npm run check:web
+```
+
+Para usar o Chrome já instalado, informe o caminho do executável. O teste usa um perfil temporário e registra a versão do navegador no relatório:
+
+```sh
+KARTUBE_CHROME_EXECUTABLE=/caminho/do/chrome npm run check:web
 ```
 
 O teste gera o build e verifica renderização, colisão, pausa, descarte/reinício, perda de contexto, layout móvel e mensagens para ausência de WebGL2/WASM. Salva captura e relatório em `/tmp/kartube-webgl.png` e `/tmp/kartube-webgl-report.json`. Chromium headless usa SwiftShader: esses resultados não medem desempenho de GPU física nem comprovam compatibilidade Android/Tauri. Para Android real, execute o servidor em uma rede acessível ao aparelho, abra a cena e exporte o relatório; a prova básica já foi aprovada pelo usuário no S20 FE; a matriz completa e o aceite de Tauri continuam pendentes.

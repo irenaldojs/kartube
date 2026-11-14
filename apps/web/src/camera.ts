@@ -27,7 +27,7 @@ export const CAMERA_TUNING = {
   stretchDamping: 0.5,    // 0.3 = quica bastante | 1 = sem repique
 
   // --- Rotação elástica (yaw) ---
-  yawStiffness: 55,       // menor = câmera fica mais atrás na curva
+  yawStiffness: 80,       // menor = câmera fica mais atrás na curva
   driftYawStiffness: 22,  // no drift fica ainda mais frouxa
   yawDamping: 0.85,
   turnSwingGain: 0.1,     // rad extra por (rad/s) de giro: exagera a rotação do kart

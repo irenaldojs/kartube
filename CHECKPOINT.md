@@ -1,5 +1,6 @@
 # Checkpoint para retomar o Kartube
 
+<<<<<<< HEAD
 **Data:** 2026-11-14 (America/Sao_Paulo). **Foco ativo: versão web; E02-T01/T02/T03 concluídas, próxima E02-T04 — posições por progresso. Android e desktop nativo adiados pelo usuário.**
 
 ## Estado atual
@@ -98,3 +99,80 @@ Câmera revisada após relato de trepidação: `render-pose.ts` interpola kart e
 Usuário aprovou a base interpolada e pediu câmera arcade: implementados órbita elástica, antecipação, FOV 45°→50,6° normal/56° turbo (teto 58° com voo/impacto), banking até ~2,4°, braço/altura de salto e pulso pequeno em batida real. Movimento reduzido por checkbox/pref. do sistema desliga esses efeitos. Base de translação interpolada foi preservada para não voltar a trepidar. Ver docs/17-fisica-arcade.md.
 
 Parâmetros locais de camera.ts preservados: resposta orbital 10/6, velocidade de referência 15 m/s, braço/altura/antecipação ajustados. Sinais de posição/alvo corrigidos para a convenção do jogo (-Z à frente), mantendo a câmera de perseguição atrás do kart.
+=======
+**Data:** 2026-11-14 (America/Sao_Paulo). **Etapa ativa: 01; E01-T06 em andamento.** Build e smoke Linux concluídos; Android adiado a pedido do usuário. A versão web permanece disponível.
+
+## Direção atual
+
+- E00 e E01-T01 a T05 concluídas; não refazer essas tarefas.
+- O usuário quer navegador e aplicativos desktop Windows/Linux. O módulo Android fica de lado por enquanto; não iniciar builds, SDKs ou regeneração Android.
+- Antes de baixar ferramentas, conferir executáveis, versões e caches existentes. O Rust já instalado atende ao build Linux; o Chrome instalado serve ao smoke web.
+- E01-T06 integral continua aberta: Linux validado no escopo abaixo; Windows e Tauri Android físico permanecem sem aprovação.
+
+## Linux entregue nesta retomada
+
+- `RUSTUP_TOOLCHAIN=stable CARGO_BUILD_JOBS=2 npm run build:desktop -- --bundles deb --ci`: aprovado. Rust **1.97.0** já instalado, release otimizado, primeiro build em **31m16s**.
+- Pacote: `artifacts/Kartube_0.1.0_amd64.deb`, **3.653.992 bytes**. Cópia original em `apps/native/src-tauri/target/release/bundle/deb/`.
+- SHA-256: `79247889d73f29ba80cb186c6d18210903c54715fda752becb33623d15e10c0b`.
+- Metadados Debian: pacote `kartube`, versão `0.1.0`, arquitetura `amd64`; dependências `libwebkit2gtk-4.1-0` e `libgtk-3-0`. Executável ELF x86-64; nenhuma biblioteca ausente no `ldd` local.
+- Pacote extraído em `artifacts/linux/`, sem instalação no sistema. O smoke executou **esse binário extraído**, não apenas o binário de target.
+- Smoke nativo aprovado: `runtime: tauri`, WebGL2/WASM, pista, estabilização física, pilotagem, pausa, liberação com contadores zerados e reinício com um canvas.
+- Captura inspecionada: pista, kart, câmera e controles renderizam corretamente. Evidências em `artifacts/kartube-native.png` e `artifacts/kartube-native-report.json`.
+- Ambiente: Ubuntu **26.04.1 x64**, WebKitGTK **2.52.6**, Xvfb e renderização por software. Isso não mede GPU física, RAM total, áudio ou desempenho sustentado.
+
+## Dependências e comandos locais
+
+- Node **24.22.1** já fornecido pelo runtime do Codex. npm **11.21.2** preparado em `/tmp/kartube-node-tools`; dependências do package-lock instaladas com `npm ci`.
+- Rust `stable` **1.97.0** existente, Cargo **1.97.0**. O wrapper declara mínimo 1.90. A referência `rust-toolchain.toml` continua em 1.100.0; selecionar `RUSTUP_TOOLCHAIN=stable` nesta máquina para não disparar outro download.
+- Uma tentativa de instalar a toolchain fixada foi interrompida após o usuário pedir auditoria local. Não considerar a entrada parcial 1.100.0 uma instalação validada.
+- Bibliotecas GTK/WebKitGTK/librsvg/AppIndicator já presentes. `tauri-driver` **2.1.0** compilado em `/tmp/kartube-system-tools/tauri/bin`; WebKitWebDriver/Xvfb extraídos de pacotes Ubuntu em `/tmp/kartube-system-tools/root/usr/bin`. Nenhum pacote foi instalado por sudo.
+- Google Chrome **154.0.8037.57** já instalado via Flatpak. Executável testado com Playwright: `/var/lib/flatpak/app/com.google.Chrome/current/active/files/extra/chrome`.
+- `scripts/webgl-smoke.mjs` aceita `KARTUBE_CHROME_EXECUTABLE` e registra versão/origem do navegador. O download de outro Chromium foi interrompido e dispensado.
+- `/tmp` e os artefatos ignorados pelo Git podem desaparecer; verificar antes de reinstalar. O guia nativo agora inclui a checagem local antes dos downloads.
+
+PATH utilizado nesta máquina:
+
+```sh
+export PATH="/tmp/kartube-node-tools/node_modules/.bin:/home/irenaldo/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:/tmp/kartube-system-tools/tauri/bin:/tmp/kartube-system-tools/root/usr/bin:$PATH"
+export RUSTUP_TOOLCHAIN=stable
+```
+
+Smoke do pacote Linux:
+
+```sh
+GDK_BACKEND=x11 LIBGL_ALWAYS_SOFTWARE=1 WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1 xvfb-run -a npm run check:native -- artifacts/linux/usr/bin/kartube-native
+```
+
+A variável de sandbox é exclusiva desta execução de teste e não faz parte do aplicativo distribuído.
+
+## Verificações
+
+- `npm run check`: tipos e arquivos de testes aprovados, sem falhas.
+- Smoke nativo: aprovado, captura inspecionada.
+- `KARTUBE_CHROME_EXECUTABLE=/var/lib/flatpak/app/com.google.Chrome/current/active/files/extra/chrome npm run check:web`: aprovado no Chrome 154.0.8037.57/SwiftShader. Inclui controles, colisão, pausa, descarte/reinício, perda de contexto, layout móvel e fallbacks. Evidências copiadas para `artifacts/kartube-webgl-report.json`, `artifacts/kartube-webgl.png` e `artifacts/kartube-driving-mobile.png`.
+- Logs auxiliares: `/tmp/kartube-desktop-build.log`, `/tmp/kartube-native-smoke.log`, `/tmp/kartube-web-smoke.log`.
+
+## Próximas ações
+
+1. Aguardar o teste manual do usuário com o `.deb` disponibilizado em `artifacts/`; o smoke não instalou o pacote no sistema.
+2. Manter Android adiado. Windows exige build em Windows ou execução autorizada do workflow; não declarar instalador Windows gerado apenas pela CI configurada.
+3. E01-T07 permanece aberta para FPS/RAM/áudio e problemas por plataforma. Não transformar contadores de recursos ou FPS amostrado em aprovação de memória/desempenho sustentado.
+
+## Histórico relevante de 2026-11-13
+
+- Commits de base: `1fadf59` fundamentos; `c9c7cc5` pista; `5dbd272` câmera; `a84337f` pilotagem; `85ed663` multitouch; `9f7513c` assets/Freio / Ré; `fa87823` wrapper nativo e checkpoint.
+- Rust Android ARM64 compilou na sessão anterior, mas Gradle e build Linux foram interrompidos antes dos pacotes. Não houve APK final nem teste físico Tauri no S20 FE.
+- Os caminhos de SDK/JDK da sessão anterior pertenciam a outro ambiente. Não presumir que existem nesta máquina e não executar `android:init`: o projeto Android já está versionado.
+- A prova anterior no S20 FE foi no Chrome; não valida Tauri Android. Só concluir esse critério quando o usuário retomar Android e houver prova física documentada.
+
+## Referências
+
+- [Guia nativo](apps/native/README.md)
+- [Etapa 01](docs/etapas/01-prototipo-3d.md)
+- [Andamento](docs/ANDAMENTO.md)
+- [Matriz e roteiro](docs/matriz-plataformas.md)
+- [Estratégia web/desktop/Android](docs/11-clientes-web-e-tauri.md)
+- [Changelog](docs/CHANGELOG.md)
+
+Corrida com checkpoints/voltas/resultados ainda não implementada. Boosts e caixas são visuais. Áudio, gamepad e GLB final seguem nos respectivos marcos.
+>>>>>>> 9165671 (test(native): validate Linux package and reuse installed Chrome)

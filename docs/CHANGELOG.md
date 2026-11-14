@@ -2,6 +2,7 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+<<<<<<< HEAD
 ## 2026-11-14 — Câmera arcade com conforto opcional
 
 - Elasticidade na órbita, look-ahead de curva, FOV por velocidade/turbo, banking leve e enquadramento de salto, preservando a base interpolada e a distância estável na reta.
@@ -63,6 +64,14 @@ Registro cronológico; distinguir proposta de implementação.
 - APK debug ARM64 gerado e copiado para `artifacts/native/Kartube_0.1.0_arm64_debug.apk`. Identificador `io.kartube.game.debug`, versão 0.1.0, arquitetura arm64-v8a e assinatura v2 Android Debug conferidos por aapt/apksigner.
 - `npm run check` e `npm run check:web` aprovados. Smoke WebDriver, preview web e integração Tauri/Gradle precisaram de portas locais fora do sandbox. Não houve mudança no gameplay.
 - Checkpoint e guia atualizados. E01-T06 segue aberta até teste físico documentado no S20 FE; Windows/CI remoto e E01-T07 permanecem pendentes. FPS/GPU do contêiner não são medição física.
+=======
+## 2026-11-14 — E01-T06 — Pacote Linux e WebView real
+
+- `.deb` Linux x64 gerado com Rust 1.97.0 existente, após checagem local das dependências. Pacote inspecionado e binário extraído aprovado no smoke Tauri/WebKitGTK 2.52.6: WebGL2/WASM, pilotagem, pausa, descarte e reinício. Captura inspecionada; artefatos locais em `artifacts/`.
+- Guia documenta auditoria antes de instalar ferramentas. Smoke web aceita `KARTUBE_CHROME_EXECUTABLE` e registra versão/origem do navegador, permitindo reutilizar o Google Chrome instalado sem baixar outro Chromium.
+- Tipos/testes e `npm run check:web` aprovados com Chrome 154.0.8037.57 existente, em SwiftShader; capturas inspecionadas. Relatórios e logs preservados em `artifacts/`.
+- Android adiado a pedido do usuário. E01-T06 integral permanece aberta; Windows, Android físico e medições E01-T07 ainda não aprovados. A prova Linux usa Xvfb/renderização por software.
+>>>>>>> 9165671 (test(native): validate Linux package and reuse installed Chrome)
 
 ## 2026-11-13 — Checkpoint de retomada dos builds nativos
 

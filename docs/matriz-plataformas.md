@@ -7,13 +7,19 @@ Data-base: 2026-11-14. Esta matriz define a cobertura mínima de E00-T05; uma li
 | Ambiente | Dispositivo / renderizador | Escopo executado | Resultado | Pendência |
 |---|---|---|---|---|
 | Chromium headless / Linux | SwiftShader, renderização por software | Build, cena/pixels, colisão, pausa/120 passos, liberação/reinício, perda de contexto, viewport móvel, fallback sem WebGL2/WASM | Aprovado em execução local automatizada | Não representa GPU física ou Android |
+| Chrome 154.0.8037.57 / Ubuntu 26.04.1 x64 | Chrome existente via Flatpak, headless/SwiftShader | `npm run check:web`: render/pixels, colisão, pilotagem/teclado/toque, pausa, descarte/reinício, perda de contexto, layout móvel e fallbacks | Aprovado em 2026-11-14; capturas inspecionadas | Não representa GPU física ou Android |
 | Chrome 157 / Windows | PC do usuário, Microsoft Basic Render Driver | Relatórios de execução WebGL2/WASM e colisão; 32 FPS amostrados, perfil equilibrado, pixelRatio 1 | Execução básica confirmada por relatório | Modelo do PC, GPU acelerada e demais testes manuais |
 | Chrome 157 / Android físico | Samsung Galaxy S20 FE, Adreno 650 | Execução, colisão, pausa, 120 passos, retomada, liberação/reinício | Prova básica aprovada pelo usuário; 60.4 FPS amostrados, perfil equilibrado, pixelRatio 1.5 | Versão real do Android, build/commit e perda forçada de contexto |
 | Chrome / Android de entrada | Aparelho a selecionar | Mesmo roteiro, perfil leve, carregamento e sessão prolongada | Planejado | Dispositivo e execução |
 | Firefox / desktop | PC a selecionar | Cena, WASM, redimensionamento e roteiro manual | Planejado | Dispositivo e execução |
 | Tauri Windows / WebView2 | PC a selecionar | Mesmo build web, carregamento WASM, foco, áudio, controles e descarte | Planejado | Empacotamento e execução na etapa 01 |
+<<<<<<< HEAD
 | Tauri Linux / WebKitGTK | Contêiner Linux / Xvfb | Cliente embutido, WebGL2/WASM, pilotagem, pausa, descarte/reinício | Smoke aprovado; pacote .deb gerado | GPU física, RAM total, áudio audível e sessão prolongada |
 | Tauri Android / WebView | S20 FE como primeiro candidato | Mesmo build, WASM, toque, pausa/retomada, áudio e recursos | APK debug ARM64 gerado e assinatura conferida | Teste físico adiado pelo usuário; Chrome não valida WebView |
+=======
+| Tauri Linux / WebKitGTK 2.52.6 | Ubuntu 26.04.1 x64, Xvfb/renderização por software | `.deb` inspecionado; binário extraído com runtime Tauri, WebGL2/WASM, pilotagem, pausa, liberação/reinício e captura inspecionada | Aprovado no smoke automatizado em 2026-11-14 | Instalação/playtest manual, GPU física, RAM total e áudio |
+| Tauri Android / WebView | S20 FE como primeiro candidato | Mesmo build, WASM, toque, pausa/retomada, áudio e recursos | Adiado pelo usuário em 2026-11-14 | APK/build e teste físico; Chrome não valida WebView |
+>>>>>>> 9165671 (test(native): validate Linux package and reuse installed Chrome)
 
 A identificação do S20 FE foi fornecida pelo usuário. O user agent reduzido informa Android 10; a versão real do sistema não foi confirmada. Os resultados manuais foram relatados pelo usuário nesta sessão, sem observação remota do agente e sem commit/build identificado.
 

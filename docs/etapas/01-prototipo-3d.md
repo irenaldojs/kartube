@@ -109,6 +109,7 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 - Smoke nativo, build Windows/CI e teste Tauri no S20 FE não executados. E01-T06/T07 continuam abertas.
 - Comandos, caminhos de SDK e próximos passos em [CHECKPOINT.md](../../CHECKPOINT.md). Não reiniciar etapas concluídas nem regenerar o projeto Android sem necessidade.
 
+<<<<<<< HEAD
 ### Retomada E01-T06 — Linux validado — 2026-11-14
 
 - Build Linux release concluído: `Kartube_0.1.0_amd64.deb` (3.687.248 bytes), pacote `kartube` 0.1.0, arquitetura amd64, dependências WebKitGTK 4.1/GTK 3 verificadas com `dpkg-deb --info`.
@@ -133,3 +134,16 @@ Validar Three.js, Rapier, câmera e pipeline básico de render em uma pista cinz
 - Prioridade ajustada pelo usuário: focar no web; ports Android/desktop adiados. Pendências nativas não bloqueiam desenvolvimento da jogabilidade web da etapa 02, mas T06/T07 não são marcadas completas. Pacotes em `artifacts/native/` preservam a versão anterior aos novos diagnósticos.
 
 - Relatório web final copiado para `artifacts/web/kartube-webgl-report.json` (ignorado pelo Git): build identificado com revisão dirty/horário, heap estimado disponível em Chromium, áudio concluído sem contexto ativo e confirmação auditiva null. Janela curta do smoke, sem benchmark sustentado ou validação física.
+=======
+### E01-T06 — Build e prova Linux — 2026-11-14
+
+- Android adiado a pedido do usuário. Foco desta retomada: navegador e desktop Linux; não há nova prova Android ou Windows.
+- Dependências locais auditadas. Rust 1.97.0 existente atende ao build e foi selecionado com `RUSTUP_TOOLCHAIN=stable`; a referência do projeto permanece em 1.100.0. Node 24.22.1 e bibliotecas GTK/WebKitGTK já presentes. Google Chrome 154.0.8037.57 via Flatpak localizado e inicialização Playwright comprovada.
+- `npm run check` aprovado. `RUSTUP_TOOLCHAIN=stable CARGO_BUILD_JOBS=2 npm run build:desktop -- --bundles deb --ci` gerou release otimizado em 31m16s e `Kartube_0.1.0_amd64.deb`, com 3.653.992 bytes.
+- Pacote Debian inspecionado: arquitetura amd64, executável ELF x86-64 e bibliotecas locais resolvidas. SHA-256: `79247889d73f29ba80cb186c6d18210903c54715fda752becb33623d15e10c0b`.
+- Smoke nativo executou o binário extraído do próprio pacote, sem instalação no sistema. Aprovados runtime Tauri, WebGL2/WASM, estabilização física, pilotagem, pausa, descarte com contadores zerados e reinício com um canvas. Captura inspecionada, com kart/pista/câmera/controles renderizados.
+- Ambiente: Ubuntu 26.04.1 x64, WebKitGTK 2.52.6, Xvfb e renderização por software. Evidências locais em `artifacts/kartube-native.png` e `artifacts/kartube-native-report.json`; pacote em `artifacts/` (ignorado pelo Git).
+- Smoke web aceita `KARTUBE_CHROME_EXECUTABLE` para reaproveitar o navegador instalado. Guia passou a conferir dependências antes de downloads.
+- `npm run check:web` aprovado com Google Chrome 154.0.8037.57 instalado, em headless/SwiftShader: renderização/pixels, colisão, controles, pausa, descarte/reinício, perda de contexto, layout móvel e fallbacks. Relatório registra versão/origem; capturas inspecionadas. Evidências preservadas em `artifacts/kartube-webgl-report.json`, `artifacts/kartube-webgl.png` e `artifacts/kartube-driving-mobile.png`.
+- T06 integral permanece aberta pelos destinos ainda não validados. GPU física, FPS sustentado, RAM total e áudio não foram aprovados nesta prova; E01-T07 permanece aberta.
+>>>>>>> 9165671 (test(native): validate Linux package and reuse installed Chrome)
