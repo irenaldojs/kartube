@@ -3,7 +3,7 @@ import { RACE_GATES } from './race-track.ts';
 import { createKartModel, loadKartSource } from './kart-model.ts';
 import { SceneAssets } from './assets.ts';
 import { createCameraRig, type CameraMode, type KartPose } from './camera.ts';
-import { TRACK_PARTS, TRACK_SUMMARY, TRACK_CENTERLINE, type SceneKind } from './track.ts';
+import { TRACK_PARTS, TRACK_SUMMARY, buildRoadSurface, type SceneKind } from './track.ts';
 export type Quality = 'low' | 'balanced';
 export function createView(host: HTMLElement, quality: Quality, onContextLost: () => void, sceneKind: SceneKind = 'drop', cameraMode: CameraMode = 'chase') {
   const canvas = document.createElement('canvas');
@@ -45,18 +45,10 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
     const gateMarkers = new Map<string, THREE.Mesh>();
     if (sceneKind === 'track') {
       const colors = { road: 0x707b80, rail: 0xb8c1c5, ramp: 0x9b8970, boost: 0x66d8bf, item: 0xd5a651, start: 0xf1f3e9, ground: 0x36474b, warning: 0xecb970 };
-      const vertices: number[] = [];
-      const edges = TRACK_CENTERLINE.map(([x, z], index, points) => {
-        const previous = points[(index + points.length - 1) % points.length]!, next = points[(index + 1) % points.length]!;
-        const dx = next[0] - previous[0], dz = next[1] - previous[1], length = Math.hypot(dx, dz);
-        return [[x + dz / length * 4, 0.01, z - dx / length * 4], [x - dz / length * 4, 0.01, z + dx / length * 4]];
-      });
-      edges.forEach((edge, index) => {
-        const next = edges[(index + 1) % edges.length]!;
-        for (const point of [edge[0]!, edge[1]!, next[0]!, edge[1]!, next[1]!, next[0]!]) vertices.push(...point);
-      });
+      const surface = buildRoadSurface();
       const roadGeometry = assets.geometry(new THREE.BufferGeometry());
-      roadGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3)); roadGeometry.computeVertexNormals();
+      roadGeometry.setAttribute('position', new THREE.BufferAttribute(surface.vertices, 3));
+      roadGeometry.setIndex(new THREE.BufferAttribute(surface.indices, 1)); roadGeometry.computeVertexNormals();
       const roadMaterial = box(1, 1, 1, colors.road).material;
       // Double-sided top ribbon avoids coplanar seams between the physical road slabs.
       roadMaterial.side = THREE.DoubleSide;
@@ -118,7 +110,7 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
       setCameraMode(mode: CameraMode) { cameraRig.setMode(mode); },
       render(position: KartPose, elapsed = 0) {
         if (disposed) return;
-        kart.position.copy(position); kart.rotation.y = position.yaw ?? 0;
+        kart.position.copy(position); kart.rotation.y = (position.yaw ?? 0) + (position.visualYawOffset ?? 0); kart.rotation.z = position.visualRoll ?? 0;
         // Surface transforms must be current before raycasting, including the first frame.
         scene.updateMatrixWorld(true);
         ray.ray.origin.set(position.x, position.y + 0.1, position.z);

@@ -68,3 +68,5 @@ Linux `.deb` gerado e smoke Tauri/WebKitGTK aprovado (WebGL2/WASM, pilotagem, pa
 - 2026-11-14: E02-T03 implementada: recuperação manual/queda/stuck com apoio e espaço verificados por Rapier, direção correta e progresso/tempo/rota preservados. Três voltas com queda e recuperação na alternativa aprovadas por inputs. Próxima E02-T04.
 
 - 2026-11-14: pista ampliada para ~223 m, curvas de raio 10 m e abertura externa amarela para queda real. Gates/âncoras/rotas ajustados, três voltas e queda por inputs aprovadas. Próxima E02-T04 permanece.
+
+- 2026-11-14: física revisada conforme especificação fake arcade do usuário: yaw direto, drift visual desacoplado, teto rígido e mini-turbo de um estágio, atrito físico removido dos pisos, apoio por três sondas e repulsão em barreiras. Referência vigente em `17-fisica-arcade.md`; sensação final depende de playtest.

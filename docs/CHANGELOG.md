@@ -2,6 +2,13 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-14 — Física fake para foco em diversão
+
+- Especificação do usuário aplicada: direção direta, aceleração/tetos rígidos, drift visual separado do movimento e mini-turbo de um estágio. Removida perda de velocidade causada pela mistura/projeção de vetores.
+- Velocidade linear comandada separada das variações do solver e clamp no teto; piso principal com colisão contínua para evitar trepidação nas emendas.
+- Atrito físico dos pisos desativado; três sondas mantêm apoio nas rampas, gravidade de pista reforçada e repulsão controlada em barreiras. Inclinação visual não altera colisor.
+- Pesquisa e parâmetros próprios documentados em docs/17-fisica-arcade.md; não é reprodução da implementação interna Nintendo. Playtest de sensação continua necessário; oito pilotos/itens ainda pendentes.
+
 ## 2026-11-14 — Pista maior com curvas e área de queda
 
 - Circuito de aproximadamente 223 m com curvas de raio 10 m; superfície contínua e barreiras em lote. Checkpoints, respawn e visão geral ajustados; duas rampas e alternativa preservadas.

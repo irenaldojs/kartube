@@ -66,3 +66,7 @@ Testes automatizados de circuito cobrem subida, trechos aéreos e duas aterrissa
 R/Reposicionar recuperam no ponto do último gate válido, com direção correta, sem reiniciar voltas/relógio/rota. As âncoras ficam 1,8 m atrás do plano aceito; recrossá-lo não concede outra passagem. Rapier verifica chão (vias/rampas), altura e espaço para o kart antes da troca. Velocidade/drift/entradas são zerados e a câmera reenquadra imediatamente. Fallback usa o spawn caso a âncora deixe de ser segura.
 
 `recovery.ts` concentra limites do protótipo: queda y<-3 m ou fora de ±36 m; stuck após 3 s de simulação tentando acelerar/ré sem progresso de 0,5 m. Freio, repouso sem intenção e voo não disparam stuck. Pausar/ocultar suspende os ticks do detector. Telemetria distingue resets brutos, recuperações aprovadas, motivo e ponto seguro. Recuperação aprovada é comunicada à regra pura da corrida para rebasear a posição sem contar um segmento de teleporte.
+
+## Revisão arcade por solicitação do usuário — 2026-11-14
+
+A especificação vigente passa a ser [Física arcade](17-fisica-arcade.md): yaw direto, movimento sem slip físico, drift visual com lado fixo, mini-turbo de um estágio, teto rígido, três sondas de apoio e repulsão curta em barreiras. Substitui os ajustes de grip/inércia dos registros anteriores. Parâmetros próprios do Kartube, inspirados em comportamento público de Mario Kart e na tabela do usuário; sem afirmar reprodução de código Nintendo.

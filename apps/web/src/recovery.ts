@@ -1,7 +1,7 @@
 import type { DrivingInput } from './driving.ts';
 export type RecoveryReason = 'manual' | 'fall' | 'stuck';
 export type RecoveryPoint = { x: number; y: number; z: number; yaw: number };
-export const RECOVERY_TUNING = { fallHeight: -3, mapLimit: 48, stuckSeconds: 3, progressRadius: 0.5 };
+export const RECOVERY_TUNING = { fallHeight: -3, mapLimit: 48, stuckSeconds: 3, progressRadius: 1 };
 export function createRecoveryDetector(dt: number) {
   let anchor: { x: number; z: number } | null = null, ticks = 0;
   return {

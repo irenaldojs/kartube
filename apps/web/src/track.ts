@@ -66,3 +66,16 @@ export const TRACK_SUMMARY = {
   ramps: 2, boosts: 3, itemBoxes: 3, alternativeRoutes: 1,
   gameplayTriggers: false,
 };
+
+// One welded surface shared by rendering and contact: no overlapping coplanar slab edges.
+export function buildRoadSurface() {
+  const vertices: number[] = [], indices: number[] = [];
+  TRACK_CENTERLINE.forEach(([x, z], index, points) => {
+    const previous = points[(index + points.length - 1) % points.length]!, next = points[(index + 1) % points.length]!;
+    const dx = next[0] - previous[0], dz = next[1] - previous[1], length = Math.hypot(dx, dz);
+    vertices.push(x + dz / length * 4, 0, z - dx / length * 4, x - dz / length * 4, 0, z + dx / length * 4);
+    const a = index * 2, b = ((index + 1) % points.length) * 2;
+    indices.push(a, a + 1, b, a + 1, b + 1, b);
+  });
+  return { vertices: new Float32Array(vertices), indices: new Uint32Array(indices) };
+}

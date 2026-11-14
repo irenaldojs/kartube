@@ -110,3 +110,28 @@ test('drift uses the same Rapier body and is cancelled by brake and reset', asyn
     assert.equal(kart.resources.bodies, 1);
   } finally { kart.dispose(); }
 });
+
+test('a barrier produces a bounded arcade push without rotating the kart', async () => {
+  const kart = await createPhysics('track');
+  try {
+    kart.reset({ x: -32.7, y: 0.4, z: 10 }, Math.PI / 2);
+    for (let i = 0; i < 60; i++) kart.step(forward);
+    assert.ok(kart.telemetry.bumps > 0);
+    assert.ok(Math.abs(kart.telemetry.yaw - Math.PI / 2) < 1e-6);
+    assert.ok(kart.position.x > -34.2);
+    assert.ok(kart.telemetry.speed <= 12);
+  } finally { kart.dispose(); }
+});
+
+test('top speed remains physically steady across the welded road surface', async () => {
+  const kart = await createPhysics('track');
+  try {
+    kart.reset({ x: -2, y: 0.4, z: -30 }, -Math.PI / 2);
+    for (let i = 0; i < 120; i++) kart.step();
+    for (let i = 0; i < 62; i++) kart.step(forward);
+    const heights: number[] = [], speeds: number[] = [];
+    for (let i = 0; i < 50; i++) { kart.step(forward); heights.push(kart.position.y); speeds.push(kart.telemetry.speed); assert.equal(kart.telemetry.commandedSpeed, 12); }
+    assert.ok(Math.max(...speeds) - Math.min(...speeds) < 0.01, JSON.stringify(speeds));
+    assert.ok(Math.max(...heights) - Math.min(...heights) < 0.003);
+  } finally { kart.dispose(); }
+});

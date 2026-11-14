@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import type { SceneKind } from './track.ts';
 
 export type CameraMode = 'chase' | 'overview';
-export type KartPose = { x: number; y: number; z: number; yaw?: number };
+export type KartPose = { x: number; y: number; z: number; yaw?: number; visualYawOffset?: number; visualRoll?: number };
 
 export function createCameraRig(camera: THREE.PerspectiveCamera, scene: SceneKind, initialMode: CameraMode) {
   let mode = initialMode, initialized = false;

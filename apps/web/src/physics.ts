@@ -1,5 +1,5 @@
-import { TRACK_PARTS, TRACK_SPAWN, type SceneKind } from './track.ts';
-import { controlKart, NEUTRAL_INPUT, type DrivingInput } from './driving.ts';
+import { TRACK_PARTS, TRACK_SPAWN, buildRoadSurface, type SceneKind } from './track.ts';
+import { controlKart, createDrivingState, NEUTRAL_INPUT, type DrivingInput } from './driving.ts';
 import { createRecoveryDetector, RECOVERY_TUNING, type RecoveryPoint, type RecoveryReason } from './recovery.ts';
 import RAPIER from '@dimforge/rapier3d-compat';
 let initialization: Promise<void> | undefined;
@@ -7,16 +7,19 @@ export const PHYSICS_DT = 1 / 60;
 export async function createPhysics(sceneKind: SceneKind = 'drop') {
   initialization ??= RAPIER.init().catch((error: unknown) => { initialization = undefined; throw error; });
   await initialization;
-  const world = new RAPIER.World({ x: 0, y: -9.81, z: 0 });
+  const world = new RAPIER.World({ x: 0, y: sceneKind === 'track' ? -30 : -9.81, z: 0 });
   try {
     world.timestep = PHYSICS_DT;
-    const supports = new Set<number>();
+    const supports = new Set<number>(), barriers = new Set<number>();
     if (sceneKind === 'track') {
-      for (const part of TRACK_PARTS) if (part.solid) {
+      const surface = buildRoadSurface();
+      supports.add(world.createCollider(RAPIER.ColliderDesc.trimesh(surface.vertices, surface.indices).setFriction(0)).handle);
+      for (const part of TRACK_PARTS) if (part.solid && !(part.kind === 'road' && part.rotationY !== undefined)) {
         const angle = (part.rotationZ ?? 0) / 2, yawAngle = (part.rotationY ?? 0) / 2;
         const collider = world.createCollider(RAPIER.ColliderDesc.cuboid(part.size[0] / 2, part.size[1] / 2, part.size[2] / 2)
-          .setTranslation(...part.position).setRotation({ x: 0, y: Math.sin(yawAngle), z: Math.sin(angle), w: Math.cos(angle) * Math.cos(yawAngle) }));
+          .setFriction(0).setTranslation(...part.position).setRotation({ x: 0, y: Math.sin(yawAngle), z: Math.sin(angle), w: Math.cos(angle) * Math.cos(yawAngle) }));
         if (part.kind === 'road' || part.kind === 'ramp') supports.add(collider.handle);
+        if (part.kind === 'rail') barriers.add(collider.handle);
       }
     } else supports.add(world.createCollider(RAPIER.ColliderDesc.cuboid(10, 0.25, 7).setTranslation(0, -0.25, 0)).handle);
     const spawn = sceneKind === 'track' ? TRACK_SPAWN : { x: 0, y: 3, z: 0 };
@@ -26,6 +29,8 @@ export async function createPhysics(sceneKind: SceneKind = 'drop') {
     world.createCollider(RAPIER.ColliderDesc.roundCuboid(0.85, 0.30, 1.35, 0.05).setRestitution(0).setFriction(0), body);
     let disposed = false;
     let steps = 0, yaw = 0, grounded = false, resets = 0, drifting = false, airControl = false;
+    let drivingState = createDrivingState();
+    let bumpTicks = 0, bumps = 0, bumpVelocity = { x: 0, z: 0 };
     const detector = createRecoveryDetector(PHYSICS_DT);
     const fallback: RecoveryPoint = { ...spawn, y: 0.4, yaw: 0 };
     let recoveryPoint = { ...fallback }, recoveries = 0, lastRecoveryReason: RecoveryReason | null = null;
@@ -48,7 +53,7 @@ export async function createPhysics(sceneKind: SceneKind = 'drop') {
     const reset = (position = spawn, heading = 0) => {
       if (disposed) return;
       body.setTranslation(position, true); body.setLinvel({ x: 0, y: 0, z: 0 }, true);
-      body.setRotation({ x: 0, y: Math.sin(heading / 2), z: 0, w: Math.cos(heading / 2) }, true); yaw = heading; grounded = false; drifting = false; airControl = false; resets++; detector.clear();
+      body.setRotation({ x: 0, y: Math.sin(heading / 2), z: 0, w: Math.cos(heading / 2) }, true); yaw = heading; grounded = false; drifting = false; airControl = false; resets++; bumpTicks = 0; drivingState = createDrivingState(); detector.clear();
     };
     const recover = (reason: RecoveryReason = 'manual') => {
       const point = safePoint(recoveryPoint) ?? safePoint(fallback);
@@ -60,11 +65,26 @@ export async function createPhysics(sceneKind: SceneKind = 'drop') {
       if (sceneKind === 'track') {
         const position = body.translation();
         if (position.y < RECOVERY_TUNING.fallHeight || Math.abs(position.x) > RECOVERY_TUNING.mapLimit || Math.abs(position.z) > RECOVERY_TUNING.mapLimit) { recover('fall'); input = NEUTRAL_INPUT; }
-        const hit = world.castRay(new RAPIER.Ray(body.translation(), { x: 0, y: -1, z: 0 }), 0.55, true, undefined, undefined, undefined, body);
-        grounded = hit !== null;
-        const controlled = controlKart(body.linvel(), yaw, grounded, input, PHYSICS_DT);
+        // Three footprint probes keep ramp contact without treating distant floor/rail tops as support.
+        const center = body.translation();
+        grounded = [-1, 0, 1].some(offset => world.castRay(new RAPIER.Ray({ x: center.x - Math.sin(yaw) * offset,
+          y: center.y, z: center.z - Math.cos(yaw) * offset }, { x: 0, y: -1, z: 0 }), 0.46, true,
+          undefined, undefined, undefined, body, collider => supports.has(collider.handle)) !== null);
+        const controlled = controlKart(body.linvel(), yaw, grounded, input, PHYSICS_DT, drivingState);
+        drivingState = controlled.state;
         yaw = controlled.yaw; drifting = controlled.drifting; airControl = controlled.airControl;
         body.setRotation({ x: 0, y: Math.sin(yaw / 2), z: 0, w: Math.cos(yaw / 2) }, true);
+        if (grounded && controlled.velocity.y <= 0) controlled.velocity.y = -2;
+        const horizontalSpeed = Math.hypot(controlled.velocity.x, controlled.velocity.z);
+        if (bumpTicks === 0 && horizontalSpeed > 0.01 && (Math.abs(input.throttle) > 0.2 || horizontalSpeed > 0.5)) {
+          const direction = { x: controlled.velocity.x / horizontalSpeed, y: 0, z: controlled.velocity.z / horizontalSpeed };
+          const hit = world.castRayAndGetNormal(new RAPIER.Ray(body.translation(), direction), 1.55, true, undefined, undefined, undefined, body, collider => barriers.has(collider.handle));
+          if (hit && Math.abs(hit.normal.y) < 0.2) {
+            bumpVelocity = { x: hit.normal.x * 2, z: hit.normal.z * 2 }; bumpTicks = 10; bumps++;
+            drivingState = createDrivingState(); drifting = false;
+          }
+        }
+        if (bumpTicks > 0) { drivingState.speed = 0; controlled.velocity.x = bumpVelocity.x; controlled.velocity.z = bumpVelocity.z; bumpTicks--; }
         body.setLinvel(controlled.velocity, true);
       }
       world.step(); steps++;
@@ -76,8 +96,8 @@ export async function createPhysics(sceneKind: SceneKind = 'drop') {
       get steps() { return steps; },
       get resources() { return { worlds: disposed ? 0 : 1, bodies: disposed ? 0 : world.bodies.len(), colliders: disposed ? 0 : world.colliders.len() }; },
       get position() { return body.translation(); },
-      get pose() { return { ...body.translation(), yaw }; },
-      get telemetry() { const velocity = body.linvel(); return { grounded, drifting, airControl, yaw, speed: Math.hypot(velocity.x, velocity.z), resets, recoveries, lastRecoveryReason, stuckSeconds: detector.stuckSeconds, recoveryPoint: { ...recoveryPoint } }; },
+      get pose() { return { ...body.translation(), yaw, visualYawOffset: drivingState.visualYawOffset, visualRoll: -drivingState.steering * (drifting ? 0.08 : 0.04) * Math.min(Math.hypot(body.linvel().x, body.linvel().z) / 4, 1) }; },
+      get telemetry() { const velocity = body.linvel(); return { grounded, drifting, airControl, bumps, commandedSpeed: drivingState.speed ?? 0, driftDirection: drivingState.driftDirection, driftCharge: drivingState.driftCharge, boostRemaining: drivingState.boostRemaining, yaw, speed: Math.hypot(velocity.x, velocity.z), resets, recoveries, lastRecoveryReason, stuckSeconds: detector.stuckSeconds, recoveryPoint: { ...recoveryPoint } }; },
       dispose() { if (!disposed) { disposed = true; world.free(); } },
     };
   } catch (error) { world.free(); throw error; }

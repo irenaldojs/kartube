@@ -47,6 +47,10 @@ A pedido do usuário, circuito substituído por `greybox-v2-rounded`: linha cent
 
 Superfície visual contínua, colisores segmentados sobrepostos e barreiras renderizadas em lote. Abertura externa da reta esquerda entre z=-10 e z=-4 (centro x=-34, z=-7), indicada por marcas amarelas, permite sair e cair; o terreno visual não tem colisor. Para testar: após a largada/entrada das rotas, virar à esquerda nessa abertura. Limite externo de recuperação ampliado para ±48 m. Teste com inputs reais atravessa a abertura e confirma queda e retorno; corrida de três voltas pelas duas rotas e todas as âncoras continuam validadas em Rapier. Playtest humano permanece pendente.
 
+## Física vigente
+
+Usuário definiu física fake arcade. Ver `docs/17-fisica-arcade.md`: yaw direto, teto rígido 12 m/s, drift visual com lado fixo e contraesterço, mini-turbo (1 s de carga, 0,65 s a até 15 m/s), três sondas de solo, gravidade -30 m/s² na pista e repulsão curta em guardrails. Aceleração linear com estado escalar separado da velocidade medida e clamp em 12 m/s; colisão do piso principal agora usa superfície contínua compartilhada com o render, evitando emendas entre placas. Piso sem atrito físico; modelo inclina/gira apenas visualmente. Solicitar feedback de dirigibilidade no playtest sem marcar sensação como aprovada por testes. Próxima tarefa estrutural continua E02-T04 web.
+
 ## Quando retomar os ports
 
 Entregar/instalar o APK no S20 FE e seguir [matriz e roteiro manual](docs/matriz-plataformas.md): inicialização offline, WebGL2/WASM, pilotagem, acelerar primeiro e depois virar com outro dedo, soltura independente, Freio / Ré, câmera, pausa/retomada, troca de app e descarte/reinício. Registrar relatório com `runtime: tauri`, versão real do Android e Android System WebView. Não inferir versões pelo user agent reduzido.
@@ -82,3 +86,5 @@ Caminhos de JDK/SDK específicos deste ambiente. Smoke WebDriver, preview web e 
 Corrida singleplayer com checkpoints/voltas já implementada; playtest humano de três voltas, posições, bots e resultados de oito pilotos ainda pendentes. Boosts e caixas são visuais. Áudio, gamepad, pipeline GLB final e assinatura de distribuição permanecem em seus marcos.
 
 Validação do circuito curvo: tipos/testes aprovados, smokes web de produção e desenvolvimento aprovados; captura geral inspecionada em `artifacts/web/kartube-track-rounded.png`. O teste de bloqueio automático permanece em cenário físico controlado de parede reta; acelerar reto até a barreira curva não garante ficar preso.
+
+Validação da revisão arcade/velocidade: tipos, testes e smokes web de produção/desenvolvimento aprovados. Teto comandado estável por 600 ticks com amostras ruidosas; reta física com variação <0,01 m/s e vertical <3 mm no teste. Sensação de gameplay aguarda feedback do usuário.

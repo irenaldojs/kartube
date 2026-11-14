@@ -77,3 +77,7 @@ Transformar movimentação em corrida válida, com progressão, HUD e resultados
 - Esta tarefa substitui a política provisória da T02 que reiniciava a prova ao reposicionar/cair. Respawn multi-kart e ocupação dinâmica serão ampliados com os oito pilotos. Próxima E02-T04: posições por progresso no trajeto.
 
 - Validação final: `npm run check`, `npm run check:web` e `npm run check:web:dev` aprovados. Smoke verifica respawn manual sem reiniciar fase/progresso, recuperação mantendo pausa, destravamento real por aceleração contra guardrail e limpeza de inputs. Captura de recuperação inspecionada e copiada para `artifacts/web/kartube-recovery.png`. Nenhum build nativo nesta entrega.
+
+### Revisão de dirigibilidade solicitada pelo usuário — 2026-11-14
+
+A especificação [Física arcade](../17-fisica-arcade.md) substitui o modelo de grip/slip inicial da T01. Movimento e yaw diretos, drift visual com lado fixo e contraesterço, mini-turbo de um estágio, pisos sem atrito físico, gravidade arcade e repulsão curta em barreiras. Recuperação tolera o vai-e-volta da batida (raio de progresso de 1 m). Não é reprodução do código interno de Mario Kart; parâmetros próprios e referência pública de comportamento. Itens e interação entre oito karts continuam pendentes; playtest de sensação necessário. Próxima tarefa estrutural permanece E02-T04 web.

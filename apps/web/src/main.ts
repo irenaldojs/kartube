@@ -113,7 +113,7 @@ async function boot() {
     };
     const update = () => { raceVisuals(); if (!paused) status.textContent = race?.phase === 'countdown' ? 'Preparando a largada' : race?.phase === 'racing' ? 'Corrida em andamento' : race?.phase === 'finished' ? 'Corrida concluída' : 'Renderização e física ativas'; publish({ status: paused ? 'paused' : 'running', quality: profile, ...display.info, wasm: true, rapierVersion: world.version,
       race: race?.snapshot ?? null, bootMs, frameTiming: frameSample.report, physicsSteps: world.steps, renderFrames: frames, bodyY: Number(world.position.y.toFixed(4)), fps: Number(fps.toFixed(1)), memory: display.memory, memorySample: 'running', physicsResources: world.resources, previousRelease: lastRelease, physicsDt: PHYSICS_DT, position: world.pose, driving: { ...world.telemetry, input: input?.read() ?? null } }); };
-    const draw = (elapsed = 0) => { raceVisuals(); display.render(world.pose, elapsed); frames++; speed.textContent = `${(world.telemetry.speed * 3.6).toFixed(0)} km/h${world.telemetry.drifting ? ' · DRIFT' : sceneKind === 'track' && !world.telemetry.grounded ? ' · NO AR' : ''}`; };
+    const draw = (elapsed = 0) => { raceVisuals(); display.render(world.pose, elapsed); frames++; speed.textContent = `${(world.telemetry.speed * 3.6).toFixed(0)} km/h${world.telemetry.boostRemaining > 0 ? ' · TURBO' : world.telemetry.drifting ? world.telemetry.driftCharge >= 1 ? ' · TURBO PRONTO' : ' · DRIFT' : sceneKind === 'track' && !world.telemetry.grounded ? ' · NO AR' : ''}`; };
     const animate = (now: number) => {
       if (destroyed) return;
       if (sampleNextFrame && !paused && !document.hidden) frameSample.add(now - previous);
