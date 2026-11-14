@@ -2,6 +2,11 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-14 — Correção de boot sem metadados de build
+
+- Corrigido `ReferenceError: __BUILD_ID__ is not defined`: relatório usa `import.meta.env.VITE_BUILD_ID` com fallback `development-unversioned`, preservando a inicialização quando a configuração de metadados não foi carregada.
+- Adicionado `npm run check:web:dev`: smoke Chromium abre o servidor de desenvolvimento com a configuração normal e com uma configuração sem metadados, verificando boot WebGL2/WASM e ausência de erros JavaScript.
+
 ## 2026-11-14 — E01-T07 — Diagnóstico por plataforma
 
 - Usuário priorizou a versão web e adiou ports Android/desktop e testes físicos; iniciada instrumentação independente de T07. Relatório com buildId, tempo de boot da cena, janela limitada de tempos de quadro/FPS/percentis/travadas e estimativa opcional de heap, sem confundir com RAM total.

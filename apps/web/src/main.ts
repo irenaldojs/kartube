@@ -25,7 +25,7 @@ const audioProbe = createAudioProbe(() => publish(report));
 const audioButton = element<HTMLButtonElement>('test-audio');
 audioButton.onclick = () => { void audioProbe.play(); };
 function publish(data: Record<string, unknown>) {
-  report = { ...data, runtime: '__TAURI_INTERNALS__' in window ? 'tauri' : 'browser', userAgent: navigator.userAgent, buildId: __BUILD_ID__, heap: readHeap(), audio: audioProbe.report };
+  report = { ...data, runtime: '__TAURI_INTERNALS__' in window ? 'tauri' : 'browser', userAgent: navigator.userAgent, buildId: import.meta.env.VITE_BUILD_ID ?? 'development-unversioned', heap: readHeap(), audio: audioProbe.report };
   audioButton.disabled = audioProbe.report.activeContexts === 1 || audioProbe.report.status === 'unsupported';
   const audioMessages: Record<string, string> = { untested: 'Áudio ainda não testado.', testing: 'Iniciando áudio…', scheduled: 'Reproduzindo tom…', completed: 'Tom enviado. Confirme se ouviu ao registrar o teste.', cancelled: 'Teste de áudio interrompido. Você pode repetir.', unsupported: 'Web Audio não está disponível neste ambiente.', error: 'Não foi possível tocar o tom. Consulte o relatório e tente novamente.' };
   element('audio-status').textContent = audioMessages[String(audioProbe.report.status)] ?? '';

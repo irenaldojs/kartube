@@ -9,4 +9,4 @@ try {
   const changes = execFileSync('git', ['status', '--porcelain', '--', 'apps/web', 'packages', 'package-lock.json'], gitOptions).trim();
   if (changes) revision += '-dirty';
 } catch { /* Source archives may not contain .git. */ }
-export default defineConfig({ define: { __BUILD_ID__: JSON.stringify(`${revision}@${new Date().toISOString()}`) } });
+export default defineConfig({ define: { 'import.meta.env.VITE_BUILD_ID': JSON.stringify(`${revision}@${new Date().toISOString()}`) } });

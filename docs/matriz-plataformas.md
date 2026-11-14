@@ -55,7 +55,7 @@ Teste físico adiado pelo usuário em 2026-11-14. E01-T06 permanece aberta; avan
 
 O JSON exportado inclui:
 
-- `buildId`: revisão Git (com `dirty` se houver fontes alteradas) e horário UTC do build; revisão `unknown` se Git estiver ausente ou indisponível. `bootMs`: tempo de inicialização da cena, da chamada de boot até o motor pronto; não inclui toda navegação/download inicial.
+- `buildId`: revisão Git (com `dirty` se houver fontes alteradas) e horário UTC do build; revisão `unknown` se Git estiver ausente ou indisponível. Sem configuração de metadados, usa `development-unversioned` e mantém o jogo funcional. `bootMs`: tempo de inicialização da cena, da chamada de boot até o motor pronto; não inclui toda navegação/download inicial.
 - `frameTiming`: janela de até 600 intervalos RAF visíveis e não pausados, com FPS médio da janela, tempos p50/p95/p99 e quadros acima de 50 ms. Usa intervalos reais, antes do limite aplicado à física. Não inclui intervalos que cruzam pausa/ocultação. Reiniciar/trocar cena/perfil inicia nova janela. Não equivale a benchmark da corrida ou 1% low.
 - `heap`: estimativa `performance.memory` quando disponível (API não padronizada); `null` onde não suportada. `totalProcessRamBytes` permanece `null`: heap JS e contadores do renderer não medem RAM total do processo/GPU.
 - `audio`: teste opt-in com tom curto a 440 Hz, estado, sample rate e latência base informada pela API. `completed` indica que a API terminou o tom; `audibleConfirmed: null` exige confirmação humana. Não representa áudio de gameplay. Pausa, ocultação, reinício/descarte cancelam o teste e solicitam fechamento do contexto.

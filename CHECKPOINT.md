@@ -36,6 +36,8 @@ Usuário pediu em 2026-11-14 foco primeiro na versão web e deixou os ports Andr
 
 Implementados no web: identificação de build, tempo de boot da cena, janela de até 600 intervalos RAF visíveis/não pausados com FPS e percentis, estimativa opcional de heap JS (RAM total null) e tom diagnóstico por gesto com cancelamento/cleanup e fallback sem Web Audio. Ver roteiro atualizado na matriz. Smoke final em Chromium aprovado; relatório local em `artifacts/web/kartube-webgl-report.json`. A amostra curta desse smoke valida instrumentação, não desempenho sustentado. Esses diagnósticos novos ainda não estão nas cópias de APK/.deb em `artifacts/native/`, que preservam os pacotes anteriores.
 
+Correção posterior: metadados de build usam `import.meta.env.VITE_BUILD_ID` com fallback `development-unversioned`, evitando ReferenceError em servidor sem a configuração. `npm run check:web:dev` verifica boot com e sem metadados.
+
 Próximo desenvolvimento: jogabilidade web da etapa 02, começando pelo controlador arcade (E02-T01); aproveitar aceleração/freio/ré já existentes, acrescentar drift e controle aéreo conforme o roteiro. Dependências de validação nativa ficam adiadas por decisão do usuário, sem marcar T06/T07 completas.
 
 ## Quando retomar os ports

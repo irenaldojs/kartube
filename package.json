@@ -24,7 +24,8 @@
     "android:init": "npm run --workspace @kartube/native android:init --",
     "dev:android": "npm run --workspace @kartube/native android:dev --",
     "build:android": "npm run --workspace @kartube/native android:build --",
-    "check:native": "node scripts/native-smoke.mjs"
+    "check:native": "node scripts/native-smoke.mjs",
+    "check:web:dev": "node scripts/web-dev-smoke.mjs"
   },
   "devDependencies": {
     "@tauri-apps/cli": "2.12.4",
