@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { RACE_GATES } from './race-track.ts';
 import { createKartModel, loadKartSource } from './kart-model.ts';
 import { SceneAssets } from './assets.ts';
 import { createCameraRig, type CameraMode, type KartPose } from './camera.ts';
@@ -39,6 +40,7 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
       const mesh = new THREE.Mesh(cube, material); mesh.scale.set(x, y, z);
       return mesh;
     }
+    const gateMarkers = new Map<string, THREE.Mesh>();
     if (sceneKind === 'track') {
       const colors = { road: 0x707b80, rail: 0xb8c1c5, ramp: 0x9b8970, boost: 0x66d8bf, item: 0xd5a651, start: 0xf1f3e9, ground: 0x36474b };
       for (const part of TRACK_PARTS) {
@@ -52,6 +54,11 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
       const grid = new THREE.GridHelper(20, 20, 0x94b5a5, 0x667c7b); grid.position.y = 0.01; scene.add(grid);
       assets.geometry(grid.geometry);
       for (const material of Array.isArray(grid.material) ? grid.material : [grid.material]) assets.material(material);
+    }
+    if (sceneKind === 'track') for (const gate of RACE_GATES) {
+      const marker = box(gate.halfExtents.x * 2, 0.06, gate.halfExtents.z * 2, 0xc5e7a4);
+      marker.position.set(gate.center.x, 0.05, gate.center.z); marker.visible = false;
+      scene.add(marker); gateMarkers.set(gate.id, marker);
     }
     const kart = new THREE.Group();
     scene.add(kart);
@@ -81,6 +88,7 @@ export function createView(host: HTMLElement, quality: Quality, onContextLost: (
         kartModel = { source: 'Cart.fbx', dimensions: loaded.dimensions };
       },
       get info() { return { kartModel, assets: assets.info, camera: cameraRig.info, shadow: 'contact', shadowVisible: shadow.visible, scene: sceneKind, ...(sceneKind === 'track' ? { track: TRACK_SUMMARY } : {}), threeVersion: THREE.REVISION, webgl2: true, gpu: String(gl.getParameter(debug ? debug.UNMASKED_RENDERER_WEBGL : gl.RENDERER)), pixelRatio: ratio }; },
+      setRaceTargets(ids: readonly string[]) { gateMarkers.forEach((marker, id) => { marker.visible = ids.includes(id); }); },
       setCameraMode(mode: CameraMode) { cameraRig.setMode(mode); },
       render(position: KartPose, elapsed = 0) {
         if (disposed) return;

@@ -43,3 +43,5 @@ export * from './race-contracts.ts';
 export { isInputFrame } from './input-frame.ts';
 export { LocalRaceSession } from './local-session.ts';
 export type { LocalRaceAuthority, LocalAuthorityFrame, LocalAuthorityEvent, LocalSessionOptions } from './local-session.ts';
+export { createCheckpointRace } from './checkpoint-race.ts';
+export type { RaceGate, CheckpointRaceConfig } from './checkpoint-race.ts';

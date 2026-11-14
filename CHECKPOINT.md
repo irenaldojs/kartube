@@ -1,6 +1,6 @@
 # Checkpoint para retomar o Kartube
 
-**Data:** 2026-11-14 (America/Sao_Paulo). **Foco ativo: versão web; E02-T01 concluída, próxima E02-T02 — largada/checkpoints/voltas. Android e desktop nativo adiados pelo usuário.**
+**Data:** 2026-11-14 (America/Sao_Paulo). **Foco ativo: versão web; E02-T01/T02 concluídas, próxima E02-T03 — respawn seguro e stuck. Android e desktop nativo adiados pelo usuário.**
 
 ## Estado atual
 
@@ -38,7 +38,7 @@ Implementados no web: identificação de build, tempo de boot da cena, janela de
 
 Correção posterior: metadados de build usam `import.meta.env.VITE_BUILD_ID` com fallback `development-unversioned`, evitando ReferenceError em servidor sem a configuração. `npm run check:web:dev` verifica boot com e sem metadados.
 
-E02-T01 implementada: Cart.fbx fornecido pelo usuário substitui a geometria provisória; carregamento, escala e descarte no web; drift por Shift/toque e controle aéreo limitado. Testes de física/controlador/modelo aprovados. Próximo desenvolvimento: E02-T02, largada com contagem regressiva, checkpoints por grafo e voltas configuráveis. Dependências de validação nativa ficam adiadas por decisão do usuário, sem marcar T06/T07 completas.
+E02-T01 implementada: Cart.fbx fornecido pelo usuário substitui a geometria provisória; carregamento, escala e descarte no web; drift por Shift/toque e controle aéreo limitado. Testes de física/controlador/modelo aprovados. E02-T02 implementada: Iniciar corrida, 1/3/5 voltas, largada atrás da linha e countdown 3–2–1; gates direcionais com bifurcação/reencontro da alternativa, HUD mínimo e término. Treino livre preservado. Pausa/ocultação congelam ticks; reposicionar/queda reiniciam a prova. Três voltas automatizadas por inputs Rapier aprovadas nas duas rotas. Colisor arredondado (mesmas dimensões externas) corrige emenda do piso. Smokes web de produção/desenvolvimento aprovados; captura da largada em `artifacts/web/kartube-race.png`. Próximo desenvolvimento: E02-T03 — respawn seguro preservando progresso e detecção de stuck. Dependências de validação nativa ficam adiadas por decisão do usuário, sem marcar T06/T07 completas.
 
 ## Quando retomar os ports
 
@@ -72,4 +72,4 @@ Caminhos de JDK/SDK específicos deste ambiente. Smoke WebDriver, preview web e 
 - [Andamento](docs/ANDAMENTO.md)
 - [Changelog](docs/CHANGELOG.md)
 
-Sem corrida com checkpoints/voltas/resultados ainda. Boosts e caixas são visuais. Áudio, gamepad, pipeline GLB final e assinatura de distribuição permanecem em seus marcos.
+Corrida singleplayer com checkpoints/voltas já implementada; playtest humano de três voltas, posições, recuperação segura, bots e resultados de oito pilotos ainda pendentes. Boosts e caixas são visuais. Áudio, gamepad, pipeline GLB final e assinatura de distribuição permanecem em seus marcos.

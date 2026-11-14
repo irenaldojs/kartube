@@ -2,6 +2,13 @@
 
 Registro cronológico; distinguir proposta de implementação.
 
+## 2026-11-14 — E02-T02 — Corrida com largada e voltas no web
+
+- Corrida opt-in com 1/3/5 voltas, spawn atrás da chegada e contagem 3–2–1. Regra pura de checkpoints direcionais por grafo, com bifurcação/reencontro para a alternativa e bloqueio de voltas por passagens fora de ordem.
+- HUD mínimo de volta/tempo/próximo gate, faixas verdes e chegada. Pausa/ocultação suspendem a corrida; reposicionar reinicia a prova até o respawn seguro da T03.
+- Colisor arredondado com dimensões externas preservadas corrige travamento na emenda do piso da alternativa. Tipos, testes e smokes web de produção/desenvolvimento aprovados, incluindo três voltas por inputs Rapier pelas duas rotas e ciclo da largada/pausa/reinício no navegador.
+- E02-T02 concluída no escopo funcional; playtest humano e critérios globais da etapa continuam abertos. Próxima E02-T03 web; ports nativos adiados.
+
 ## 2026-11-14 — E02-T01 — Cart.fbx, drift e controle aéreo web
 
 - Modelo do usuário substitui o kart de caixas: FBX incluído no build web, escala/orientação ajustadas, materiais preservados e câmeras/luzes de autoria removidas. Cache de bytes e descarte por cena; colisor simples permanece separado.

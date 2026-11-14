@@ -6,7 +6,7 @@
 |---|---|---|---|
 | 00 — Fundamentos | Concluída | Sessões local/remota, codecs TS/Rust, pistas, WebSocket e prova WebGL2/WASM desktop e S20 FE | Critérios de fundamentos atendidos; validações futuras nos respectivos marcos |
 | 01 — Protótipo 3D | Em andamento | Kart dirigível e ciclo de assets/descarte verificado | Foco web: diagnósticos T07 implementados; ports e provas físicas adiados |
-| 02 — Corrida local | Em andamento (web) | E02-T01: Cart.fbx, drift e controle aéreo | E02-T02: largada, checkpoints e voltas |
+| 02 — Corrida local | Em andamento (web) | E02-T01/T02: modelo, controle, largada e voltas por grafo | E02-T03: respawn seguro e stuck |
 | 03 — Bots locais | Planejada | — | 8 pilotos terminam corrida |
 | 04 — Mecânicas | Planejada | — | Rampas, boosts, itens e atalho |
 | 05 — Servidor Rust | Planejada | — | Lobby/sala e conexões |
@@ -62,3 +62,5 @@ Linux `.deb` gerado e smoke Tauri/WebKitGTK aprovado (WebGL2/WASM, pilotagem, pa
 - 2026-11-14: prioridade revisada pelo usuário: desenvolver primeiro o web; ports Android/desktop ficam para depois. Pendências nativas não bloqueiam o desenvolvimento web da etapa 02, sem marcar T06/T07 completas.
 
 - 2026-11-14: E02-T01 implementada no web: modelo Cart.fbx, drift por Shift/toque e controle aéreo moderado. Tipos/testes aprovados, incluindo circuito com rampas/aterrissagens; próxima E02-T02.
+
+- 2026-11-14: E02-T02 implementada no web: treino/corrida, countdown, 1/3/5 voltas e gates direcionais com alternativa válida. Três voltas automatizadas em Rapier aprovadas nas duas rotas; playtest humano segue pendente. Próxima E02-T03.

@@ -19,12 +19,13 @@ export async function createPhysics(sceneKind: SceneKind = 'drop') {
     const spawn = sceneKind === 'track' ? TRACK_SPAWN : { x: 0, y: 3, z: 0 };
     const body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(spawn.x, spawn.y, spawn.z).lockRotations());
     body.enableCcd(true);
-    world.createCollider(RAPIER.ColliderDesc.cuboid(0.9, 0.35, 1.4).setRestitution(0).setFriction(0), body);
+    // Small rounded edges cross flush slab seams without changing the outer kart dimensions.
+    world.createCollider(RAPIER.ColliderDesc.roundCuboid(0.85, 0.30, 1.35, 0.05).setRestitution(0).setFriction(0), body);
     let disposed = false;
     let steps = 0, yaw = 0, grounded = false, resets = 0, drifting = false, airControl = false;
-    const reset = () => {
+    const reset = (position = spawn) => {
       if (disposed) return;
-      body.setTranslation(spawn, true); body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      body.setTranslation(position, true); body.setLinvel({ x: 0, y: 0, z: 0 }, true);
       body.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true); yaw = 0; grounded = false; drifting = false; airControl = false; resets++;
     };
     const step = (input: DrivingInput = NEUTRAL_INPUT) => {

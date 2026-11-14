@@ -70,3 +70,7 @@ Roteiro complementar por perfil/plataforma:
 5. Registrar erros e exclusões explicitamente. Não preencher versões reais de Android/WebView pelo user agent reduzido. T07 só fecha com resultados por plataforma, ou bloqueios documentados.
 
 Referências das APIs: [performance.memory](https://developer.mozilla.org/en-US/docs/Web/API/Performance/memory) e [Web Audio e gesto do usuário](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Best_practices).
+
+## Corrida web — E02-T02
+
+Selecionar 1/3/5 voltas e Iniciar corrida. Confirmar kart atrás da linha e bloqueio de aceleração até 3–2–1 terminar; primeira passagem não concede volta. Seguir faixas verdes e repetir pela alternativa em uma das voltas; chegada deve exigir o percurso válido, congelar tempo e frear. Pausar/ocultar deve suspender contagem e relógio. Reposicionar reinicia a prova inteira nesta versão; recuperação preservando progresso vem na T03. Treino livre continua disponível. Três voltas pelas duas rotas foram verificadas por inputs Rapier automatizados; playtest humano continua pendente.
